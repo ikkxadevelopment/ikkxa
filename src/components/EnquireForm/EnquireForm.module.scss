@@ -1,0 +1,79 @@
+
+
+.card {
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        transition: background-color 5000s ease-in-out 0s;
+        -webkit-text-fill-color: #000000 !important;
+    }
+
+    :global {
+        .form-control {
+            border-radius: 0;
+            font-weight: 400;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #000000;
+        }
+
+        .form-floating>.form-control, .form-floating>.form-select {
+            padding-left: 0;
+            padding-right: 0;
+            background: transparent;
+            border-width: 0 0 1px 0;
+        }
+        .form-floating>.form-select {
+            line-height: 1.2;
+            height: auto;
+            border-radius: 0;
+           
+            &:focus {
+                box-shadow: none;
+                border-color: #000000;
+            }
+        }
+
+        .form-floating>label {
+            padding: 0.8rem 0rem;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .form-floating>label::after {
+            background-color: transparent;
+            display: none;
+        }
+    }
+}
+
+
+
+.success {
+    background-color: rgba(255, 255, 255, 0.822);
+    border-radius: 15px;
+    width: 100%;
+    backdrop-filter: blur(19px);
+    padding: 11px;
+    opacity: 0;
+    max-width: 300px;
+    box-shadow: 0px 3px 5px 1px rgb(164 151 151 / 17%);
+
+    &_img {
+        --size: 30px;
+        width: var(--size);
+        height: var(--size);
+        background-color: #0dd985;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+
+      
+    }
+
+    &_content {
+        font-size: 12px;
+
+    }
+}

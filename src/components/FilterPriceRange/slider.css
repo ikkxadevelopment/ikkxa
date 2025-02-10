@@ -1,0 +1,28 @@
+.range-slider {
+    
+    @apply w-full h-[4px] bg-gray-200 rounded-lg cursor-pointer;
+  }
+  
+  .range-slider-track {
+    @apply bg-red-500 h-[4px] rounded-lg;
+  }
+  
+  .range-slider-thumb {
+    @apply w-2 h-2 bg-blue-500 rounded-full cursor-pointer;
+  }
+  
+  .range-slider-thumb-active {
+    @apply w-4 h-4 bg-blue-700 rounded-full cursor-pointer;
+  }
+
+  .range-slider__range {
+    @apply h-[4px]
+  }
+
+  .range-slider .range-slider__thumb {
+    @apply w-[14px] h-[14px] bg-black;
+  }
+
+  .range-slider .range-slider__range {
+    @apply  bg-black;
+  }

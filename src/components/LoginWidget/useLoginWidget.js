@@ -141,7 +141,7 @@ export const useLoginWidget = ({ }) => {
                 if(pathname.includes("cart")){
                     console.log("in cart page");
                 } else {
-                    router.push('/');
+                    // router.push('/');
                 }
             }
         } catch (error) {

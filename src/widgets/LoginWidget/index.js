@@ -104,10 +104,10 @@ export default function LoginWidget() {
                                                                 </div>
 
                                                                 <button type="submit" className="btn btn-lg btn-primary w-full">{t('SendOTP')}</button>
-                                                                <button onClick={handleGoogleSignIn} role='button' className="btn btn-lg border w-full flex justify-center items-center">
+                                                                {/* <button onClick={handleGoogleSignIn} role='button' className="btn btn-lg border w-full flex justify-center items-center">
                                                                     <span className='me-2 text-xl'><FcGoogle /></span>
                                                                     Sign in with Google
-                                                                </button>
+                                                                </button> */}
                                                                 <div className="text-center">
                                                                     <p className='text-xs mt-5 text-[#565656]'>By continuing, you agree to Voizzit’s <Link href="/">Terms of Service</Link> and <Link href="/">Privacy Policy</Link></p>
                                                                 </div>

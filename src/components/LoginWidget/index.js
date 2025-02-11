@@ -193,7 +193,7 @@ export default function LoginWidget({ }) {
                     >
                       {isSubmitting ? `${t('Loading')}...` : `${t('SendOTP')}`}
                     </button>
-                    <button
+                    {/* <button
                       onClick={handleGoogleSignIn}
                       className="btn btn-lg border w-full flex justify-center items-center"
                       type="button"
@@ -202,7 +202,7 @@ export default function LoginWidget({ }) {
                         <FcGoogle />
                       </span>
                       {t('SignInWithGoogle')}
-                    </button>
+                    </button> */}
                     <div className="text-center">
                       <p className="text-xs mt-5 text-[#565656]">
                         {t('ByContinuing')}{" "}

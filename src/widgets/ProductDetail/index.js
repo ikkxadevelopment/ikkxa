@@ -37,11 +37,12 @@ import {
 import { FaWhatsapp, FaFacebook } from "react-icons/fa";
 import { IoCopyOutline } from "react-icons/io5";
 import { useToast } from "@/hooks/use-toast";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
 export default function ProductDetail({ data,structuredData, isOutOfStock }) {
   const t = useTranslations("Index");
   // console.log(structuredData,data,"structuredData");
+
   useHeaderSecondary(true);
   const datas = data?.results;
   const currency = getCurrency();
@@ -125,6 +126,27 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
       )}`
     );
   };
+
+
+  const variantParentRef = useRef(null); // Create a ref for the variant parent div
+
+  // Function to scroll to the variant parent div
+  const scrollToVariantParent = () => {
+    if (variantParentRef.current) {
+      variantParentRef.current.scrollIntoView({
+        behavior: "smooth",  // Smooth scrolling effect
+        block: "start",      // Align to the top of the container
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Check if there's an error message for the current product and scroll to the variant section
+    if (errorMessages[datas?.product.id]) {
+      scrollToVariantParent();
+    }
+  }, [errorMessages, datas?.product.id]); // Run this effect when errorMessages or product ID changes
+
 
   return (
     <Suspense fallback={<p className="text-center py-10">Loading...</p>}>
@@ -259,7 +281,7 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
                 </div>
               )}
 
-              <div className="py-3 lg:py-4 border-b border-gray-200">
+              <div className="py-3 lg:py-4 border-b border-gray-200" ref={variantParentRef}>
                 <div className="flex items-center gap-4">
                   <DetailCounter
                     data={productDetail}
@@ -273,7 +295,7 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
                 </div>
               </div>
 
-              <div className="py-3 lg:py-4 border-b border-gray-200">
+              <div className="py-3 lg:py-4 border-b border-gray-200" >
                 <p className="text-stone-950 text-base font-semibold mb-3">
                   {t("Size")}: {productDetail?.size}
                 </p>

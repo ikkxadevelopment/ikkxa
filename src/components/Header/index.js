@@ -289,7 +289,6 @@ export default function Header({ data, menu }) {
                     <Link
                       href={`${link?.url}`}
                       className="rounded-md text-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50"
-                      prefetch={false}
                     >
                       {link?.label}
                     </Link>
@@ -302,7 +301,6 @@ export default function Header({ data, menu }) {
                               key={j}
                               href={subcat.url}
                               className="block px-4 py-2 text-sm hover:bg-gray-100"
-                              prefetch={false}
                             >
                               {subcat.title}
                             </Link>

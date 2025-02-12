@@ -21,7 +21,7 @@ import ProductsSlider from "@/widgets/ProductsSlider";
 
 export async function generateMetadata({ params: { lang } }) {
   const [locale, country] = lang.split("-");
-  const seoData = await getMetaData(locale);
+  const seoData = await getMetaData(lang);
 
   return {
     title: seoData?.message?.tittle || "IKKXA - Online Shopping",

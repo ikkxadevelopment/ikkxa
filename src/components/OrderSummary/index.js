@@ -143,7 +143,7 @@ export default function OrderSummary({ data }) {
       )}
       {data?.formatted_shipping_cost !== "0" && (
         <div className="px-3 py-2 bg-green-100 rounded-sm border text-emerald-500 text-xs font-semibold">
-          {t("GetFreeShipping")}
+          {t("GetFreeShipping")} {currency}
         </div>
       )}
       {addressIsModalOpen && (

@@ -15,7 +15,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
-export default function Coupon({ data }) {
+export default function Coupon({ data, setCouponApplied }) {
   const lang = useLocale();
   const [locale, country] = lang.split('-');
   const t = useTranslations("Index");
@@ -56,6 +56,7 @@ export default function Coupon({ data }) {
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
         resetForm({ values: { couponCode: "" } });
         setAppliedCoupon({});
+        setCouponApplied(false)
       } else {
         console.log("sdfsdf");
       }
@@ -84,6 +85,7 @@ export default function Coupon({ data }) {
       if (result.success) {
         mutate(`${GET_CART}lang=${locale}&token=true`);
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
+        setCouponApplied(true)
       } else {
         setErrors({ apiError: result.message || "Failed to apply coupon" });
       }

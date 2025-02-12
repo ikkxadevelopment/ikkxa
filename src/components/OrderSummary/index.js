@@ -22,6 +22,7 @@ export default function OrderSummary({ data }) {
     useRecoilState(addressIsOpen);
   const { data: address, error: addressError } = useSWR(`${ALL_ADDRESSES}`);
   const [isLogined, setIsLogined] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
   const currency = getCurrency();
   const defaultAddress =
     address?.data?.addresses?.find((item) => item.default_shipping === 1) ||
@@ -39,7 +40,7 @@ export default function OrderSummary({ data }) {
       <h4 className=" text-black text-lg font-semibold mb-3">
         {t("OrderSummary")}
       </h4>
-      <Coupon />
+      <Coupon setCouponApplied={setCouponApplied} />
 
       {/* position: fixed;
     z-index: 1;

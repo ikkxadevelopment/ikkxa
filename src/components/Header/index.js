@@ -293,7 +293,7 @@ export default function Header({ data, menu }) {
                       {link?.label}
                     </Link>
                     {link?.subcategories && link.subcategories.length > 0 && (
-                      <div className="absolute left-0 hidden group-hover:block min-w-[500px] bg-white shadow-lg rounded-md mt-1 py-2 lg:p-5 
+                      <div className="absolute start-0 hidden group-hover:block min-w-[500px] bg-white shadow-lg rounded-md mt-1 py-2 lg:p-5 
                         opacity-0 group-hover:opacity-100 transition-all duration-200 ease-in-out transform group-hover:translate-y-0 translate-y-1">
                         <div className="grid grid-cols-2 gap-2">
                           {link.subcategories.map((subcat, j) => (

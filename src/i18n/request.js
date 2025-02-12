@@ -1,3 +1,25 @@
+// import { notFound } from 'next/navigation';
+// import { getRequestConfig } from 'next-intl/server';
+// import { routing } from './routing';
+
+// export default getRequestConfig(async ({ requestLocale }) => {
+//   // Validate that the incoming `locale` parameter is valid
+//   let locale = await requestLocale;
+//   // if (!routing.locales.includes(locale)) notFound();
+//    if (!locale || !routing.locales.includes(locale)) {
+//        locale = routing.defaultLocale;
+//     }
+//   const currentLocale = locale?.split(",")[0]?.split("-")[0]
+//   return {
+//     messages: (
+//       await (currentLocale === 'en'
+//         ? // When using Turbopack, this will enable HMR for `en`
+//           import('../../messages/en.json')
+//         : import(`../../messages/${currentLocale}.json`))
+//     ).default
+//   };
+// });
+
 import { notFound } from 'next/navigation';
 import { getRequestConfig } from 'next-intl/server';
 import { routing } from './routing';
@@ -5,13 +27,9 @@ import { routing } from './routing';
 export default getRequestConfig(async ({ requestLocale }) => {
   // Validate that the incoming `locale` parameter is valid
   let locale = await requestLocale;
-  // if (!routing.locales.includes(locale)) notFound();
-   if (!locale || !routing.locales.includes(locale)) {
-       locale = routing.defaultLocale;
-    }
+  if (!routing.locales.includes(locale)) notFound();
   const currentLocale = locale?.split(",")[0]?.split("-")[0]
   return {
-    locale,
     messages: (
       await (currentLocale === 'en'
         ? // When using Turbopack, this will enable HMR for `en`
@@ -20,6 +38,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ).default
   };
 });
+
+
 
 
 // + import {routing} from './i18n/routing';

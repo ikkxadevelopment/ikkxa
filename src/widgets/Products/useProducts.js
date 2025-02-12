@@ -1,12 +1,12 @@
 import { FILTER, FILTER_PRODUCTS } from "@/constants/apiRoutes";
 import qs from "qs";
-// import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback, useDebounce } from "use-debounce";
 import useSWRInfinite from "swr/infinite";
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/routing";
-import { useSearchParams } from "next/navigation";
+// import { usePathname, useRouter } from "@/i18n/routing";
+// import { useSearchParams } from "next/navigation";
 
 // const fetcher = (url) => axios.get(url).then((res) => res.data);
 

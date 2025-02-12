@@ -6,12 +6,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // Validate that the incoming `locale` parameter is valid
   let locale = await requestLocale;
   if (!routing.locales.includes(locale)) notFound();
-
-  // Extract the primary locale (e.g., 'en-US' -> 'en')
-  const currentLocale = locale?.split(",")[0]?.split("-")[0];
-
+  const currentLocale = locale?.split(",")[0]?.split("-")[0]
   return {
-    locale: currentLocale, // Ensure locale is returned
     messages: (
       await (currentLocale === 'en'
         ? // When using Turbopack, this will enable HMR for `en`
@@ -20,6 +16,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ).default
   };
 });
+
 
 // import {getRequestConfig} from 'next-intl/server';
 // import {routing} from '@/i18n/routing';

@@ -8,6 +8,8 @@ import {getMessages} from 'next-intl/server';
 import { Toaster } from "@/components/ui/toaster";
 import { getFooter, getGlobal, getMenuData } from "@/lib/getHome";
 import { GoogleTagManager } from '@next/third-parties/google' 
+import { Analytics } from '@vercel/analytics/next';
+
 
 const inter = Inter({ subsets: ["latin"] ,
   weight: ['300', '400', '500', '600', '700']});
@@ -49,6 +51,7 @@ export default async function RootLayout({
             <Toaster />
         </GlobalProviders>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
       <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TR3CTMHB"
 height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe></noscript>

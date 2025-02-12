@@ -50,7 +50,6 @@ export async function generateMetadata({ params: { product, lang } }) {
 
 export default async function ProductDetailPage({ params: { product, lang } }) {
   const [locale, country] = lang.split("-");
-  console.warn(lang,product,'NEXT_LOCALE');
 
   const data = await getSingleProduct(product, locale, country);
   const isOutOfStock = data?.results?.product?.stock.every(item => item.current_stock === 0);

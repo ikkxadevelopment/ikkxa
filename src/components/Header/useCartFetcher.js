@@ -43,7 +43,7 @@ export const useCartFetcher = () => {
     cart: data?.data?.carts,  
     cartLength,
     calculations: data?.data?.calculations,
-    isLoading: error && !data,
+    isLoading: !error && !data,
     isError: error,
   };
 };

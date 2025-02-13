@@ -27,13 +27,12 @@ const CartWidget = () => {
   const t = useTranslations("Index");
   // const { cart, isLoading, isError, addItem, removeItem } = useCartWidget();
   const { width } = useGetDeviceType();
-  const { cart, calculations, isLoading } = useCartFetcher();
-
-
+  const { cart, calculations, isLoading, isError } = useCartFetcher();
   if (isLoading) return <CartSkeleton/>;
+  
   return (
     <section className="">
-      {cart?.length>0?
+      {(!isLoading&&cart?.length>0)?
       <>
        <div className="container">
         {width >= 992 && (

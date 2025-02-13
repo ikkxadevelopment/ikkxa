@@ -23,7 +23,8 @@ const useProducts = ({ slug }) => {
     minPrice: 0,
     maxPrice: 899,
     attribute_value_id: [],
-    child_category:[]
+    child_category:[],
+    type:""
   });
   const [tempFilters, setTempFilters] = useState(filters);
   const [debouncedMinPrice] = useDebounce(filters.minPrice, 300);
@@ -36,7 +37,7 @@ const useProducts = ({ slug }) => {
     maxPrice: 899,
     attribute_value_id: [],
     child_category:[],
-    
+    type:""
   };
 
   const createQueryParams = (filters) => {
@@ -64,6 +65,10 @@ const useProducts = ({ slug }) => {
         searchParams.append("sub_category", id);
       });
     }
+    if (filters?.type) {
+      searchParams.set("type", filters?.type);
+    }
+
 
     return searchParams.toString();
   };
@@ -82,6 +87,7 @@ const useProducts = ({ slug }) => {
     const maxPrice = searchParams.get("priceMax");
     const attributeValues = searchParams.getAll("product_category");
     const childValues = searchParams.getAll("sub_category");
+    const type = searchParams.get("type"); 
     const q=searchParams.getAll("q")
     if (sort) newFilters.sort = sort;
     if (minPrice && maxPrice) {
@@ -106,6 +112,9 @@ const useProducts = ({ slug }) => {
     }
     if(q){
       newFilters.q = q;
+    }
+    if (type) {  // Add this check
+      newFilters.type = type;
     }
 
 
@@ -243,6 +252,7 @@ const useProducts = ({ slug }) => {
         price: `{"min":${debouncedMinPrice},"max":${debouncedMaxPrice}}`,
         attribute_value_id: filters.attribute_value_id,
         child_category: filters.child_category,
+        type: filters.type,
         route: isSearchPage ? "all.products" :"product.by.category",
       },
       { encodeValuesOnly: true, arrayFomat: "brackets" }

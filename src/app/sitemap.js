@@ -13,7 +13,7 @@ export async function generateSitemaps() {
 function getApiUrl(region) {
   const baseUrls = {
     sa: 'https://ksa.ikkxa.com/web-api/site-map',
-    ae: 'https://ksa.ikkxa.com/web-api/site-map',
+    ae: 'https://uae.ikkxa.com/web-api/site-map',
   };
   return baseUrls[region] || baseUrls.sa; // Fallback to SA if region not found
 }

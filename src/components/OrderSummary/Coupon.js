@@ -57,6 +57,9 @@ export default function Coupon({ data, setCouponApplied }) {
         resetForm({ values: { couponCode: "" } });
         setAppliedCoupon({});
         setCouponApplied(false)
+        window.location.reload(); // Refresh the window
+
+
       } else {
         console.log("sdfsdf");
       }
@@ -86,6 +89,8 @@ export default function Coupon({ data, setCouponApplied }) {
         mutate(`${GET_CART}lang=${locale}&token=true`);
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
         setCouponApplied(true)
+        window.location.reload(); // Refresh the window
+
       } else {
         setErrors({ apiError: result.message || "Failed to apply coupon" });
       }

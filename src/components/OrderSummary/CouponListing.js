@@ -58,6 +58,7 @@ export function CouponListing({}) {
 const CouponItem = ({ data }) => {
   const t = useTranslations("Index");
   const [copied, setCopied] = useState(false);
+  const currency=getCurrency()
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(data?.code);
@@ -74,11 +75,11 @@ const CouponItem = ({ data }) => {
         <span className="mr-2">
           <IoWalletSharp />
         </span>
-        {t('Save100AED')}
+        {data?.code}
       </div>
       <div>
         <div className="pt-2 px-4 pb-3  text-start">
-          <h5 className="text-sm font-semibold">{t('ExtraOff')} </h5>
+          {/* <h5 className="text-sm font-semibold">{t('ExtraOff')} </h5> */}
           <p className="text-xs opacity-60">
             {t('onOrdersAbove')} {data?.minimum_shopping} {currency} {t('and')} {t('discountUpto')}{" "}
             {data?.maximum_discount} {currency}

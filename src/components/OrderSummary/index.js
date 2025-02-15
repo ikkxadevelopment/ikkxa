@@ -91,15 +91,15 @@ export default function OrderSummary({ data }) {
             )}
           </p>
         </div>
-
+        {data?.tax>0&&
         <div className="flex justify-between ">
           <p className="text-black text-sm">{t("VATInclusive")}</p>
           <p className="text-black text-sm ">
             {" "}
             {data?.tax} {currency}
-          </p>
+            </p>
         </div>
-
+      }
 
 
       </div>

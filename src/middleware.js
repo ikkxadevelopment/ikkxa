@@ -97,9 +97,9 @@ const middleware = async (req, ev) => {
   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
   const newPathname = `/${currentLocale}-${countryCode}`;
 
-  // if (!req.nextUrl.pathname.startsWith(newPathname)) {
-  //   return NextResponse.redirect(new URL(newPathname, req.url));
-  // }
+  if (!req.nextUrl.pathname.startsWith(newPathname)) {
+    return NextResponse.redirect(new URL(newPathname, req.url));
+  }
 
   return createMiddleware(routing)(req, ev);
 };
@@ -113,6 +113,8 @@ export const config = {
     '/((?!api|_next|_vercel|.*\\..*).*)'
   ]
 };
+
+
 
 
 // import { getToken } from "next-auth/jwt";

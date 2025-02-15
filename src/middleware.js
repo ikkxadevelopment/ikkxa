@@ -76,7 +76,6 @@
 
 // export { auth as middleware } from "@/auth"
 
-
 import { getToken } from "next-auth/jwt";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
@@ -89,13 +88,20 @@ const middleware = async (req, ev) => {
   const isProtectedRoute = protectedPaths.some((path) =>
     req.nextUrl.pathname.includes(path)
   );
+  
+  const cookies = req.cookies;
+  const nextLocale = cookies.get('NEXT_LOCALE')?.value;
+  let selectedCountryCode = nextLocale.match(/-(\w+)$/)?.[1]
 
-  // Check geo location
-  const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
-
+  // If no country is selected manually, use the geo-detected country
+  if (!selectedCountryCode) {
+    // Check geo location
+    const detectedCountry = req.geo?.country || 'SA'; // Default to Saudi if geo is unavailable
+    selectedCountryCode = detectedCountry === 'AE' ? 'AE' : 'SA';
+  }
 
   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
-  const newPathname = `/${currentLocale}-${countryCode}`;
+  const newPathname = `/${currentLocale}-${selectedCountryCode}`;
 
   if (!req.nextUrl.pathname.startsWith(newPathname)) {
     return NextResponse.redirect(new URL(newPathname, req.url));
@@ -110,10 +116,9 @@ export const config = {
   matcher: [
     '/',
     '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
-    '/((?!api|_next|_vercel|.*\\..*).*)'
+    '/((?!api|_next|_vercel|.\\..).*)'
   ]
 };
-
 
 
 

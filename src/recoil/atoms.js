@@ -76,6 +76,14 @@ export const trax_id = atom({
   effects: [localStorageEffect('trax_id')],
   
 });
+
+export const couponAppliedState = atom({
+  key: `couponAppliedState`,
+  default: null, // Default value
+  effects: [localStorageEffect('couponAppliedState')],
+});
+
+
 export const headerState = atom({
   key: `headeraa_${getUniqueKey()}`,
   default: false,
@@ -85,3 +93,4 @@ export const addressIsOpen = atom({
   key: `addr_${getUniqueKey()}`,
   default: false,
 });
+

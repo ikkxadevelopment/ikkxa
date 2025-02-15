@@ -28,7 +28,13 @@ export default function Coupon({ data, setCouponApplied }) {
 
   useEffect(() => {
     setAppliedCoupon(appliedData?.data[0]);
-    setCouponApplied(appliedData?.data[0])
+    // setCouponApplied(appliedData?.data[0])
+    if(appliedData?.data?.length>0){
+      setCouponApplied(appliedData?.data[0])
+    } else {
+      setCouponApplied({})
+    }
+    console.log(appliedData,"appliedData");
   }, [appliedData]);
   //   const couponId = appliedData?.data[0]?.coupon_id;
   const validationSchema = Yup.object({
@@ -57,7 +63,7 @@ export default function Coupon({ data, setCouponApplied }) {
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
         resetForm({ values: { couponCode: "" } });
         setAppliedCoupon({});
-        setCouponApplied("")
+        setCouponApplied({})
         window.location.reload(); // Refresh the window
 
 
@@ -89,7 +95,10 @@ export default function Coupon({ data, setCouponApplied }) {
       if (result.success) {
         mutate(`${GET_CART}lang=${locale}&token=true`);
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
+        if(appliedData?.data[0]){
         setCouponApplied(appliedData?.data[0])
+
+      }
         window.location.reload(); // Refresh the window
 
       } else {

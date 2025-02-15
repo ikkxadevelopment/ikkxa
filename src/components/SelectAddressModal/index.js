@@ -14,8 +14,8 @@ import useCheckout from "../OrderSummary/useCheckout";
 import { ALL_ADDRESSES } from "@/constants/apiRoutes";
 import useSWR from "swr";
 import { useCartFetcher } from "../Header/useCartFetcher";
-import { checkoutDataState } from "@/recoil/atoms";
-import { useRecoilState } from "recoil";
+import { checkoutDataState, couponAppliedState } from "@/recoil/atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useTranslations } from "next-intl";
 
 export function SelectAddressModal({}) {
@@ -31,6 +31,7 @@ export function SelectAddressModal({}) {
   );
   const data = calculations;
   const { handleCheckout } = useCheckout();
+  const couponApplied = useRecoilValue(couponAppliedState);
   let updatedObject;
   let def;
   const handleChangeAddress = (value) => {
@@ -45,7 +46,7 @@ export function SelectAddressModal({}) {
       billing_address: defaultAddress,
     };
     setCheckoutData(updatedObject)
-    handleCheckout(defaultAddress?.id,"IKKXA100")
+    handleCheckout(defaultAddress?.id,`${couponApplied?.coupon_code?couponApplied?.coupon_code:""}`)
     setIsOpen(false);
   }
   return (

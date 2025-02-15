@@ -11,7 +11,7 @@ import { AddressModal } from "../AddressModal";
 import { useSession } from "next-auth/react";
 import { LoginModal } from "../LoginModal";
 import { useRecoilState } from "recoil";
-import { addressIsOpen, loginIsOpen } from "@/recoil/atoms";
+import { addressIsOpen, couponAppliedState, loginIsOpen } from "@/recoil/atoms";
 import getCurrency from "@/hooks/getCurrency";
 
 export default function OrderSummary({ data }) {
@@ -22,7 +22,7 @@ export default function OrderSummary({ data }) {
     useRecoilState(addressIsOpen);
   const { data: address, error: addressError } = useSWR(`${ALL_ADDRESSES}`);
   const [isLogined, setIsLogined] = useState(false);
-  const [couponApplied, setCouponApplied] = useState("");
+  const [couponApplied, setCouponApplied] = useRecoilState(couponAppliedState);
   const currency = getCurrency();
   const defaultAddress =
     address?.data?.addresses?.find((item) => item.default_shipping === 1) ||
@@ -114,7 +114,7 @@ export default function OrderSummary({ data }) {
         <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
           <button
             className="w-full btn btn-grad btn-lg lg:mb-3 "
-            onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code}`)}
+            onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code?couponApplied?.coupon_code:""}`)}
           >
             {console.log(couponApplied,"couponApplied")}
             {loading ? `${t("Loading")}` : `${t("ProceedToCheckout")}`}

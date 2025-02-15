@@ -22,7 +22,7 @@ export default function OrderSummary({ data }) {
     useRecoilState(addressIsOpen);
   const { data: address, error: addressError } = useSWR(`${ALL_ADDRESSES}`);
   const [isLogined, setIsLogined] = useState(false);
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponApplied, setCouponApplied] = useState("");
   const currency = getCurrency();
   const defaultAddress =
     address?.data?.addresses?.find((item) => item.default_shipping === 1) ||
@@ -114,8 +114,9 @@ export default function OrderSummary({ data }) {
         <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
           <button
             className="w-full btn btn-grad btn-lg lg:mb-3 "
-            onClick={() => handleCheckout(defaultAddress?.id, "IKKXA100")}
+            onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code}`)}
           >
+            {console.log(couponApplied,"couponApplied")}
             {loading ? `${t("Loading")}` : `${t("ProceedToCheckout")}`}
           </button>
         </div>

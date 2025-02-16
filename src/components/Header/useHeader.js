@@ -35,33 +35,33 @@ export const useHeader = () => {
 
 
  
-  // const onSelectChange = (lang) => {
-
-    
-  //   const nextLocale = lang;
-    
-  //   startTransition(() => {
-  //     router.replace(
-  //       // Adjust this line according to your routing logic
-  //       { pathname, params },
-  //       { locale: nextLocale }
-  //     );
-  //   });
-  // }
-
-
   const onSelectChange = (lang) => {
-    const currentPath = window.location.pathname;
-    const match = currentPath.match(/^\/(en|ar)-(SA|AE)/);
+
     
-    if (match) {
-      const currentCountry = match[2];
-      const restOfPath = currentPath.replace(/^\/(en|ar)-(SA|AE)/, '');
-      const newPath = `/${lang}-${currentCountry}`;
+    const nextLocale = lang;
+    
+    startTransition(() => {
+      router.replace(
+        // Adjust this line according to your routing logic
+        { pathname, params },
+        { locale: nextLocale }
+      );
+    });
+  }
+
+
+  // const onSelectChange = (lang) => {
+  //   const currentPath = window.location.pathname;
+  //   const match = currentPath.match(/^\/(en|ar)-(SA|AE)/);
+    
+  //   if (match) {
+  //     const currentCountry = match[2];
+  //     const restOfPath = currentPath.replace(/^\/(en|ar)-(SA|AE)/, '');
+  //     const newPath = `/${lang}-${currentCountry}`;
       
-      window.location.href = newPath;
-    }
-  };
+  //     window.location.href = newPath;
+  //   }
+  // };
 
   return {
     main,

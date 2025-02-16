@@ -8,7 +8,7 @@ export default function FilterSideBar({ data,setSliderValue, catId,isFilterCheck
   const t = useTranslations("Index");
   return (
     <div className="">
-      <h2 className="text-md font-semibold">{t('filters')}</h2>
+      <h2 className="text-md font-semibold">{t('FILTERS')}</h2>
       <FilterPriceRange setSliderValue={setSliderValue} sliderValue={sliderValue} filter={filters}  handleFilterChange={handleFilterChange} handlePriceChange={handlePriceChange} />
       
       {data?.results?.categories?.map((item, i) => {

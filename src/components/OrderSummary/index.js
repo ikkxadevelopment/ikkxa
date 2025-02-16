@@ -40,7 +40,7 @@ export default function OrderSummary({ data }) {
       <h4 className=" text-black text-lg font-semibold mb-3">
         {t("OrderSummary")}
       </h4>
-      <Coupon setCouponApplied={setCouponApplied} />
+      <Coupon session={session} setCouponApplied={setCouponApplied} />
 
       {/* position: fixed;
     z-index: 1;

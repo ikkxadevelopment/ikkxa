@@ -154,7 +154,7 @@ export const useCartWidget = () => {
   
     toast({
       variant: "destructive",
-      description: "Product is out of stock",
+      description: `${t("ProductIsOutOfStock")}`,
     });
   };
 
@@ -167,7 +167,7 @@ export const useCartWidget = () => {
           mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
         }
         toast({ 
-          title: "Item removed from cart",
+          title: `${t('ItemRemovedFromCart')}`,
           variant: "destructive",
         })
       // }
@@ -185,14 +185,14 @@ export const useCartWidget = () => {
         if(res.success){
           mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`)
           toast({ 
-            title: "Cart item updated",
+            title: `${t('CartItemUpdated')}`,
             variant: "success",
             
            })
           return res
         } else{
           toast({ 
-            title: "Cart item not updated",
+            title: `${t('CartItemNotUpdated')}`,
             variant: "destructive",
           })
           return res
@@ -228,7 +228,7 @@ export const useCartWidget = () => {
       } else {
         // Set an error message for out-of-stock scenario
         setErrorMessages({
-          [productId]: "Out of stock for this variant."
+          [productId]: `${t("OutOfStockForThisVariant")}`
         });
       }
     } else {

@@ -246,7 +246,12 @@
     "StartAddingItems":"قم بإضافة منتجاتك المفضلة لقائمة الرغبات بالضغط على رمز القلب",
     "Outofstock":"غير متوفر",
     "CopyLink": "نسخ الرابط",
-    "LinkCopied": "تم نسخ الرابط"
+    "LinkCopied": "تم نسخ الرابط",
+    "ItemRemovedFromCart": "تمت إزالة العنصر من العربة",
+    "CartItemUpdated": "تم تحديث عنصر العربة",
+    "CartItemNotUpdated": "لم يتم تحديث عنصر العربة",
+    "ProductIsOutOfStock": "المنتج غير متوفر في المخزون",
+    "OutOfStockForThisVariant": "غير متوفر في المخزون لهذا النوع."
   }
 }
 

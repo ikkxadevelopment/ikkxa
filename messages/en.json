@@ -246,6 +246,11 @@
       "StartAddingItems":"Start adding items you love to your wishlist by tapping on the heart icon",
       "Outofstock":"Out of stock",
       "CopyLink": "Copy Link",
-      "LinkCopied": "Link copied to clipboard"
+      "LinkCopied": "Link copied to clipboard",
+      "ItemRemovedFromCart": "Item removed from cart",
+      "CartItemUpdated":"Cart item updated",
+      "CartItemNotUpdated":"Cart item not updated",
+      "ProductIsOutOfStock": "Product is out of stock",
+      "OutOfStockForThisVariant": "Out of stock for this variant."
     }
   }

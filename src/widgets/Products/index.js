@@ -25,6 +25,9 @@ import NoData from "./NoData";
 import { useTranslations } from "next-intl";
 import LoadMoreComponent from "./LoadMoreComponent";
 import { Link } from "@/i18n/routing";
+import { useEffect } from "react";
+import { isComponentPresentState } from "@/recoil/atoms";
+import { useRecoilState } from "recoil";
 
 export default function Products({ slug }) {
   const t = useTranslations("Index");
@@ -59,6 +62,13 @@ export default function Products({ slug }) {
     products[products?.length - 1]?.results?.products?.has_more_data;
   const nodata =
     products && products[products?.length - 1]?.results?.products?.total;
+
+    const [, setIsComponentPresent] = useRecoilState(isComponentPresentState);
+
+    useEffect(() => {
+      setIsComponentPresent(true);
+      return () => setIsComponentPresent(false); 
+    }, []);
 
   return (
     <section className=" pb-[60px]">

@@ -12,21 +12,33 @@ import { IoWalletSharp } from "react-icons/io5";
 import { BiSolidOffer } from "react-icons/bi";
 import { useTranslations } from "next-intl";
 import getCurrency from "@/hooks/getCurrency";
+import { useSession } from "next-auth/react";
+import { LoginModal } from "../LoginModal";
+import { useRecoilState } from "recoil";
+import { loginIsOpen } from "@/recoil/atoms";
 
 export function CouponListing({}) {
   const t = useTranslations("Index");
+  const session = useSession();
   const currency=getCurrency()
   const [isOpen, setIsOpen] = useState(false);
+  const [isLogined, setIsLogined] = useState(false);
   const { data, error } = useSWR(`${GET_COUPONS}`);
+    const [isLoginOpen, setIsLoginOpen] = useRecoilState(loginIsOpen);
 
   return (
+    <>
     <Dialog
       open={isOpen}
       className="bg-red-400"
       onOpenChange={(open) => {
-        setIsOpen(open);
-        if (!open) {
+        if (session?.status === "authenticated") {
+          setIsOpen(open);
           //   formik.resetForm();
+        } else {
+          setIsLogined(true);
+          setIsLoginOpen(true);
+
         }
       }}
     >
@@ -52,6 +64,8 @@ export function CouponListing({}) {
         </DialogHeader>
       </DialogContent>
     </Dialog>
+    {isLogined && !isLoginOpen && <LoginModal />}
+    </>
   );
 }
 

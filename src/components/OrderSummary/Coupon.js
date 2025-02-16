@@ -14,9 +14,11 @@ import { trax_id } from "@/recoil/atoms";
 import useSWR, { useSWRConfig } from "swr";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Coupon({ data, setCouponApplied }) {
   const lang = useLocale();
+  const session = useSession();
   const [locale, country] = lang.split('-');
   const t = useTranslations("Index");
   const trx = useRecoilValue(trax_id);
@@ -133,7 +135,7 @@ export default function Coupon({ data, setCouponApplied }) {
                   id="couponCode"
                   className="input font-semibold"
                   //   value={values.couponCode}
-                  disabled={appliedCoupon?.length > 0}
+                  disabled={appliedCoupon?.length > 0 || session?.status !== "authenticated"}
                   placeholder={t('EnterVoucher')}
                 />
               </div>
@@ -149,7 +151,7 @@ export default function Coupon({ data, setCouponApplied }) {
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || session?.status !== "authenticated"}
                 >
                   {isSubmitting ? `${t('Applying')}...` : `${t('Apply')}`}
                 </button>

@@ -12,24 +12,23 @@ import {
 import PaymetnIcons from "@/components/PaymentIcons";
 import OrderSummary from "@/components/OrderSummary";
 import useGetDeviceType from "@/hooks/useGetDeviceType";
-import useSWR from "swr";
-import { useSession } from "next-auth/react";
-import axios from "axios";
-import { GET_CART } from "@/constants/apiRoutes";
-import { swrFetcher } from "@/utils/fetcher";
-import useSWRFetcher from "@/hooks/swrFetcher";
 import { useCartFetcher } from "@/components/Header/useCartFetcher";
 import NoCart from "./NoCart";
 import { CartSkeleton } from "./CartSkeleton";
 import { useTranslations } from "next-intl";
+import { useRecoilState } from "recoil";
+import { isComponentPresentState } from "@/recoil/atoms";
+import { useEffect } from "react";
+import useHeaderSecond from "@/hooks/useHeaderSecond";
 
 const CartWidget = () => {
   const t = useTranslations("Index");
+  useHeaderSecond()
   // const { cart, isLoading, isError, addItem, removeItem } = useCartWidget();
   const { width } = useGetDeviceType();
   const { cart, calculations, isLoading, isError } = useCartFetcher();
   if (isLoading) return <CartSkeleton/>;
-  
+
   return (
     <section className="">
       {(!isLoading&&cart?.length>0)?

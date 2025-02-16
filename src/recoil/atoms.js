@@ -94,3 +94,7 @@ export const addressIsOpen = atom({
   default: false,
 });
 
+export const isComponentPresentState = atom({
+  key: 'isComponentPresentState',
+  default: false,
+});

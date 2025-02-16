@@ -262,7 +262,7 @@ export default function LoginWidget({ }) {
                     <button
                       type="submit"
                       className="btn btn-lg btn-primary w-full"
-                      disabled={!isOtpValid || isSubmitting} // Disable if OTP is not valid or submitting
+                      disabled={isSubmitting||(!isOtpValid)} // Disable if OTP is not valid or submitting
                     >
                       {isSubmitting ? `${t('Loading')}...` : "Verify OTP"}
                     </button>
@@ -272,7 +272,7 @@ export default function LoginWidget({ }) {
                         <button
                           className="text-teal-500 font-medium underline ml-2 cursor-pointer"
                           onClick={() => setIsOtpSent(false)}
-                          disabled={isSubmitting} // Disable while submitting
+                          // disabled={isSubmitting} 
                         >
                           {t('ResendOTP')}
                         </button>

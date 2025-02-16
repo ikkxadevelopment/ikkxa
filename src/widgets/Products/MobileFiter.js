@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/sheet";
 import { BsSliders } from "react-icons/bs";
 import { useState } from "react";
-import { MdArrowBack } from "react-icons/md";
-import { useTranslations } from "next-intl";
+import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function MobileFilter({
   data,
@@ -31,7 +31,8 @@ export default function MobileFilter({
     applyMobileFilters(minPrice, maxPrice);
     setIsOpen(false);
   };
-
+  const lang = useLocale();
+  const [locale, country] = lang.split("-");
   return (
     <>
       <button
@@ -47,12 +48,12 @@ export default function MobileFilter({
         <SheetContent side={"left"} className="px-0 h-full pt-0 w-full pb-0">
           <div className="w-full  bg-white shadow grid-cols-3 grid relative z-20 py-[14px] px-3 items-center">
             <button onClick={() => setIsOpen(false)} className="text-2xl">
-              <MdArrowBack />
+            {locale === "ar" ? <MdArrowForward /> : <MdArrowBack />}
             </button>
             <div className=" text-stone-950 text-lg font-semibold text-center">
-              {t("Filters")}
+              {t("FILTERS")}
             </div>
-            <div className="text-right text-neutral-500 text-base font-medium ">
+            <div className="text-end text-neutral-500 text-base font-medium ">
               <button
                 onClick={() => {
                   setIsOpen(false);

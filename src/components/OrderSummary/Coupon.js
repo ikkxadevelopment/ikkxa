@@ -9,17 +9,16 @@ import {
 import { axiosPostWithToken } from "@/lib/getHome";
 import { Input } from "../ui/input";
 import { CouponListing } from "./CouponListing";
-import { useRecoilValue } from "recoil";
-import { trax_id } from "@/recoil/atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { loginIsOpen, trax_id } from "@/recoil/atoms";
 import useSWR, { useSWRConfig } from "swr";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 
-export default function Coupon({ data, setCouponApplied }) {
+export default function Coupon({ data, setCouponApplied, session }) {
   const lang = useLocale();
-  const session = useSession();
-  const [locale, country] = lang.split('-');
+  const [locale, country] = lang.split("-");
+  const [isLoginOpen, setIsLoginOpen] = useRecoilState(loginIsOpen);
   const t = useTranslations("Index");
   const trx = useRecoilValue(trax_id);
   const [appliedCoupon, setAppliedCoupon] = useState({});
@@ -31,18 +30,18 @@ export default function Coupon({ data, setCouponApplied }) {
   useEffect(() => {
     setAppliedCoupon(appliedData?.data[0]);
     // setCouponApplied(appliedData?.data[0])
-    if(appliedData?.data?.length>0){
-      setCouponApplied(appliedData?.data[0])
+    if (appliedData?.data?.length > 0) {
+      setCouponApplied(appliedData?.data[0]);
     } else {
-      setCouponApplied({})
+      setCouponApplied({});
     }
-    console.log(appliedData,"appliedData");
+    console.log(appliedData, "appliedData");
   }, [appliedData]);
   //   const couponId = appliedData?.data[0]?.coupon_id;
   const validationSchema = Yup.object({
     couponCode: Yup.string()
-      .required(`${t('CouponCodeIsRequired')}`)
-      .min(3, `${t('CouponCodeLimitError')}`),
+      .required(`${t("CouponCodeIsRequired")}`)
+      .min(3, `${t("CouponCodeLimitError")}`),
   });
 
   const handleRemoveCoupon = async (resetForm) => {
@@ -65,10 +64,8 @@ export default function Coupon({ data, setCouponApplied }) {
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
         resetForm({ values: { couponCode: "" } });
         setAppliedCoupon({});
-        setCouponApplied({})
+        setCouponApplied({});
         window.location.reload(); // Refresh the window
-
-
       } else {
         console.log("sdfsdf");
       }
@@ -86,33 +83,34 @@ export default function Coupon({ data, setCouponApplied }) {
       coupon_code: values.couponCode,
       trx_id: trx,
     };
+    if (session?.status === "authenticated") {
+      try {
+        const result = await axiosPostWithToken(
+          `${COUPON_APPLY}`,
+          checkoutPayload,
+          lang
+        );
 
-    try {
-      const result = await axiosPostWithToken(
-        `${COUPON_APPLY}`,
-        checkoutPayload,
-        lang
-      );
-
-      if (result.success) {
-        mutate(`${GET_CART}lang=${locale}&token=true`);
-        mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
-        if(appliedData?.data[0]){
-        setCouponApplied(appliedData?.data[0])
-
+        if (result.success) {
+          mutate(`${GET_CART}lang=${locale}&token=true`);
+          mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
+          if (appliedData?.data[0]) {
+            setCouponApplied(appliedData?.data[0]);
+          }
+          window.location.reload(); // Refresh the window
+        } else {
+          setErrors({ apiError: result.message || "Failed to apply coupon" });
+        }
+      } catch (error) {
+        const apiErrorMessage =
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.";
+        setErrors({ apiError: apiErrorMessage });
+      } finally {
+        setSubmitting(false);
       }
-        window.location.reload(); // Refresh the window
-
-      } else {
-        setErrors({ apiError: result.message || "Failed to apply coupon" });
-      }
-    } catch (error) {
-      const apiErrorMessage =
-        error.response?.data?.message ||
-        "Something went wrong. Please try again.";
-      setErrors({ apiError: apiErrorMessage });
-    } finally {
-      setSubmitting(false);
+    } else {
+      setIsLoginOpen(true);
     }
   };
 
@@ -135,8 +133,8 @@ export default function Coupon({ data, setCouponApplied }) {
                   id="couponCode"
                   className="input font-semibold"
                   //   value={values.couponCode}
-                  disabled={appliedCoupon?.length > 0 || session?.status !== "authenticated"}
-                  placeholder={t('EnterVoucher')}
+                  disabled={appliedCoupon?.length > 0}
+                  placeholder={t("EnterVoucher")}
                 />
               </div>
               {appliedCoupon ? (
@@ -151,9 +149,9 @@ export default function Coupon({ data, setCouponApplied }) {
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  disabled={isSubmitting || session?.status !== "authenticated"}
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting ? `${t('Applying')}...` : `${t('Apply')}`}
+                  {isSubmitting ? `${t("Applying")}...` : `${t("Apply")}`}
                 </button>
               )}
             </div>

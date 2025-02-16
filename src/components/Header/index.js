@@ -30,6 +30,7 @@ import {
   cartState,
   userDetail,
   headerState,
+  isComponentPresentState,
 } from "@/recoil/atoms";
 import { useEffect, useRef, useState } from "react";
 import { GET_CART } from "@/constants/apiRoutes";
@@ -44,6 +45,7 @@ import {
 } from "next/navigation";
 import SearchMobile from "../Search/SearchMobile";
 import { useWishlistFetcher } from "./useWishlistFetcher";
+import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 export default function Header({ data, menu }) {
   const { main } = useHeader();
@@ -86,7 +88,7 @@ export default function Header({ data, menu }) {
   //   }};
   //   fetchCartData();
   // },[isLogined, authToken, cartStateItem ])
-
+  const isInside = useRecoilValue(isComponentPresentState);
   return (
     <>
       <header
@@ -97,7 +99,13 @@ export default function Header({ data, menu }) {
       >
         <div className="shadow-sm bg-white z-50  relative py-3 md:py-2">
           <div className="container mx-auto flex justify-between items-center  px-4 md:px-6">
-            <div className="flex">
+            <div className="flex items-center">
+              {isInside?
+              <Link href={"/"} className="text-2xl me-2 lg:hidden">
+                {locale==="ar"?<MdArrowForward />:<MdArrowBack />}
+              
+            </Link>
+            :
               <Sheet>
                 <SheetTrigger className="lg:hidden">
                   <span className="text-2xl">
@@ -239,6 +247,7 @@ export default function Header({ data, menu }) {
                   </div>
                 </SheetContent>
               </Sheet>
+              }
               <Link href="/" className="flex items-center" prefetch={false}>
                 <div className="aspect-[126/52] w-[84px] md:w-[126px] relative me-5">
                   <Image

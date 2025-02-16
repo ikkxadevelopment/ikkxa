@@ -50,9 +50,9 @@ export default function MobileFilter({
               <MdArrowBack />
             </button>
             <div className=" text-stone-950 text-lg font-semibold text-center">
-              {t("Filters")}
+              {t("FILTERS")}
             </div>
-            <div className="text-right text-neutral-500 text-base font-medium ">
+            <div className="text-end text-neutral-500 text-base font-medium ">
               <button
                 onClick={() => {
                   setIsOpen(false);

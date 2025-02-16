@@ -27,7 +27,7 @@ import useHeaderSecondary from "@/hooks/useHeaderSecondary";
 import DetailBack from "@/components/DetailBack";
 import { Link } from "@/i18n/routing";
 import getCurrency from "@/hooks/getCurrency";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +46,8 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
   useHeaderSecondary(true);
   const datas = data?.results;
   const currency = getCurrency();
+
+
 
   // const structuredData = {
   //   "@context": "https://schema.org/",

@@ -34,43 +34,20 @@ export const useHeader = () => {
   // }, []); 
 
 
+ 
   const onSelectChange = (lang) => {
-    // Get the current pathname
-    const currentPath = window.location.pathname;
+
     
-    // Extract current locale-country pattern
-    const match = currentPath.match(/^\/(en|ar)-(SA|AE)/);
+    const nextLocale = lang;
     
-    if (match) {
-      // Keep the current country code
-      const currentCountry = match[2];
-      
-      // Create new path with new language but same country
-      const newPath = currentPath.replace(
-        /^\/(en|ar)-(SA|AE)/,
-        `/${lang}-${currentCountry}`
+    startTransition(() => {
+      router.replace(
+        // Adjust this line according to your routing logic
+        { pathname, params },
+        { locale: nextLocale }
       );
-      
-      startTransition(() => {
-        router.replace(newPath);
-      });
-    }
+    });
   }
-
-
-  // const onSelectChange = (lang) => {
-
-    
-  //   const nextLocale = lang;
-    
-  //   startTransition(() => {
-  //     router.replace(
-  //       // Adjust this line according to your routing logic
-  //       { pathname, params },
-  //       { locale: nextLocale }
-  //     );
-  //   });
-  // }
 
 
   return {

@@ -45,7 +45,7 @@ import {
 } from "next/navigation";
 import SearchMobile from "../Search/SearchMobile";
 import { useWishlistFetcher } from "./useWishlistFetcher";
-import { MdArrowBack } from "react-icons/md";
+import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 export default function Header({ data, menu }) {
   const { main } = useHeader();
@@ -102,7 +102,8 @@ export default function Header({ data, menu }) {
             <div className="flex items-center">
               {isInside?
               <Link href={"/"} className="text-2xl me-2 lg:hidden">
-              <MdArrowBack />
+                {locale==="ar"?<MdArrowForward />:<MdArrowBack />}
+              
             </Link>
             :
               <Sheet>

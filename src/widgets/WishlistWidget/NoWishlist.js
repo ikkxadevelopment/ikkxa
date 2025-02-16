@@ -1,9 +1,11 @@
 "use client";
 import Image from "@/components/Image/image";
+import useHeaderSecond from "@/hooks/useHeaderSecond";
 import { useTranslations } from "next-intl";
 
 const NoWishlist = () => {
   const t = useTranslations("Index");
+  useHeaderSecond()
   return (
     <section className="py-10 min-h-screen flex items-center">
       <div className="container">

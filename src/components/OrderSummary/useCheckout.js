@@ -5,9 +5,9 @@ import { useRecoilState } from "recoil";
 import { checkoutDataState } from "@/recoil/atoms";
 import { COD_ORDER, CONFIRM_ORDER } from "@/constants/apiRoutes";
 import { axiosPostWithToken } from "@/lib/getHome";
-import { useRouter } from "next/navigation";
 import qs from "qs";
 import { useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 
 const useCheckout = (data) => {
   const router = useRouter();

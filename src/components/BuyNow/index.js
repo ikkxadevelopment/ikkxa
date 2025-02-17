@@ -18,11 +18,11 @@ import { axiosPostWithToken } from "@/lib/getHome";
 import { Input } from "../ui/input";
 import { useRecoilState } from "recoil";
 import { checkoutDataState, loginIsOpen, selectedVariantState, errorMessageProductCard } from "@/recoil/atoms";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import getCurrency from "@/hooks/getCurrency";
 import { AddressModal } from "../AddressModal";
 import { useSession } from "next-auth/react";
+import { useRouter } from "@/i18n/routing";
 
 export default function BuyNow({ data, count, detail }) {
   const t = useTranslations("Index");

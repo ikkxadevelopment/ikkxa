@@ -38,6 +38,7 @@ export default function LoginWidget({ }) {
     isOpen,
     expired,
     setIsOtpSent,
+    setInvalid
   } = useLoginWidget({});
 
   const handleGoogleSignIn = () => {
@@ -79,7 +80,7 @@ export default function LoginWidget({ }) {
             setSubmitting(true)
             sendOtp(values, setSubmitting);
           } else {
-            handleSubmit(values);
+            handleSubmit(values,setSubmitting);
           }
           // setSubmitting(false); // Reset submitting state
         }}
@@ -232,6 +233,7 @@ export default function LoginWidget({ }) {
                         value={otpValue}
                         onChange={(value) => {
                           setOtpValue(value); // Update OTP value in state
+                          setInvalid(false)
                           handleChange({
                             target: { name: "otp", value },
                           });
@@ -264,7 +266,7 @@ export default function LoginWidget({ }) {
                       className="btn btn-lg btn-primary w-full"
                       disabled={isSubmitting||(!isOtpValid)} // Disable if OTP is not valid or submitting
                     >
-                      {isSubmitting ? `${t('Loading')}...` : "Verify OTP"}
+                      {isSubmitting && isOtpValid ? `${t('Loading')}...` : "Verify OTP"}
                     </button>
                     <div className="text-center">
                       <p className="text-xs mt-5 text-[#565656]">

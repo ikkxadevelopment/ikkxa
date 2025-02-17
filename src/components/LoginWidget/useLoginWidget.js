@@ -94,7 +94,7 @@ export const useLoginWidget = ({ }) => {
         }
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, setSubmitting) => {
    
         let payload = {};
         const guestToken = localStorage.getItem("guestToken");
@@ -130,6 +130,7 @@ export const useLoginWidget = ({ }) => {
 
             if (result.error) {
                 setInvalid(true);
+                setSubmitting(false)
             } else {
                 console.log('successs during sign-in:', result);
                 if(isQuestToken){
@@ -144,7 +145,9 @@ export const useLoginWidget = ({ }) => {
                     // router.push('/');
                 }
             }
+            setSubmitting(false)
         } catch (error) {
+            setSubmitting(false)
             console.error('Error during sign-in:', error);
             alert('Error during sign-in');
         }
@@ -162,6 +165,7 @@ export const useLoginWidget = ({ }) => {
         setIsPhone,
         isPhone,
         setIsOtpSent,
-        expired
+        expired,
+        setInvalid
     };
 };

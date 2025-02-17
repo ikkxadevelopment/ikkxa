@@ -221,7 +221,7 @@ export default function BuyNow({ data, count, detail }) {
                     onClick={handleBuynow}
                     disabled={loading}
                   >
-                    {loading ? t("Loading...") : t("ProceedToCheckout")}
+                    {loading ? t("loading") : t("ProceedToCheckout")}
                   </button>
                 </div>
               </div>

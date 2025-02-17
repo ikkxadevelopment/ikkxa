@@ -85,7 +85,7 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </Head> */}
-      <main className="min-h-screen   md:pt-20">
+      <main className="min-h-screen  pt-[58px] lg:pt-[70px] md:pt-20">
       <Script
       id="structuredData"
           type="application/ld+json"

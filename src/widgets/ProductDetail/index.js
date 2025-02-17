@@ -178,11 +178,11 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="grid grid-cols-12 gap-4">
+          <div className="grid grid-cols-12 gap-4 ">
             <div className="col-span-12 lg:col-span-4  relative">
               <ProductThumbSlider data={datas?.product?.gallery} />
               <DropdownMenu>
-                  <DropdownMenuTrigger className="text-xl w-9 h-9 rounded-full bg-white flex items-center z-10 justify-center absolute top-[70px] lg:top-4 right-[14px]">
+                  <DropdownMenuTrigger className="text-xl w-9 h-9 rounded-full bg-white flex items-center z-10 justify-center absolute top-[20px] lg:top-4 right-[14px]">
                     <IoShareSocialOutline className="w-5 h-5" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>

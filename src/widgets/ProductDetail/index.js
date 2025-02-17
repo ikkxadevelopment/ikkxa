@@ -38,12 +38,14 @@ import { FaWhatsapp, FaFacebook } from "react-icons/fa";
 import { IoCopyOutline } from "react-icons/io5";
 import { useToast } from "@/hooks/use-toast";
 import { Suspense, useEffect, useRef } from "react";
+import useHeaderSecond from "@/hooks/useHeaderSecond";
 
 export default function ProductDetail({ data,structuredData, isOutOfStock }) {
   const t = useTranslations("Index");
   // console.log(structuredData,data,"structuredData");
 
-  useHeaderSecondary(true);
+  useHeaderSecond();
+  // useHeaderSecondary(true);
   const datas = data?.results;
   const currency = getCurrency();
 
@@ -154,7 +156,7 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
     <Suspense fallback={<p className="text-center py-10">Loading...</p>}>
 
       <section className="">
-        <DetailBack route={`/`} />
+        {/* <DetailBack route={`/`} /> */}
         <div className="container px-0 md:px-3">
           <Breadcrumb className="mb-5 hidden lg:block">
             <BreadcrumbList>

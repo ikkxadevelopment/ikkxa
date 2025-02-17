@@ -3,6 +3,7 @@ import { useLocale } from "next-intl";
 import Image from "next/image";
 import { BsBag } from "react-icons/bs";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { LangSwitcher } from "../Header/LangSwitcher";
 
 export default function DetailBack({ route }) {
   const lang = useLocale();
@@ -16,12 +17,16 @@ export default function DetailBack({ route }) {
         >
      {locale==="ar"?<MdArrowForward />:<MdArrowBack />}
         </Link>
+        <div className="flex space-x-2 ">
+        <LangSwitcher/>
+        
         <Link
           href={"/cart"}
           className="text-xl w-9 h-9 rounded-full bg-white flex items-center justify-center"
         >
           <BsBag />
         </Link>
+        </div>
         {/* <div className="text-black text-xl font-semibold leading-relaxed  ">
         </div> */}
       </div>

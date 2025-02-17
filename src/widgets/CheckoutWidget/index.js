@@ -52,20 +52,22 @@ const CheckoutWidget = () => {
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
-
+  console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData");
   const handleTamaraCheckout = async () => {
     // setLoading(true);
     // setError(null);
 
+ 
+
     const checkoutPayload = {
       payment_type: 0,
-      sub_total: 259,
-      discount_offer: 80,
-      shipping_tax: 35,
-      tax: 0,
-      coupon_discount: 0,
-      total: 214,
-      trx_id: "B5dpA3HiqgqJLwl0kwWQx",
+      sub_total: checkoutData?.sub_total,
+      discount_offer: checkoutData?.discount,
+      shipping_tax: checkoutData?.shipping_cost,
+      tax: checkoutData?.total_tax,
+      coupon_discount: checkoutData?.coupon_discount,
+      total: checkoutData?.total_payable,
+      trx_id: checkoutData?.trx_id,
       quantity: [
         {
           id: 3167,
@@ -113,13 +115,13 @@ const CheckoutWidget = () => {
 
       const data = {
         payment_type: 0,
-        sub_total: 259,
-        discount_offer: 80,
-        shipping_tax: 35,
-        tax: 0,
-        coupon_discount: 0,
-        total: 214,
-        trx_id: "B5dpA3HiqgqJLwl0kwWQx",
+        sub_total: checkoutData?.sub_total,
+        discount_offer: checkoutData?.discount,
+        shipping_tax: checkoutData?.shipping_cost,
+        tax: checkoutData?.total_tax,
+        coupon_discount: checkoutData?.coupon_discount,
+        total: checkoutData?.total_payable,
+        trx_id: checkoutData?.trx_id,
         quantity: [
           {
             id: 3167,

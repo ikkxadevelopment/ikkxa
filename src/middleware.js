@@ -76,65 +76,6 @@
 
 // export { auth as middleware } from "@/auth"
 
-import { getToken } from "next-auth/jwt";
-import createMiddleware from "next-intl/middleware";
-import { routing } from "@/i18n/routing";
-import { NextResponse } from "next/server";
-
-const middleware = async (req, ev) => {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-  const protectedPaths = ['/profile', '/orders'];
-  const isProtectedRoute = protectedPaths.some((path) =>
-    req.nextUrl.pathname.includes(path)
-  );
-
-  // Parse the current URL path
-  const pathname = req.nextUrl.pathname;
-  
-  // Skip middleware for static files and API routes
-  if (
-    pathname.includes('._next') || 
-    pathname.includes('/api/') ||
-    pathname.match(/\.(.*)$/)
-  ) {
-    return NextResponse.next();
-  }
-
-  // Extract locale and country from URL if present
-  const urlPattern = /^\/(en|ar)-(SA|AE)/;
-  const match = pathname.match(urlPattern);
-
-  // If URL already has valid locale-country pattern, proceed
-  if (match) {
-    return createMiddleware(routing)(req, ev);
-  }
-  
-  // Determine country based on geolocation
-  const geoCountry = req.geo?.country;
-  const countryCode = geoCountry === 'AE' ? 'AE' : 'SA';
-
-  // Set default locale
-  const defaultLocale = 'en';
-  
-  // Build the new pathname with geolocation-based country
-  const newPathname = `/${defaultLocale}-${countryCode}${pathname === '/' ? '' : pathname}`;
-  const url = new URL(newPathname, req.url);
-  url.search = req.nextUrl.search;
-  return NextResponse.redirect(url);
-};
-
-export default middleware;
-
-export const config = {
-  matcher: [
-    '/',
-    '/(en|ar)-(SA|AE)/:path*',
-    '/((?!api|_next|_vercel|.*\\..*).*)'
-  ]
-};
-
-
 // import { getToken } from "next-auth/jwt";
 // import createMiddleware from "next-intl/middleware";
 // import { routing } from "@/i18n/routing";
@@ -148,18 +89,39 @@ export const config = {
 //     req.nextUrl.pathname.includes(path)
 //   );
 
-//   // Check geo location
-//   const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
-
-
-//   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
-//   const newPathname = `/${currentLocale}-${countryCode}`;
-
-//   if (!req.nextUrl.pathname.startsWith(newPathname)) {
-//     return NextResponse.redirect(new URL(newPathname, req.url));
+//   // Parse the current URL path
+//   const pathname = req.nextUrl.pathname;
+  
+//   // Skip middleware for static files and API routes
+//   if (
+//     pathname.includes('._next') || 
+//     pathname.includes('/api/') ||
+//     pathname.match(/\.(.*)$/)
+//   ) {
+//     return NextResponse.next();
 //   }
 
-//   return createMiddleware(routing)(req, ev);
+//   // Extract locale and country from URL if present
+//   const urlPattern = /^\/(en|ar)-(SA|AE)/;
+//   const match = pathname.match(urlPattern);
+
+//   // If URL already has valid locale-country pattern, proceed
+//   if (match) {
+//     return createMiddleware(routing)(req, ev);
+//   }
+  
+//   // Determine country based on geolocation
+//   const geoCountry = req.geo?.country;
+//   const countryCode = geoCountry === 'AE' ? 'AE' : 'SA';
+
+//   // Set default locale
+//   const defaultLocale = 'en';
+  
+//   // Build the new pathname with geolocation-based country
+//   const newPathname = `/${defaultLocale}-${countryCode}${pathname === '/' ? '' : pathname}`;
+//   const url = new URL(newPathname, req.url);
+//   url.search = req.nextUrl.search;
+//   return NextResponse.redirect(url);
 // };
 
 // export default middleware;
@@ -167,10 +129,48 @@ export const config = {
 // export const config = {
 //   matcher: [
 //     '/',
-//     '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
+//     '/(en|ar)-(SA|AE)/:path*',
 //     '/((?!api|_next|_vercel|.*\\..*).*)'
 //   ]
 // };
+
+
+import { getToken } from "next-auth/jwt";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
+import { NextResponse } from "next/server";
+
+const middleware = async (req, ev) => {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  const protectedPaths = ['/profile', '/orders'];
+  const isProtectedRoute = protectedPaths.some((path) =>
+    req.nextUrl.pathname.includes(path)
+  );
+
+  // Check geo location
+  const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
+
+
+  const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
+  const newPathname = `/${currentLocale}-${countryCode}`;
+
+  // if (!req.nextUrl.pathname.startsWith(newPathname)) {
+  //   return NextResponse.redirect(new URL(newPathname, req.url));
+  // }
+
+  return createMiddleware(routing)(req, ev);
+};
+
+export default middleware;
+
+export const config = {
+  matcher: [
+    '/',
+    '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
+    '/((?!api|_next|_vercel|.*\\..*).*)'
+  ]
+};
 
 
 

@@ -391,13 +391,13 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
             </div>
             <div className="col-span-12 px-3 md:px-0 lg:col-span-3 z-10">
               <div className="sticky top-24">
-                <div className="fixed lg:static border-t lg:border-0 lg:mb-3  bottom-0 left-0 w-full bg-white z-50 grid grid-cols-2 lg:grid-cols-1 gap-3 px-3 lg:px-0 lg:pt-0 lg:pb-0  pt-2 pb-3 shadow-md lg:shadow-none">
+                <div className="fixed lg:static border-t lg:border-0 lg:mb-3  bottom-0 left-0 w-full bg-white z-50 grid grid-cols-1 lg:grid-cols-1 gap-3 px-3 lg:px-0 lg:pt-0 lg:pb-0  pt-2 pb-3 shadow-md lg:shadow-none">
                   <AddToCart size={"lg"} data={datas?.product} count={count} />
-                  <BuyNow
+                  {/* <BuyNow
                     data={datas?.product}
                     detail={productDetail}
                     count={count}
-                  />
+                  /> */}
                 </div>
                 <div className="mb-3">
                   <PaymetnIcons />

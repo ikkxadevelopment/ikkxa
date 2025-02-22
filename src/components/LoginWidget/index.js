@@ -24,6 +24,7 @@ export default function LoginWidget({ }) {
   const lang = useLocale()
   const [locale, country] = lang.split("-");
   const { width } = useGetDeviceType();
+  const [isResent, setIsResent] = useState(false)
   const {
     sendOtp,
     handleSubmit,
@@ -76,9 +77,10 @@ export default function LoginWidget({ }) {
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
-          if (!isOtpSent) {
+          if (!isOtpSent || isResent) {
             setSubmitting(true)
             sendOtp(values, setSubmitting);
+            setIsResent(false)
           } else {
             handleSubmit(values,setSubmitting);
           }
@@ -272,8 +274,9 @@ export default function LoginWidget({ }) {
                       <p className="text-xs mt-5 text-[#565656]">
                         {t('ResentOTPTitle')}{" "}
                         <button
+                          type="submit"
                           className="text-teal-500 font-medium underline ml-2 cursor-pointer"
-                          onClick={() => setIsOtpSent(false)}
+                          onClick={() => setIsResent(true)}
                           // disabled={isSubmitting} 
                         >
                           {t('ResendOTP')}

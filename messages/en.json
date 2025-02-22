@@ -251,6 +251,7 @@
       "CartItemUpdated":"Cart item updated",
       "CartItemNotUpdated":"Cart item not updated",
       "ProductIsOutOfStock": "Product is out of stock",
-      "OutOfStockForThisVariant": "Out of stock for this variant."
+      "OutOfStockForThisVariant": "Out of stock for this variant.",
+      "ResendIn":"Resend in"
     }
   }

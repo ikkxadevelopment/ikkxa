@@ -39,7 +39,9 @@ export default function LoginWidget({ }) {
     isOpen,
     expired,
     setIsOtpSent,
-    setInvalid
+    setInvalid,
+    countdown,
+    setClickFrom
   } = useLoginWidget({});
 
   const handleGoogleSignIn = () => {
@@ -276,10 +278,11 @@ export default function LoginWidget({ }) {
                         <button
                           type="submit"
                           className="text-teal-500 font-medium underline ml-2 cursor-pointer"
-                          onClick={() => setIsResent(true)}
-                          // disabled={isSubmitting} 
+                          onClick={() => {setIsResent(true); setClickFrom('resent')}}
+                          disabled={countdown > 0} 
                         >
-                          {t('ResendOTP')}
+                          {countdown > 0 ? `${t("ResendIn")} ${countdown}s` : t("ResendOTP")}
+                          {/* {t('ResendOTP')} */}
                         </button>
                       </p>
                     </div>

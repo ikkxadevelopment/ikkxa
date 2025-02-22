@@ -10,11 +10,13 @@ import { useRecoilState } from "recoil";
 import { loginIsOpen } from "@/recoil/atoms";
 import { useLocale } from "next-intl";
 import { usePathname } from "@/i18n/routing";
+import { useToast } from "@/hooks/use-toast";
 
 
 export const useLoginWidget = ({ }) => {
     const router = useRouter();
     const session = useSession();
+    const { toast } = useToast();
     const pathname=usePathname()
     const [isPhone, setIsPhone] = useState(true);
     const [isOpen, setIsOpen] =  useRecoilState(loginIsOpen);
@@ -22,6 +24,8 @@ export const useLoginWidget = ({ }) => {
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [inValid, setInvalid] = useState(false);
     const [expired, setExpired] = useState(false);
+    const [countdown, setCountdown] = useState(30);
+    const [clickFrom, setClickFrom] = useState("")
     const lang = useLocale();
     const [locale, country] = lang.split('-');
     const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
@@ -79,6 +83,7 @@ export const useLoginWidget = ({ }) => {
 
             if (response.data.success === true ) {
                 setIsOtpSent(true);
+                handleResend()
                 
             } else if(response.data.resend_count===0) {
                 setExpired(true)
@@ -153,6 +158,34 @@ export const useLoginWidget = ({ }) => {
         }
     };
 
+    const startCountdown = () => {
+        let timer = null
+        if (timer) clearInterval(timer); // Clear previous timer if exists
+        setCountdown(30);
+      
+        timer = setInterval(() => {
+          setCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      };
+
+    const handleResend = () => {
+        if(clickFrom === "resent"){
+            toast({
+                title: "Otp send successfully",
+                variant: "success",
+              });
+        }
+        setClickFrom('')
+        startCountdown();
+      };
+      
+
     return {
         sendOtp,
         handleSubmit,
@@ -166,6 +199,8 @@ export const useLoginWidget = ({ }) => {
         isPhone,
         setIsOtpSent,
         expired,
-        setInvalid
+        setInvalid,
+        countdown, 
+        setClickFrom
     };
 };

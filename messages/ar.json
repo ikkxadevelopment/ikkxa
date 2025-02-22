@@ -251,7 +251,8 @@
     "CartItemUpdated": "تم تحديث عنصر العربة",
     "CartItemNotUpdated": "لم يتم تحديث عنصر العربة",
     "ProductIsOutOfStock": "المنتج غير متوفر في المخزون",
-    "OutOfStockForThisVariant": "غير متوفر في المخزون لهذا النوع."
+    "OutOfStockForThisVariant": "غير متوفر في المخزون لهذا النوع.",
+    "ResendIn": "إعادة الإرسال خلال"
   }
 }
 

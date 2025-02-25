@@ -46,6 +46,7 @@ import {
 import SearchMobile from "../Search/SearchMobile";
 import { useWishlistFetcher } from "./useWishlistFetcher";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function Header({ data, menu }) {
   const { main } = useHeader();
@@ -89,8 +90,20 @@ export default function Header({ data, menu }) {
   //   fetchCartData();
   // },[isLogined, authToken, cartStateItem ])
   const isInside = useRecoilValue(isComponentPresentState);
+  const handleWhatsAppShare = () => {
+    const text = `${window.location.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+  };
+
+const ksa ="+966549577332"
+const uae ="+971507187565"
+
   return (
     <>
+    <a href={`https://wa.me/${country==="SA"?ksa:uae}?text=Hello!`} className="flex items-center justify-center text-2xl text-white size-14 shadow-md rounded-full fixed bottom-2 right-2 z-20 bg-green-500" target="_blank">
+    <FaWhatsapp  /> 
+</a>
+
       <header
         className={`${
           isInner ? "hidden md:block" : ""

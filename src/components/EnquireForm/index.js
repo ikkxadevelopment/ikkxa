@@ -5,6 +5,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useLocale, useTranslations } from "next-intl";
 import { CONTACT } from '@/constants/apiRoutes';
+import { useToast } from "@/hooks/use-toast";
 
 export default function EnquireForm() {
   const lang = useLocale();
@@ -18,13 +19,18 @@ export default function EnquireForm() {
     subject: Yup.string().required(`${t("SubjectIsRequired")}`),
     message: Yup.string().required(`${t("MessageIsRequired")}`).min(10, `${t("MessageTooShort")}`),
   });
+  const { toast } = useToast()
 
   const handleSubmit = async (values, { setSubmitting, setErrors, resetForm }) => {
     try {
       const result = await axiosPostWithToken(CONTACT, values, lang);
-      if (result.success) {
+      if (result.status) {
         resetForm();
-        alert(t("MessageSentSuccessfully"));
+        toast({ 
+          title: `${t("MessageSentSuccessfully")}`,
+          variant: "success",
+          
+         })
       } else {
         setErrors({ apiError: result.message || t("FailedToSendMessage") });
       }

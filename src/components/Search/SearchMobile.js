@@ -164,8 +164,8 @@ export default function SearchMobile() {
                       }}
                       className="block mb-3"
                     >
-                      <div className="flex space-x-3 items-center">
-                        <div className="flex-col-auto w-auto">
+                      <div className="flex  items-center">
+                        <div className="flex-col-auto w-auto me-3">
                           <div className="aspect-[490/625]  relative w-[50px] md:w-[55px] rounded overflow-hidden">
                             <Image
                               src={`${suggestion?.image_190x230}`}

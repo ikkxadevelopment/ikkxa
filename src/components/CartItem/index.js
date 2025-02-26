@@ -38,8 +38,8 @@ export default function CartItem({ data, isSidebar }) {
     <div
       className={` lg:mb-4 px-4 py-3 lg:p-4 lg:rounded border-b-8 lg:border border-gray-200 lg:border-neutral-200`}
     >
-      <div className="flex space-x-3 ">
-        <div className="flex-col-auto w-auto">
+      <div className="flex  ">
+        <div className="flex-col-auto w-auto me-3">
           <div
             className={`aspect-[490/625]  relative ${
               isSidebar ? "w-[84px]" : "w-[84px] md:w-[90px]"

@@ -23,7 +23,7 @@ export default function Footer({ data, menu }) {
     <footer>
       <div className="lg:hidden">
         <Tabs defaultValue="tab0" className="w-full">
-          <TabsList className="w-full">
+          <TabsList className="w-full overflow-x-auto">
             {menu?.map((item, i)=>{
               return(
                 <TabsTrigger value={`tab${i}`} key={i} className="w-full">

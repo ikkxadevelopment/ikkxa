@@ -100,7 +100,7 @@ const uae ="+971507187565"
 
   return (
     <>
-    <a href={`https://wa.me/${country==="SA"?ksa:uae}?text=Hello!`} className="flex items-center justify-center text-2xl text-white size-14 shadow-md rounded-full fixed bottom-2 right-2 z-50 bg-green-500" target="_blank">
+    <a href={`https://wa.me/${country==="SA"?ksa:uae}?text=Hello!`} className="flex items-center justify-center text-2xl text-white size-14 shadow-md rounded-full fixed bottom-2 right-2 z-[500] bg-green-500" target="_blank">
     <FaWhatsapp  /> 
 </a>
 

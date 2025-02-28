@@ -314,11 +314,11 @@ const CheckoutWidget = () => {
                   <div>
                     <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                       {" "}
-                      Tamara – Split in 4, No Fees!
+                      Tamara – {t('SplitIn4NoFees')}
                     </h5>
                     <p className="text-[#9e9e9e] text-xs">
                       {" "}
-                      Split your payment into 4 interest-free installments.
+                      {t('SplitYourPayment')}
                     </p>
                   </div>
 

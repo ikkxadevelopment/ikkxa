@@ -254,6 +254,21 @@
       "OutOfStockForThisVariant": "Out of stock for this variant.",
       "ResendIn":"Resend in",
       "MessageSentSuccessfully":"Message sent successfully",
+      "DownloadInvoice":"Download Invoice",
+      "PaymentStatus" : "Payment status",
+      "Unpaid":"Unpaid",
+      "Paid":"Paid",
+      "Confirmed":"Confirmed",
+      "Card":"Card",
+      "BackToOrders":"Back to orders",
+      "OrdersDetails":"Orders Details",
+      "OrderDate":"Order date",
+      "PaymentMethod":"Payment method",
+      "OrderStatus":"Order status",
+      "Qty":"Qty",
+      "PhoneNumber":"Phone number",
+      "Delivery":"Delivery",
+      "TotalPrice":"Total Price",
       "AllProducts":"All Products"
     }
   }

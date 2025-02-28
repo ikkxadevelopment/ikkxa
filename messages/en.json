@@ -253,6 +253,7 @@
       "ProductIsOutOfStock": "Product is out of stock",
       "OutOfStockForThisVariant": "Out of stock for this variant.",
       "ResendIn":"Resend in",
-      "MessageSentSuccessfully":"Message sent successfully"
+      "MessageSentSuccessfully":"Message sent successfully",
+      "AllProducts":"All Products"
     }
   }

@@ -67,11 +67,11 @@ export default function OrderSingleWidget({ slug }) {
   const paymentType = (status) => {
     switch (status) {
       case "unpaid":
-        return <span className="status pending text-[#f3ac30]">Unpaid</span>;
+        return <span className="status pending text-[#f3ac30]">{t('Unpaid')}</span>;
       case "paid":
         return (
           <span className="status delivered text-[#38ae04] text-sm font-semibold">
-            Paid
+            {t('Paid')}
           </span>
         );
     }
@@ -79,31 +79,31 @@ export default function OrderSingleWidget({ slug }) {
   const orderStatus = (status) => {
     switch (status) {
       case "canceled":
-        return <span className="status pending text-[#ce2f2f]">Cancelled</span>;
+        return <span className="status pending text-[#ce2f2f]">{t('Cancelled')}</span>;
       case "pending":
-        return <span className="status pending text-[#ce712f]">Pending</span>;
+        return <span className="status pending text-[#ce712f]">{t('Pending')}</span>;
       case "delivered":
         return (
           <span className="status delivered text-[#38ae04] font-semibold">
-            Delivered
+            {t('Delivered')}
           </span>
         );
       case "confirm":
         return (
           <span className="status delivered text-[#38ae04] font-semibold">
-            Confirmed
+            {t('Confirmed')}
           </span>
         );
       case "return_requested":
         return (
           <span className="status cancelled font-semibold">
-            Return Requested
+            {t('ReturnRequested')}
           </span>
         );
       case "picked_up":
         return (
           <span className="status delivered text-[#044bae] font-semibold">
-            Returned
+            {t('Returned')}
           </span>
         );
     }
@@ -128,19 +128,19 @@ export default function OrderSingleWidget({ slug }) {
       case "tamara":
         return (
           <span className="status delivered text-[#38ae04] font-semibold">
-            Paid
+            {t('Paid')}
           </span>
         );
       case "pay_later":
         return (
           <span className="status delivered text-[#38ae04] font-semibold">
-            Cash on delivery
+            {t('CashOnDelivery')}
           </span>
         );
       case "moyasar":
         return (
           <span className="status pending inline-flex items-center  ">
-            Card
+            {t('Card')}
             <div className="  aspect-[46/17] w-14 relative">
               <Image
                 src={"/images/icon-visa.png"}
@@ -167,15 +167,15 @@ export default function OrderSingleWidget({ slug }) {
           <span className="me-2 inline-block">
             <MdArrowBack />
           </span>
-          Back to orders
+          {t('BackToOrders')}
         </Link>
         <DownloadInvoice id={resData?.id} />
       </div>
       <div className="justify-start items-center gap-3.5 flex mb-6">
         <div className="text-black text-lg font-semibold capitalize leading-relaxed">
-          Orders Details:
+          {t('OrdersDetails')}:
           <span className="ms-3 px-2 py-1 inline-block text-black text-xs font-medium bg-zinc-100 rounded-sm">
-            ORDER ID: #{slug}
+            {t('ORDERID')}: #{slug}
           </span>
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function OrderSingleWidget({ slug }) {
         </div> */}
         <div className="">
           <p className="text-black text-sm font-semibold">
-            Order date:&nbsp;
+            {t('OrderDate')}:&nbsp;
             <span className="text-black text-sm font-normal">
               {formattedDate(resData?.date)}
             </span>{" "}
@@ -198,7 +198,7 @@ export default function OrderSingleWidget({ slug }) {
         </div>
         <div className="lg:text-end">
           <p className="text-black text-sm font-semibold">
-            Payment status:&nbsp;
+            {t('PaymentStatus')}:&nbsp;
             <span className="text-black text-sm font-normal">
               {paymentType(resData?.payment_status)}
             </span>{" "}
@@ -207,7 +207,7 @@ export default function OrderSingleWidget({ slug }) {
         {resData?.payment_type && (
           <div>
             <p className="text-black text-sm font-semibold">
-              Payment method:&nbsp;
+              {t('PaymentMethod')}:&nbsp;
               <span className="text-black text-sm font-normal">
                 {paymentMethod(resData?.payment_type)}
               </span>{" "}
@@ -217,7 +217,7 @@ export default function OrderSingleWidget({ slug }) {
         {resData?.order_status && (
           <div className="lg:text-end">
             <p className="text-black text-sm font-semibold ">
-              Order status:&nbsp;
+              {t('OrderStatus')}:&nbsp;
               <span className="text-black text-sm font-normal">
                 {orderStatus(resData?.order_status)}
               </span>{" "}
@@ -287,7 +287,7 @@ export default function OrderSingleWidget({ slug }) {
                           </h3>
                           <p className=" mb-2 text-stone-950 text-sm">
                             {" "}
-                            Size:{" "}
+                            {t('Size')}:{" "}
                             <span className="font-semibold">
                               {" "}
                               {item?.size}{" "}
@@ -295,7 +295,7 @@ export default function OrderSingleWidget({ slug }) {
                           </p>
                           <p className=" mb-2 text-stone-950 text-sm">
                             {" "}
-                            Qty :{" "}
+                            {t('Qty')} :{" "}
                             <span className="font-semibold">
                               {" "}
                               {item?.quantity}
@@ -338,7 +338,7 @@ export default function OrderSingleWidget({ slug }) {
 
       <div className="">
         <div className=" text-black text-base font-semibold capitalize leading-relaxed mb-[10px]">
-          Shipping Address
+          {t('ShippingAddress')}
         </div>
         <div className="">
           <div className="text-neutral-800 text-base font-medium leading-normal mb-1">
@@ -358,9 +358,9 @@ export default function OrderSingleWidget({ slug }) {
             {resData?.shipping_address?.state},{" "}
             {resData?.shipping_address?.country}
             <br />
-            Phone number : {resData?.shipping_address?.phone_no}
+            {t('PhoneNumber')} : {resData?.shipping_address?.phone_no}
             <br />
-            email: {resData?.shipping_address?.email}
+            {t('Email')}: {resData?.shipping_address?.email}
           </div>
         </div>
       </div>
@@ -369,18 +369,18 @@ export default function OrderSingleWidget({ slug }) {
 
       <div className="">
         <div className=" text-black text-base font-semibold capitalize leading-relaxed mb-[10px]">
-          Order Summary
+          {t('OrderSummary')}
         </div>
 
         <ul className=" ">
           <li className="justify-between items-center flex mb-2">
-            <div className="text-stone-500 text-sm font-medium ">Subtotal</div>
+            <div className="text-stone-500 text-sm font-medium ">{t('Subtotal')}</div>
             <div className=" text-right text-stone-500 text-sm font-medium ">
               {resData?.formatted_sub_total} {currency}{" "}
             </div>
           </li>
           <li className="justify-between items-center flex mb-2">
-            <div className="text-stone-500 text-sm font-medium ">Discount</div>
+            <div className="text-stone-500 text-sm font-medium ">{t('Discount')}</div>
             <div className="w-56 text-right text-stone-500 text-sm font-medium ">
               - {resData?.formatted_discount} {currency}
             </div>
@@ -388,7 +388,7 @@ export default function OrderSingleWidget({ slug }) {
           {resData?.payment_type === "pay_later" && (
             <li className="justify-between items-center flex mb-2">
               <div className="text-stone-500 text-sm font-medium ">
-                COD Charge
+                {t('Charge')}
               </div>
               <div className="w-56 text-right text-stone-500 text-sm font-medium ">
                 {resData?.plus_cod_charge} {currency}
@@ -397,14 +397,14 @@ export default function OrderSingleWidget({ slug }) {
           )}
 
           <li className="justify-between items-center flex  mb-2">
-            <div className="text-stone-500 text-sm font-medium ">Delivery</div>
+            <div className="text-stone-500 text-sm font-medium ">{t('Delivery')}</div>
             {resData?.shipping_cost > 0 ? (
               <div className=" text-right text-stone-500 text-sm font-medium ">
                 {resData?.formatted_shipping_cost} {currency}{" "}
               </div>
             ) : (
               <div className="w-20 text-right text-green-700 text-sm font-medium ">
-                Free
+                {t('FREE')}
               </div>
             )}
           </li>
@@ -419,7 +419,7 @@ export default function OrderSingleWidget({ slug }) {
 
           <li className="justify-between items-center flex mb-2">
             <div className="text-neutral-900 text-sm font-semibold ">
-              Total Price
+              {t('TotalPrice')}
             </div>
             <div className="w-72 text-right text-stone-500 text-sm font-semibold ">
               {resData?.formatted_total_payable} {currency}

@@ -252,7 +252,23 @@
     "CartItemNotUpdated": "لم يتم تحديث عنصر العربة",
     "ProductIsOutOfStock": "المنتج غير متوفر في المخزون",
     "OutOfStockForThisVariant": "غير متوفر في المخزون لهذا النوع.",
-    "ResendIn": "إعادة الإرسال خلال"
+    "ResendIn": "إعادة الإرسال خلال",
+    "MessageSentSuccessfully": "تم إرسال الرسالة بنجاح",
+    "DownloadInvoice": "تنزيل الفاتورة",
+    "PaymentStatus": "حالة الدفع",
+    "Unpaid": "غير مدفوع",
+    "Paid": "مدفوع",
+    "Confirmed": "مؤكد",
+    "Card": "بطاقة",
+    "BackToOrders": "الرجوع إلى الطلبات",
+    "OrdersDetails": "تفاصيل الطلب",
+    "OrderDate": "تاريخ الطلب",
+    "PaymentMethod": "طريقة الدفع",
+    "OrderStatus": "حالة الطلب",
+    "Qty": "الكمية",
+    "PhoneNumber": "رقم الهاتف",
+    "Delivery": "التوصيل",
+    "TotalPrice": "السعر الكلي"
   }
 }
 

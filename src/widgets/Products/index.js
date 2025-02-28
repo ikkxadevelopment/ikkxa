@@ -52,6 +52,7 @@ export default function Products({ slug }) {
     setSliderValue,
     handleSortMobile,
     isSearchPage,
+    isAllProducts
   } = useProducts({ slug });
   const subCategory = categories?.results?.categories.find(
     (item) => item?.slug === slug
@@ -65,6 +66,7 @@ export default function Products({ slug }) {
     products && products[products?.length - 1]?.results?.products?.total;
 
     useHeaderSecond()
+    
 
   return (
     <section className=" pb-[60px]">
@@ -121,7 +123,12 @@ export default function Products({ slug }) {
                   <h2 className="text-sm lg:text-xl font-semibold">
                     {products&&products[0]?.results?.products?.total} {t('resultsFor')} {searchTerm}
                   </h2>
-                ) : (
+                ) : isAllProducts?
+                <h2 className="text-sm lg:text-xl font-semibold">
+
+{t('AllProducts')}
+                  </h2>
+                  :(
                   <h2 className="text-sm lg:text-xl font-semibold">
 
 {products&&products[0]?.results?.title}

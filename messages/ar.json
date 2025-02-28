@@ -268,7 +268,8 @@
     "Qty": "الكمية",
     "PhoneNumber": "رقم الهاتف",
     "Delivery": "التوصيل",
-    "TotalPrice": "السعر الكلي"
+    "TotalPrice": "السعر الكلي",
+    "AllProducts":"جميع المنتجات"
   }
 }
 

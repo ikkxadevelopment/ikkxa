@@ -15,6 +15,7 @@ const useProducts = ({ slug }) => {
   const lang = useLocale();
   const [locale, country] = lang.split('-');
   const isSearchPage = pathname?.includes("search")
+  const isAllProducts = pathname?.includes("products")
   const router = useRouter();
   const [sliderValue, setSliderValue] = useState([0, 899]);
   const [filters, setFilters] = useState({
@@ -253,7 +254,7 @@ const useProducts = ({ slug }) => {
         attribute_value_id: filters.attribute_value_id,
         child_category: filters.child_category,
         type: filters.type,
-        route: isSearchPage ? "all.products" :"product.by.category",
+        route: isSearchPage||isAllProducts ? "all.products" :"product.by.category",
       },
       { encodeValuesOnly: true, arrayFomat: "brackets" }
     );
@@ -293,7 +294,8 @@ const useProducts = ({ slug }) => {
     isLoadingMore,
     isLoadingProducts: !error && !data,
     isError: error,
-    isSearchPage
+    isSearchPage,
+    isAllProducts
   };
 };
 

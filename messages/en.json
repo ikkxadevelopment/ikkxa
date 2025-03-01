@@ -209,7 +209,7 @@
       "RelatedProducts":"Related products",
       "NoItemsAvailable":"No items available",
       "BuyNow":"Buy Now",
-      "ShippingAddress":"Shipping address",
+      "ShippingAddress":"Shipping address", 
       "tabyEmiTitle":"Pay 4 interest-free payments of SAR",
       "LearnMore":"Learn more",
       "RevalidatePaths":"Revalidate Paths",
@@ -269,6 +269,7 @@
       "PhoneNumber":"Phone number",
       "Delivery":"Delivery",
       "TotalPrice":"Total Price",
-      "AllProducts":"All Products"
+      "AllProducts":"All Products",
+      "New":"New"
     }
   }

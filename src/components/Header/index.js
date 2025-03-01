@@ -305,14 +305,20 @@ const uae ="+971507187565"
               </Link>
             </div>
             <nav className="hidden space-x-2 lg:flex">
+              {console.log(menu,"menumenumenu")}
+              
               {menu?.map((link, i) => {
                 return (
                   <div key={i} className="relative group">
                     <Link
                       href={`${link?.url}`}
-                      className="rounded-md text-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50"
+                      className="rounded-md relative text-nowrap px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50"
                     >
                       {link?.label}
+                      {link?.is_offer&&
+                      <span className="absolute text-[10px] text-red-500 top-0 right-0 translate-x-1/2 -translate-y-[30%] block">
+                        {t("New")}
+                      </span>}
                     </Link>
                     {link?.subcategories && link.subcategories.length > 0 && (
                       <div className="absolute start-0 hidden group-hover:block min-w-[500px] bg-white shadow-lg rounded-md mt-1 py-2 lg:p-5 

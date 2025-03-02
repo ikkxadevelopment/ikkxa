@@ -42,7 +42,7 @@ export function CouponListing({}) {
         }
       }}
     >
-      <DialogTrigger asChild>
+      {/* <DialogTrigger asChild>
         <button className="btn bg-white border btn-sm w-full mb-4 text-start flex items-center">
       <span className="me-2">
       <BiSolidOffer />
@@ -50,7 +50,7 @@ export function CouponListing({}) {
        
           {t('ViewAvailableOffers')}
         </button>
-      </DialogTrigger>
+      </DialogTrigger> */}
       <DialogContent className=" sm:max-w-[500px] p-3 rounded-none lg:rounded-none lg:p-5 ">
         <DialogHeader>
           <h3 className="text-black text-xl font-semibold mb-3">

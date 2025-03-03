@@ -25,15 +25,15 @@ export async function generateMetadata({ params: { lang } }) {
   console.log(country,"countrycountrycountry");
   let seoTitle 
   if(country==="SA") {
-    seoTitle="Abayas in Saudi Arabia | Jalabiyas | Party wears and Newborn - IKKXA"
+    seoTitle="Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA"
   }
 
   if(country==="AE") {
-    seoTitle="Abayas in Saudi Arabia | Jalabiyas | Party wears and Newborn - IKKXA"
+    seoTitle="Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA"
   }
 
   return {
-    title: seoData?.message?.tittle || "Abayas in Saudi Arabia | Jalabiyas | Party wears and Newborn - IKKXA",
+    title: seoData?.message?.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA",
     description:
       seoData?.message?.desc ||
       "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
@@ -43,7 +43,7 @@ export async function generateMetadata({ params: { lang } }) {
     },
     openGraph: {
       images: seoData?.message?.image || [],
-      title: seoData?.message?.tittle || "Abayas in Saudi Arabia | Jalabiyas | Party wears and Newborn - IKKXA",
+      title: seoData?.message?.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA",
       description:
         seoData?.message?.desc ||
         "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",

@@ -3,7 +3,7 @@ import { ALL_ADDRESSES, APPLIED_COUPON } from "@/constants/apiRoutes";
 import useSWR from "swr";
 import useCheckout from "./useCheckout";
 import Coupon from "./Coupon";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { fetcherWithToken } from "@/utils/fetcher";
 import Link from "next/link";
@@ -32,6 +32,8 @@ export default function OrderSummary({ data }) {
     defaultAddress,
   });
 
+  const lang = useLocale();
+  const [locale, country] = lang.split("-");
   // if (loading) return <p>Loading...</p>;
   // if (addressError) return <p>Error loading address.</p>;
 
@@ -93,7 +95,7 @@ export default function OrderSummary({ data }) {
         </div>
         {data?.tax>0&&
         <div className="flex justify-between ">
-          <p className="text-black text-sm">{t("VATInclusive")}</p>
+          <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}</p>
           <p className="text-black text-sm ">
             {" "}
             {data?.tax} {currency}

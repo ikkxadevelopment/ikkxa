@@ -410,7 +410,7 @@ export default function OrderSingleWidget({ slug }) {
           </li>
           <li className="justify-between items-center flex mb-2">
             <div className="text-stone-500 text-sm font-medium ">
-              {t("VATInclusive")}
+              {t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}
             </div>
             <div className="w-56 text-right text-stone-500 text-sm font-medium ">
               {resData?.formatted_tax} {currency}

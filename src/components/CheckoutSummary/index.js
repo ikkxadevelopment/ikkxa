@@ -1,9 +1,12 @@
 import getCurrency from "@/hooks/getCurrency";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function CheckoutSummary({ data, isCod }) {
   const t = useTranslations("Index");
   const currency = getCurrency();
+  const lang = useLocale();
+  const [locale, country] = lang.split("-");
+  
   return (
     <div className="p-6 bg-stone-50 md:rounded border border-gray-200 ">
       <h4 className=" text-black text-lg font-semibold mb-3">{t('OrderSummary')}</h4>
@@ -60,7 +63,7 @@ export default function CheckoutSummary({ data, isCod }) {
         </div>
 
         <div className="flex justify-between mb-2">
-          <p className="text-black text-sm">{t("VATInclusive")}</p>
+          <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}</p>
           <p className="text-black text-sm ">
             {" "}
             {data?.total_tax} {currency}

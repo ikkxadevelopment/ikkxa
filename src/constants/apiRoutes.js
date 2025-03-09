@@ -68,6 +68,7 @@ export const CONFIRM_ORDER ="user/confirm-order"
 export const COD_ORDER ="user/complete-order"
 export const TABBY_CHECKOUT = "tabby/pay"
 export const TAMARA_CHECKOUT = "tamara/pay"
+export const NGENIUS_CHECKOUT = "ngenius/pay"
 
 export const COUPON_APPLY ="apply-coupon"
 export const GET_COUPONS="user/coupons"

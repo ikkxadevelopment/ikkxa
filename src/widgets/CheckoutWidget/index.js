@@ -15,7 +15,7 @@ import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { getSession, useSession } from "next-auth/react";
 import { useSWRConfig } from "swr";
-import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT } from "@/constants/apiRoutes";
+import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT,NGENIUS_CHECKOUT } from "@/constants/apiRoutes";
 import axios from "axios";
 import OrderPending from "./OrderPending";
 import OrderSuccess from "./OrderSuccess";
@@ -157,7 +157,60 @@ const CheckoutWidget = () => {
     // return data;
   };
 
+  const handleNgeniusCheckout = async () => {
+    try {
+      const session = await getSession();
+      const token = session?.accessToken;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in Authorization header
+          "Content-Type": "application/json", // Set content type
+        },
+      };
 
+      const data = {
+        payment_type: 0,
+        sub_total: checkoutData?.sub_total,
+        discount_offer: checkoutData?.discount,
+        shipping_tax: checkoutData?.shipping_cost,
+        tax: checkoutData?.total_tax,
+        coupon_discount: checkoutData?.coupon_discount,
+        total: checkoutData?.total_payable,
+        trx_id: checkoutData?.trx_id,
+        quantity: [
+          {
+            id: 3167,
+            quantity: 1,
+          },
+        ],
+        coupon_code: "",
+        coupon: [],
+        checkout_method: 2,
+        shipping_address: address,
+        billing_address: address,
+        buy_now: 0,
+      };
+
+      
+
+      const response = await axios.get(
+        `${baseUrl}${NGENIUS_CHECKOUT}/${order_id}`,
+        data,
+        config
+      );
+
+      if (response?.data?.success) {
+        router.push(response?.data?.message);
+      }
+    } catch (error) {
+      // setError(error);
+      console.error("Checkout error:", error);
+    } finally {
+      // setLoading(false);
+    }
+    // await mutate(wishlistKey);
+    // return data;
+  };
 
 
 
@@ -277,6 +330,35 @@ const CheckoutWidget = () => {
                   </div>
                 )}
               </Label>
+
+              <Label
+                htmlFor="Network"
+                className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
+              >
+                <RadioGroupItem value="Network" id="Network" />
+                <div className="flex items-center w-full justify-between">
+                  <div>
+                    <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                      {" "}
+                      Network – {t('SplitIn4NoFees')}
+                    </h5>
+                    <p className="text-[#9e9e9e] text-xs">
+                      {" "}
+                      {t('SplitYourPayment')}
+                    </p>
+                  </div>
+
+                  <div className="aspect-[46/17] w-12 relative">
+                    <Image
+                      src={"/images/tamara_logo.png"}
+                      fill
+                      className="object-contain"
+                      alt="tamara logo"
+                    />
+                  </div>
+                </div>
+              </Label>
+
               <Label
                 htmlFor="tabby"
                 className="flex items-center space-x-3 w-full p-3 lg:p-6  mb-0 rounded border border-gray-200 bg-white"
@@ -402,6 +484,23 @@ const CheckoutWidget = () => {
                   onClick={handleCheckoutCod}
                 >
                   {t('PlaceOrder')}
+                </button>
+              )}
+              {paymentMethod === "Network" && (
+                <button
+                  href={`${checkoutData?.tabby_checkout_url}`}
+                  onClick={() => handleNgeniusCheckout()}
+                  className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
+                >
+                  {t('PlaceOrderWith')}{" "}
+                  <div className="aspect-[46/17] w-12 relative ms-2">
+                    <Image
+                      src={"/images/tabby_logo.png"}
+                      fill
+                      className="object-contain"
+                      alt="tabby logo"
+                    />
+                  </div>
                 </button>
               )}
               {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">

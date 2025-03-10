@@ -191,8 +191,6 @@ const CheckoutWidget = () => {
         buy_now: 0,
       };
 
-      
-
       const response = await axios.get(
         `${baseUrl}${NGENIUS_CHECKOUT}/${order_id}`,
         data,
@@ -200,7 +198,8 @@ const CheckoutWidget = () => {
       );
 
       if (response?.data?.success) {
-        router.push(response?.data?.message);
+        // Update to use redirect_url from the message object
+        router.push(response.data.message.redirect_url);
       }
     } catch (error) {
       // setError(error);
@@ -298,6 +297,7 @@ const CheckoutWidget = () => {
               // value={values.gender}
               onValueChange={(value) => setPaymentMethod(value)}
             >
+              {country==="SA"&&
               <Label
                 htmlFor="card"
                 className="p-3 lg:p-6  mb-0 rounded border border-gray-200 bg-white"
@@ -329,35 +329,30 @@ const CheckoutWidget = () => {
                     <MoyasarPage data={checkoutData} />
                   </div>
                 )}
-              </Label>
-
+              </Label>}
+{country === "AE" &&
               <Label
                 htmlFor="Network"
                 className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
               >
                 <RadioGroupItem value="Network" id="Network" />
                 <div className="flex items-center w-full justify-between">
-                  <div>
-                    <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
-                      {" "}
-                      Network – {t('SplitIn4NoFees')}
-                    </h5>
-                    <p className="text-[#9e9e9e] text-xs">
-                      {" "}
-                      {t('SplitYourPayment')}
+                <p className="text-black text-sm lg:text-base font-semibold mb-1">
+                      {t('CreditCard')}/{t('debitCard')}
                     </p>
-                  </div>
 
-                  <div className="aspect-[46/17] w-12 relative">
-                    <Image
-                      src={"/images/tamara_logo.png"}
-                      fill
-                      className="object-contain"
-                      alt="tamara logo"
-                    />
-                  </div>
+                    <div className="justify-start items-start gap-1 inline-flex">
+                      {payments?.map((item, i) => {
+                        return (
+                          <div key={i} className=" relative w-12 h-6">
+                            <Image src={item?.img} className="" fill alt="" />
+                          </div>
+                        );
+                      })}
+                    </div>
                 </div>
               </Label>
+              }
 
               <Label
                 htmlFor="tabby"
@@ -486,21 +481,21 @@ const CheckoutWidget = () => {
                   {t('PlaceOrder')}
                 </button>
               )}
-              {paymentMethod === "Network" && (
+              {paymentMethod === "Network" && country === "AE" && (
                 <button
                   href={`${checkoutData?.tabby_checkout_url}`}
                   onClick={() => handleNgeniusCheckout()}
                   className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
                 >
                   {t('PlaceOrderWith')}{" "}
-                  <div className="aspect-[46/17] w-12 relative ms-2">
+                  {/* <div className="aspect-[46/17] w-12 relative ms-2">
                     <Image
                       src={"/images/tabby_logo.png"}
                       fill
                       className="object-contain"
                       alt="tabby logo"
                     />
-                  </div>
+                  </div> */}
                 </button>
               )}
               {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">

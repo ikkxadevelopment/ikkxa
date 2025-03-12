@@ -1,5 +1,6 @@
 import { Inter, Noto_Kufi_Arabic } from "next/font/google";
 import "../globals.css";
+import "../font.css"
 import Header from "@/components/Header";
 import GlobalProviders from "@/components/GlobalProviders";
 import Footer from "@/components/Footer";
@@ -9,7 +10,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { getFooter, getGlobal, getMenuData } from "@/lib/getHome";
 import { GoogleTagManager } from '@next/third-parties/google' 
 import { Analytics } from '@vercel/analytics/next';
-
 
 const inter = Inter({ subsets: ["latin"] ,
   weight: ['300', '400', '500', '600', '700']});

@@ -98,7 +98,10 @@ export default function ProductCard({ data, isWishlist }) {
           {data?.product_name}
         </h4>
         <p className=" text-base font-semibold mb-2 ">
-          <span className="text-neutral-800 font-normal text-xs">{currency}</span>{" "}
+          <span className="text-neutral-800 font-normal text-sm">
+          {/* <i className="icon-riyal text-sm"></i> */}
+            {currency}
+            </span>{" "}
           {data?.discount_percentage}
           {(data?.discount_percentage!==data?.price)&&
                <>

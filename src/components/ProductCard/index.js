@@ -80,7 +80,16 @@ export default function ProductCard({ data, isWishlist }) {
         >
           {(data?.discount_percentage!==data?.price)&&
           <span className="text-xs absolute bottom-0 left-0 font-semibold  px-2 py-[2px] text-[#F2432D] bg-[#FCEFEE] inline-block z-10">
-            {data?.special_discount_type==="flat"? `${t('Save')} ${data?.discount_amount} ${currency}`:`${offerPerc}% ${t('Off')}`} 
+           {
+  data?.special_discount_type === "flat" 
+  ? (
+    <>
+      {t('Save')} {data?.discount_amount} <span>{currency}</span>
+    </>
+  )
+  : `${offerPerc}% ${t('Off')}`
+}
+
           </span>
 }
           <Image

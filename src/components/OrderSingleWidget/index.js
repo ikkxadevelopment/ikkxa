@@ -375,13 +375,13 @@ export default function OrderSingleWidget({ slug }) {
         <ul className=" ">
           <li className="justify-between items-center flex mb-2">
             <div className="text-stone-500 text-sm font-medium ">{t('Subtotal')}</div>
-            <div className=" text-right text-stone-500 text-sm font-medium ">
+            <div className=" text-end text-stone-500 text-sm font-medium ">
               {resData?.formatted_sub_total} {currency}{" "}
             </div>
           </li>
           <li className="justify-between items-center flex mb-2">
             <div className="text-stone-500 text-sm font-medium ">{t('Discount')}</div>
-            <div className="w-56 text-right text-stone-500 text-sm font-medium ">
+            <div className="w-56 text-end text-stone-500 text-sm font-medium ">
               - {resData?.formatted_discount} {currency}
             </div>
           </li>
@@ -390,7 +390,7 @@ export default function OrderSingleWidget({ slug }) {
               <div className="text-stone-500 text-sm font-medium ">
                 {t('Charge')}
               </div>
-              <div className="w-56 text-right text-stone-500 text-sm font-medium ">
+              <div className="w-56 text-end text-stone-500 text-sm font-medium ">
                 {resData?.plus_cod_charge} {currency}
               </div>
             </li>
@@ -399,11 +399,11 @@ export default function OrderSingleWidget({ slug }) {
           <li className="justify-between items-center flex  mb-2">
             <div className="text-stone-500 text-sm font-medium ">{t('Delivery')}</div>
             {resData?.shipping_cost > 0 ? (
-              <div className=" text-right text-stone-500 text-sm font-medium ">
+              <div className=" text-end text-stone-500 text-sm font-medium ">
                 {resData?.formatted_shipping_cost} {currency}{" "}
               </div>
             ) : (
-              <div className="w-20 text-right text-green-700 text-sm font-medium ">
+              <div className="w-20 text-end text-green-700 text-sm font-medium ">
                 {t('FREE')}
               </div>
             )}
@@ -412,7 +412,7 @@ export default function OrderSingleWidget({ slug }) {
             <div className="text-stone-500 text-sm font-medium ">
               {t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}
             </div>
-            <div className="w-56 text-right text-stone-500 text-sm font-medium ">
+            <div className="w-56 text-end text-stone-500 text-sm font-medium ">
               {resData?.formatted_tax} {currency}
             </div>
           </li>
@@ -421,7 +421,7 @@ export default function OrderSingleWidget({ slug }) {
             <div className="text-neutral-900 text-sm font-semibold ">
               {t('TotalPrice')}
             </div>
-            <div className="w-72 text-right text-stone-500 text-sm font-semibold ">
+            <div className="w-72 text-end text-stone-500 text-sm font-semibold ">
               {resData?.formatted_total_payable} {currency}
             </div>
           </li>

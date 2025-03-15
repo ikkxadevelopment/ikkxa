@@ -305,7 +305,6 @@ const uae ="+971507187565"
               </Link>
             </div>
             <nav className="hidden space-x-2 lg:flex">
-              {console.log(menu,"menumenumenu")}
               
               {menu?.map((link, i) => {
                 return (

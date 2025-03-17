@@ -7,6 +7,9 @@ export default function Counter({data}) {
   
   const { updateItem, removeItem } = useCartWidget();
   const [count, setCount] = useState(data?.quantity);
+  const checkStock=() => {
+    return data?.stock_list?.some(item => item.current_stock <= count && item.name === data?.variant);
+  }
   const increment = async () => {
     const increasedCount = count + 1
     const res = await updateItem(data?.id,increasedCount, data?.variant)
@@ -41,6 +44,7 @@ export default function Counter({data}) {
       <button 
         className="px-2 rounded-tr  rounded-br border bg-neutral-100"
         onClick={increment}
+        disabled={checkStock()}
       >
         <PlusIcon className="w-4 h-4 md:w-5 md:h-5" />
       </button>

@@ -26,7 +26,7 @@ export default function DetailCounter({data, count, setCount}) {
       <div className="text-base border-t border-b border-zinc-300 font-medium  px-3 py-1">{count}</div>
       <button 
         className="px-2 rounded-tr  rounded-br border bg-neutral-100"
-        disabled={data.quantity === count}
+        disabled={data.quantity === count || !data.quantity}
         onClick={increment}
       >
         <PlusIcon className="w-4 h-4 md:w-5 md:h-5" />

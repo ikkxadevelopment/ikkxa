@@ -1,9 +1,12 @@
 
 import CategoriesWidget from "@/components/CategoriesWidget";
-import { getAllCategories } from "@/lib/getHome";
+import { getAllCategories, getMetaData } from "@/lib/getHome";
 
 
-export async function generateMetadata() {
+export async function generateMetadata({params: {lang}}) {
+  const seoData = await getMetaData(`/${lang}/categories`);
+  console.log(seoData,"seoDataseoData");
+  
     return {
       title: "Categories | IKKXA",
       description:

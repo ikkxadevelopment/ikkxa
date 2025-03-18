@@ -21,7 +21,6 @@ export default function CategoriesWidget({ data }) {
               <div key={i}>
                 <div className="w-full overflow-hidden h-full min-h-[432px] bg-gray-200 p-8 relative rounded-md flex-col justify-between items-start gap-24 inline-flex">
                 {/* bg-gradient-to-b  from-gray-200 to-orange-400  */}
-                 {console.log(item,"itemitemitemitemitemitem")}
                   <div className=" w-[100%] h-full absolute bottom-0 right-0 pointer-events-none">
                   {/* aspect-[240/355] aspect  */}
                     <Image
@@ -48,7 +47,6 @@ export default function CategoriesWidget({ data }) {
                           key={index}
                           className="px-3 py-2 bg-white/70 rounded-3xl   text-stone-950 text-sm"
                         >
-                          {console.log(cate,"wdfsdfsdf")}
                           {cate?.title}
                         </Link>
                       );

@@ -86,11 +86,11 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
         />
       </Head> */}
       <main className="min-h-screen  pt-[58px] md:pt-20">
-      <Script
+      {/* <Script
       id="structuredData"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        /> */}
         <ProductDetail data={data} structuredData={structuredData} isOutOfStock={isOutOfStock}/>
       </main>
     </>

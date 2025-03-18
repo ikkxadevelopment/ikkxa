@@ -27,6 +27,9 @@ export default function ProductCard({ data, isWishlist }) {
   const { width } = useGetDeviceType();
   const offerPerc =
     100 - Math.round((data?.discount_percentage / data?.price) * 100);
+  const checkStock = () => {
+    return data?.stock?.some(item => item.current_stock > 0);
+  }
   return (
     <div className="group">
       <div className="relative overflow-hidden">
@@ -134,13 +137,20 @@ export default function ProductCard({ data, isWishlist }) {
         {errorMessages[data.id] && (
           <p className="text-xs" style={{ color: "red" }}>{errorMessages[data.id]}</p>
         )}
-        <div className="pt-4">
-          {data?.has_variant && width < 992 ? (
-            <SelectVariantDialog data={data} />
+        {
+          checkStock() ? (
+            <div className="pt-4">
+              {data?.has_variant && width < 992 ? (
+                <SelectVariantDialog data={data} />
+              ) : (
+                <AddToCart data={data} />
+              )}
+            </div>
           ) : (
-          <AddToCart data={data} />
-          )}
-        </div>
+            <p className="text-red-500 text-sm mt-2">
+              {t("Outofstock")}
+            </p>)
+        }
       </div>
     </div>
   );

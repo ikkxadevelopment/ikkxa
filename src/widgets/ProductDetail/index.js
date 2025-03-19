@@ -40,7 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Suspense, useEffect, useRef } from "react";
 import useHeaderSecond from "@/hooks/useHeaderSecond";
 
-export default function ProductDetail({ data,structuredData, isOutOfStock }) {
+export default function ProductDetail({ data, isOutOfStock }) {
   const t = useTranslations("Index");
   // console.log(structuredData,data,"structuredData");
 

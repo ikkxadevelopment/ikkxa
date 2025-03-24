@@ -54,27 +54,27 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
   const data = await getSingleProduct(product, locale, country);
   const isOutOfStock = data?.results?.product?.stock.every(item => item.current_stock === 0);
 
-  const structuredData = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    name:  data?.results?.product?.language_product?.name,
-    image: data?.results?.product?.gallery?.large,
-    description:data?.results?.product?.short_description,
-    sku: data?.results?.product?.product_stock?.sku,
-    brand: {
-      "@type": "Brand",
-      name: "IKKXA",
-    },
-    offers: {
-      "@type": "Offer",
-      url: `https://ikkxa.com/${locale}-${country}/products/${data?.results?.product?.slug}`,
-      priceCurrency: "SAR",
-      price: data?.results?.product?.stock[0]?.product?.discount_percentage,
-      priceValidUntil: data?.results?.product?.special_discount_end,
-      itemCondition: "https://schema.org/NewCondition",
-      availability: `https://schema.org/${isOutOfStock?"OutOfStock":"InStock"}`,
-    },
-  };
+  // const structuredData = {
+  //   "@context": "https://schema.org/",
+  //   "@type": "Product",
+  //   name:  data?.results?.product?.language_product?.name,
+  //   image: data?.results?.product?.gallery?.large,
+  //   description:data?.results?.product?.short_description,
+  //   sku: data?.results?.product?.product_stock?.sku,
+  //   brand: {
+  //     "@type": "Brand",
+  //     name: "IKKXA",
+  //   },
+  //   offers: {
+  //     "@type": "Offer",
+  //     url: `https://ikkxa.com/${locale}-${country}/products/${data?.results?.product?.slug}`,
+  //     priceCurrency: "SAR",
+  //     price: data?.results?.product?.stock[0]?.product?.discount_percentage,
+  //     priceValidUntil: data?.results?.product?.special_discount_end,
+  //     itemCondition: "https://schema.org/NewCondition",
+  //     availability: `https://schema.org/${isOutOfStock?"OutOfStock":"InStock"}`,
+  //   },
+  // };
   
   if (!data) return notFound();
   return (
@@ -86,12 +86,12 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
         />
       </Head> */}
       <main className="min-h-screen  pt-[58px] md:pt-20">
-      <Script
+      {/* <Script
       id="structuredData"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-        <ProductDetail data={data} structuredData={structuredData} isOutOfStock={isOutOfStock}/>
+        /> */}
+        <ProductDetail data={data}  isOutOfStock={isOutOfStock}/>
       </main>
     </>
   );

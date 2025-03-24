@@ -27,6 +27,9 @@ export default function ProductCard({ data, isWishlist }) {
   const { width } = useGetDeviceType();
   const offerPerc =
     100 - Math.round((data?.discount_percentage / data?.price) * 100);
+  const checkStock = () => {
+    return data?.stock?.some(item => item.current_stock > 0);
+  }
   return (
     <div className="group">
       <div className="relative overflow-hidden">
@@ -80,7 +83,16 @@ export default function ProductCard({ data, isWishlist }) {
         >
           {(data?.discount_percentage!==data?.price)&&
           <span className="text-xs absolute bottom-0 left-0 font-semibold  px-2 py-[2px] text-[#F2432D] bg-[#FCEFEE] inline-block z-10">
-            {data?.special_discount_type==="flat"? `${t('Save')} ${data?.discount_amount} ${currency}`:`${offerPerc}% ${t('Off')}`} 
+           {
+  data?.special_discount_type === "flat" 
+  ? (
+    <>
+      {t('Save')} {data?.discount_amount} <span>{currency}</span>
+    </>
+  )
+  : `${offerPerc}% ${t('Off')}`
+}
+
           </span>
 }
           <Image
@@ -98,7 +110,10 @@ export default function ProductCard({ data, isWishlist }) {
           {data?.product_name}
         </h4>
         <p className=" text-base font-semibold mb-2 ">
-          <span className="text-neutral-800 font-normal text-xs">{currency}</span>{" "}
+          <span className="text-neutral-800 font-normal text-sm">
+          {/* <i className="icon-riyal text-sm"></i> */}
+            {currency}
+            </span>{" "}
           {data?.discount_percentage}
           {(data?.discount_percentage!==data?.price)&&
                <>
@@ -122,13 +137,20 @@ export default function ProductCard({ data, isWishlist }) {
         {errorMessages[data.id] && (
           <p className="text-xs" style={{ color: "red" }}>{errorMessages[data.id]}</p>
         )}
-        <div className="pt-4">
-          {data?.has_variant && width < 992 ? (
-            <SelectVariantDialog data={data} />
+        {
+          checkStock() ? (
+            <div className="pt-4">
+              {data?.has_variant && width < 992 ? (
+                <SelectVariantDialog data={data} />
+              ) : (
+                <AddToCart data={data} />
+              )}
+            </div>
           ) : (
-          <AddToCart data={data} />
-          )}
-        </div>
+            <p className="text-red-500 text-sm mt-2">
+              {t("Outofstock")}
+            </p>)
+        }
       </div>
     </div>
   );

@@ -14,13 +14,13 @@ const getCurrency = () => {
 
     switch (country) {
         case 'SA':
-            currency = 'SAR'; 
+            currency = <i className="icon-riyal "></i>; 
             break;
         case 'AE':
             currency = 'AED'; 
             break;
         default:
-            currency = 'SAR'; 
+            currency = <i className="icon-riyal "></i>; 
     }
 
     return currency;

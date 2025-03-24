@@ -22,7 +22,7 @@ import ProductsSlider from "@/widgets/ProductsSlider";
 export async function generateMetadata({ params: { lang } }) {
   const [locale, country] = lang.split("-");
   const seoData = await getMetaData(lang);
-  console.log(country,"countrycountrycountry");
+  console.log(seoData,"countrycountrycountry");
   let seoTitle 
   if(country==="SA") {
     seoTitle="Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA"

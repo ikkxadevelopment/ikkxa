@@ -44,7 +44,7 @@ export default function CategoriesSubSlider({ data }) {
           {data?.data?.length > 0 &&
             data?.data?.map((item, i) => {
               return (
-                <SwiperSlide key={i} className="max-w-[65px] mr-[10px] "><CategoryCard data={item}  /></SwiperSlide>
+                <SwiperSlide key={i} className="max-w-[65px] me-[10px] "><CategoryCard data={item}  /></SwiperSlide>
                );
             })}
         </Slider>

@@ -40,7 +40,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Suspense, useEffect, useRef } from "react";
 import useHeaderSecond from "@/hooks/useHeaderSecond";
 
-export default function ProductDetail({ data,structuredData, isOutOfStock }) {
+export default function ProductDetail({ data, isOutOfStock }) {
   const t = useTranslations("Index");
   // console.log(structuredData,data,"structuredData");
 
@@ -285,24 +285,28 @@ export default function ProductDetail({ data,structuredData, isOutOfStock }) {
                 </div>
               )}
 
-              <div className="py-3 lg:py-4 border-b border-gray-200" ref={variantParentRef}>
-                <div className="flex items-center gap-4">
-                  <DetailCounter
-                    data={productDetail}
-                    count={count}
-                    setCount={setCount}
-                  />
-                  <div className="text-orange-600 text-sm font-medium leading-tight">
-                    {productDetail?.quantity &&
-                      `${t("Only")} ${productDetail?.quantity} ${t("left")}`}
+              {productDetail?.quantity &&
+                <div className="py-3 lg:py-4 border-b border-gray-200" ref={variantParentRef}>
+                  <div className="flex items-center gap-4">
+                    <DetailCounter
+                      data={productDetail}
+                      count={count}
+                      setCount={setCount}
+                    />
+                    <div className="text-orange-600 text-sm font-medium leading-tight">
+                      {productDetail?.quantity &&
+                        `${t("Only")} ${productDetail?.quantity} ${t("left")}`}
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
 
               <div className="py-3 lg:py-4 border-b border-gray-200" >
-                <p className="text-stone-950 text-base font-semibold mb-3">
-                  {t("Size")}: {productDetail?.size}
-                </p>
+                {productDetail?.size &&
+                  <p className="text-stone-950 text-base font-semibold mb-3">
+                    {t("Size")}: {productDetail?.size}
+                  </p>
+                }
                 {datas?.product?.attribute_values && (
                   <VariantCheckbox
                     setProductDetail={setProductDetail}

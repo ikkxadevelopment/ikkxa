@@ -148,6 +148,7 @@ export async function getMenuData(lang, country) {
 export async function getMetaData(url) {
   // const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
   const slug = `${META_DATA}${url}`;
+  
   const urlParamsObject = null;
   const data = await strapiFetch(slug, urlParamsObject, options);
   return data;

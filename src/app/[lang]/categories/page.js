@@ -4,7 +4,7 @@ import { getAllCategories, getMetaData } from "@/lib/getHome";
 
 
 export async function generateMetadata({params: {lang}}) {
-  const seoData = await getMetaData(`/${lang}/categories`);
+  const seoData = await getMetaData(`${lang}/categories`);
   console.log(seoData,"seoDataseoData");
   
     return {
@@ -17,10 +17,6 @@ export async function generateMetadata({params: {lang}}) {
       },
     };
   }
-  
-
-  
-
   
 
 export default async function ProductsPage({params: {lang}}) {

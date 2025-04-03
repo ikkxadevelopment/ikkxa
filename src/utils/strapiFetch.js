@@ -8,6 +8,7 @@ const strapiFetch = async (slug, urlParamsObject, options, country) => {
     //     `${process.env.NEXT_PUBLIC_BASE_URL}${slug}${queryString ? `?${queryString}` : ""}`,
     //     { ...options }
     // );
+    
     const res = await fetch(
         `${baseUrl}${slug}${queryString ? `?${queryString}` : ""}`,
         { ...options }

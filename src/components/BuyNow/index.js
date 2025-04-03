@@ -194,7 +194,7 @@ export default function BuyNow({ data, count, detail }) {
                   </p>
                   <p className="text-black text-sm ">
                     {" "}
-                    {detail?.price * count} {currency}
+                    {currency} {detail?.price * count} 
                   </p>
                 </div>
 
@@ -202,8 +202,8 @@ export default function BuyNow({ data, count, detail }) {
                   <p className="text-black text-sm">{t("Discount")}</p>
                   <p className="text-sm text-[#00b553]">
                     {" "}
-                    -{detail?.price * count - detail?.disPrice * count}{" "}
-                    {currency}
+                    -{currency} {detail?.price * count - detail?.disPrice * count}{" "}
+                    
                   </p>
                 </div>
 
@@ -212,7 +212,7 @@ export default function BuyNow({ data, count, detail }) {
                     {t("Total")}
                   </p>
                   <p className="text-black text-base font-semibold">
-                    {detail?.disPrice * count} {currency}
+                  {currency} {detail?.disPrice * count} 
                   </p>
                 </div>
                 <div className="w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">

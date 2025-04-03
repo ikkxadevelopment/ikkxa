@@ -208,13 +208,13 @@ export default function ProductDetail({ data, isOutOfStock }) {
               <div className="text-sm">SKU : {productDetail?.sku}</div>
               <div className="py-4 border-b border-gray-200">
                 <p className="text-xl font-bold mb-2">
-                  {productDetail?.disPrice} {currency}
+                {currency} {productDetail?.disPrice} 
                   {productDetail?.disPrice !== productDetail?.price && (
                     <>
                       {datas?.product?.special_discount_type === "flat" ? (
                         <span className=" ms-2 px-1.5 py-1 bg-red-50 rounded inline-block text-red-500 text-base font-bold">
-                          {t("Save")}: {productDetail?.price - productDetail?.disPrice}{" "}
-                          {currency}
+                          {t("Save")}:   {currency} {productDetail?.price - productDetail?.disPrice}{" "}
+                        
                         </span>
                       ) : (
                         <span className=" ms-2 px-1.5 py-1 bg-red-50 rounded inline-block text-red-500 text-base font-bold">
@@ -226,7 +226,7 @@ export default function ProductDetail({ data, isOutOfStock }) {
                 </p>
                 {productDetail?.disPrice !== productDetail?.price && (
                   <p className="text-neutral-400 text-sm line-through">
-                    {productDetail?.price} {currency}
+                    {currency} {productDetail?.price}
                   </p>
                 )}
 {isOutOfStock && (

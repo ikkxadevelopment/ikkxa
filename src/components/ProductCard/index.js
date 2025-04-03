@@ -87,7 +87,7 @@ export default function ProductCard({ data, isWishlist }) {
   data?.special_discount_type === "flat" 
   ? (
     <>
-      {t('Save')} {data?.discount_amount} <span>{currency}</span>
+      {t('Save')}  <span>{currency}</span> {data?.discount_amount}
     </>
   )
   : `${offerPerc}% ${t('Off')}`

@@ -363,12 +363,9 @@ const CheckoutWidget = () => {
                   <div>
                     <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                       {" "}
-                      Tabby – {t('SplitIn4NoFees')}
+                      Tabby –  {t('SplitYourPayment')}
                     </h5>
-                    <p className="text-[#9e9e9e] text-xs">
-                      {" "}
-                      {t('SplitYourPayment')}
-                    </p>
+                   
                   </div>
 
                   <div className="aspect-[46/17] w-12 relative">

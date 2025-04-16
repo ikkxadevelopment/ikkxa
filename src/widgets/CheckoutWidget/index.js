@@ -367,7 +367,7 @@ const CheckoutWidget = () => {
                     </h5>
                     <p className="text-[#9e9e9e] text-xs">
                       {" "}
-                      {t('SplitYourPayment')}.
+                      {t('SplitYourPayment')}
                     </p>
                   </div>
 

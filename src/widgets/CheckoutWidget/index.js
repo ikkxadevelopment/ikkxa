@@ -139,7 +139,7 @@ const CheckoutWidget = () => {
       
 
       const response = await axios.get(
-        `${baseUrl}${TABBY_CHECKOUT}/${order_id}`,
+        `${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
         data,
         config
       );

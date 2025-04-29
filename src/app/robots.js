@@ -6,7 +6,7 @@ export default function robots() {
           disallow: ['/wishlist','/cart','/profile','/orders','/manage-addresses','/checkout'],
         },
       ],
-      sitemap: 'https://ikkxa.com/sitemap.xml',
+      // sitemap: 'https://ikkxa.com/sitemap.xml',
     }
   }
 

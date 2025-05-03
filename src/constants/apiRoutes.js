@@ -91,3 +91,5 @@ export const FOOTER_DATA ="footer-data"
 export const SOCIAL_LOGIN="social-login"
 export const BUY_NOW="user/buy-now"
 export const CONTACT="save-contactus"
+
+export const BLOG="blogs"

@@ -25,7 +25,13 @@ export async function generateMetadata({ params: { product, lang } }) {
     // keywords: data?.results?.product?.product_meta_keywords,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        [`en-${country}`]: `/en-${country}`,
+        [`ar-${country}`]: `/ar-${country}`,
+      },
     },
+    metadataBase: new URL('https://ikkxa.com'),
+  
     robots: {
       index: true,
       follow: true,

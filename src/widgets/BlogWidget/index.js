@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { BLOG } from '@/constants/apiRoutes';
 import { useLocale } from 'next-intl';
 import React, { useState } from 'react';
+import useBlogCategories from "./useBlogCategories";
 
 
 const blogs = [
@@ -26,6 +27,7 @@ const blogs = [
   
 
 const BlogWidget = () => {
+  const { blogCategories, setBlogCategories, isLoading, isError } = useBlogCategories();
     const lang = useLocale();
     const [locale, country] = lang.split('-');
     const [blogsData, setBlogsData] = useState([])
@@ -33,6 +35,7 @@ const BlogWidget = () => {
     const [sort, setSort] = useState('newest')
     const [slug, setSlug] = useState('jalabiya')
     const [totalPages, setTotalPages] = useState(3)
+    
     const goToNextPage = () => {
         if (page < totalPages) setPage((prev) => prev + 1);
       };
@@ -40,7 +43,10 @@ const BlogWidget = () => {
       const goToPreviousPage = () => {
         if (page > 1) setPage((prev) => prev - 1);
       };
-    
+      const handleFilterClick = (slug) => {
+        console.log("Selected slug:", slug);
+        setSlug(slug)
+      };
     
     const url = `${BLOG}?page=${page}&lang=${locale}&slug=${slug}&sort=${sort}`
     const { data, error } = useSWR(url, {
@@ -69,7 +75,24 @@ const BlogWidget = () => {
         <br />
         <button onClick={goToNextPage} disabled={page === totalPages}>Next</button>
       </div>
+      <div>
+      {blogCategories?.map((category) => {
+        const titleObj = category.current_language.find((item) => item.lang === locale);
+        const displayTitle = titleObj ? titleObj.title : category.title;
+
+        return (
+          <button
+            key={category.id}
+            onClick={() => handleFilterClick(category.slug)}
+            style={{ margin: "5px", padding: "10px" }}
+          >
+            {displayTitle}
+          </button>
+        );
+      })}
+      </div>
     </div>
+
   );
 };
 

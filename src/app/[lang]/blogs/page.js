@@ -1,4 +1,5 @@
 import { getSingleMedia } from "@/lib/getPages";
+import BlogListing from "@/widgets/BlogListing";
 import DetailWidget from "@/widgets/DetailWidget";
 import { notFound } from "next/navigation";
 
@@ -20,7 +21,7 @@ export default async function LeaderSinglePage({ params: { slug, lang } }) {
     if (!data) return notFound();
     return (
         <main>
-            <DetailWidget data={data?.data}/>
+           <BlogListing/>
         </main>
     )
 }

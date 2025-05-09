@@ -106,6 +106,8 @@ export default function ProductCard({ data, isWishlist }) {
         </div>
       </div>
       <div className="py-2">
+      <Link
+          href={`/products/${data?.slug}`}>
         <h4 className="text-sm font-normal line-clamp-2 mb-2">
           {data?.product_name}
         </h4>
@@ -126,6 +128,7 @@ export default function ProductCard({ data, isWishlist }) {
                </>}
       
         </p>
+        </Link>
         {data?.current_stock<5&&
         <p className=" text-[10px] font-semibold flex items-center ">
           <span className="text-xs text-[#F2432D] me-1">

@@ -37,9 +37,15 @@ export async function generateMetadata({ params: { lang } }) {
     description:
       seoData?.message?.desc ||
       "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
+      metadataBase: new URL('https://ikkxa.com'),
+    
     alternates: {
       canonical:
         seoData?.message?.canonical_url || `https://ikkxa.com/${lang}`,
+      languages: {
+        [`en-${country}`]: `/en-${country}`,
+        [`ar-${country}`]: `/ar-${country}`,
+      },
     },
     openGraph: {
       images: seoData?.message?.image || [],

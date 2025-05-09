@@ -1,0 +1,82 @@
+"use client"
+import Image from "@/components/Image/image";
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "next/navigation";
+import { FaFacebook, FaLinkedinIn, FaTwitter, FaWhatsapp } from "react-icons/fa";
+
+export default function DetailWidget({ data }) {
+  const t = useTranslations('Index')
+  const pathname = usePathname()
+  const pathSegments = pathname.split('/');
+  const cat = pathSegments[2];
+
+  const url = `${process.env.NEXT_PUBLIC_DOMAIN}${pathname}`
+  const text = "Check out this post!"
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+  const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+  const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+  const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}%20${encodeURIComponent(url)}`;
+
+
+
+
+  return (
+    <section className={`overflow-hidden bg-slate-50 pt-14  pb-12 2xl:pt-[120px] 2xl:pb-[100px]`} id="DetailWidget">
+      <div className="container">
+        <div className="2xl:px-24 mb-8">
+          <p className=" text-blue-600 text-base font-semibold  leading-none mb-2"><Link href={`/`} className="uppercase">HOME</Link> / <Link href={`/${cat}`} className="uppercase">{cat}</Link></p>
+          <div className="grid grid-cols-12 lg:gap-x-5 gy-3 items-end">
+            <div className="col-span-12 lg:col-span-9">
+              <h1 className="  text-3xl lg:text-5xl xl:text-6xl font-semibold  lg:leading-normal xl:leading-tight bg-gradient-to-r from-[#242E49]  to-[#5B95F9] bg-clip-text text-transparent font-condensed mb-1 lg:mb-1">{data?.title}</h1>
+              <div className="text-neutral-700 text-base">{data?.date && `Published on ${new Date(data?.date).toLocaleDateString('en-GB')}`}</div>
+            </div>
+            <div className="col-span-12 lg:col-span-3">
+              <div className="lg:text-end">
+                <a className="inline-block px-2 py-1 me-1 text-[#969696]" href={facebookShareUrl} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>
+                <a className="inline-block px-2 py-1 me-1 text-[#969696]" href={twitterShareUrl} target="_blank" rel="noopener noreferrer"><FaTwitter /></a>
+                <a className="inline-block px-2 py-1 me-1 text-[#969696]" href={linkedInShareUrl} target="_blank" rel="noopener noreferrer"><FaLinkedinIn /></a>
+                <a className="inline-block px-2 py-1 me-1 text-[#969696]" href={whatsappShareUrl} target="_blank" rel="noopener noreferrer"><FaWhatsapp /></a>
+              </div>
+            </div>
+
+
+
+
+          </div>
+        </div>
+        <div className="aspect-[1454/548] bg-slate-200 relative">
+        {data?.cover?.url&& <Image src={`${data?.cover?.url}`} className="object-cover" fill alt={data?.title} />}
+        </div>
+
+        <div className="2xl:px-24 py-14">
+          <div className="grid grid-cols-12 lg:gap-x-10">
+            <div className="col-span-9"><div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data?.content }}></div></div>
+            <div className="col-span-3">
+              <div className="text-blue-600 text-2xl font-semibold mb-2">{t(`More${cat}`)}</div>
+              {data?.items?.map((item, i) => {
+                return (
+                  <Link key={i} href={`${item?.slug}`} className="py-3 block  border-b border-neutral-300">
+                    <div className="grid grid-cols-12 gap-x-3 items-center">
+                      <div className="col-span-4">
+                        <div className="aspect-[1/1] relative">
+                          <Image src={`${item?.cover?.url}`} className="object-cover" fill alt={item?.title} />
+                        </div>
+                      </div>
+                      <div className="col-span-8">
+                        <h3 className="text-black text-lg font-medium font-condensed line-clamp-2">{item?.title}</h3>
+                        <p className="text-zinc-600/90 text-sm  leading-snug line-clamp-2">{item?.description}</p>
+                      </div>
+                    </div>
+
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}

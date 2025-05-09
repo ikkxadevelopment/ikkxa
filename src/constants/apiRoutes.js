@@ -93,3 +93,4 @@ export const BUY_NOW="user/buy-now"
 export const CONTACT="save-contactus"
 
 export const BLOG="blogs"
+export const BLOG_CATEGORY="load/blog-categories"

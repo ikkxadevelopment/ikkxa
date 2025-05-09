@@ -23,41 +23,41 @@ const blogs = [
       fullDescription: 'Here we explore something new and insightful.',
       writer: 'Jane Smith',
     },
-  ];
+];
   
 
 const BlogWidget = () => {
   const { blogCategories, setBlogCategories, isLoading, isError } = useBlogCategories();
-    const lang = useLocale();
-    const [locale, country] = lang.split('-');
-    const [blogsData, setBlogsData] = useState([])
-    const [page, setPage] = useState(1)
-    const [sort, setSort] = useState('newest')
-    const [slug, setSlug] = useState('jalabiya')
-    const [totalPages, setTotalPages] = useState(3)
-    
-    const goToNextPage = () => {
-        if (page < totalPages) setPage((prev) => prev + 1);
-      };
-    
-      const goToPreviousPage = () => {
-        if (page > 1) setPage((prev) => prev - 1);
-      };
-      const handleFilterClick = (slug) => {
-        console.log("Selected slug:", slug);
-        setSlug(slug)
-      };
-    
-    const url = `${BLOG}?page=${page}&lang=${locale}&slug=${slug}&sort=${sort}`
-    const { data, error } = useSWR(url, {
-        onSuccess: (data) => {
-          if (data) {
-            const blogResult = data?.results?.blogs?.data
-            setBlogsData(blogResult)
-          }
-        },
-      });
-    
+  const lang = useLocale();
+  const [locale, country] = lang.split('-');
+  const [blogsData, setBlogsData] = useState([])
+  const [page, setPage] = useState(1)
+  const [sort, setSort] = useState('newest')
+  const [slug, setSlug] = useState('jalabiya')
+  const [totalPages, setTotalPages] = useState(3)
+  
+  const url = `${BLOG}?page=${page}&lang=${locale}&slug=${slug}&sort=${sort}`
+  const { data, error } = useSWR(url, {
+    onSuccess: (data) => {
+      if (data) {
+        const blogResult = data?.results?.blogs?.data
+        setBlogsData(blogResult)
+      }
+    },
+  });
+
+  const goToNextPage = () => {
+      if (page < totalPages) setPage((prev) => prev + 1);
+    };
+  
+    const goToPreviousPage = () => {
+      if (page > 1) setPage((prev) => prev - 1);
+    };
+    const handleFilterClick = (slug) => {
+      setSlug(slug)
+    };
+  
+  
   return (
     <div>
       <h1>Blog List</h1>

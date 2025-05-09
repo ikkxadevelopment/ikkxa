@@ -13,8 +13,6 @@ const useBlogCategories = () => {
     onSuccess: (data) => {
       if (data) {
         const blogCategoriesResult = data?.results?.categories?.data
-    console.log("blogCategories",blogCategoriesResult);
-
         setBlogCategories(blogCategoriesResult)
       }
     },

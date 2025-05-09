@@ -20,12 +20,18 @@ export async function generateMetadata({ params: { product, lang } }) {
     : [];
   const canonicalUrl = `https://ikkxa.com/en-SA/products/${meta?.slug}`;
   return {
-    title: meta_base?.meta_title,
-    description: meta_base?.meta_description,
+    title: meta_base?.meta_title||data?.results?.product?.language_product?.name,
+    description: meta_base?.meta_description||data?.results?.product?.short_description,
     // keywords: data?.results?.product?.product_meta_keywords,
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        [`en-${country}`]: `/en-${country}`,
+        [`ar-${country}`]: `/ar-${country}`,
+      },
     },
+    metadataBase: new URL('https://ikkxa.com'),
+  
     robots: {
       index: true,
       follow: true,

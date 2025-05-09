@@ -11,6 +11,7 @@ export async function generateMetadata({params: {lang}}) {
       title: "Categories | IKKXA",
       description:
         "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
+        
       robots: {
         index: true,
         follow: true,

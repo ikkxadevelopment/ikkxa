@@ -1,18 +1,47 @@
-'use client';
+import Link from "next/link";
 
-import Error from 'next/error';
+// export default function NotFound() {
+//   return (
+//     <div>
+//       <h2>Not Found</h2>
+//       <p>Could not find requested resource</p>
+//       <Link href="/">Return Home</Link>
+//     </div>
+//   );
+// }
 
-// Render the default Next.js 404 page when a route
-// is requested that doesn't match the middleware and
-// therefore doesn't have a locale associated with it.
 
-export default function NotFound() {
+// "use client";
+import Image from "@/components/Image/image";
+import { useTranslations } from "next-intl";
+
+const NotFound = () => {
+  const t = useTranslations("Index");
   return (
-    <html lang="en">
-      <body>
-        <Error statusCode={404} />
-        
-      </body>
-    </html>
+    <section className="py-10 min-h-screen flex items-center ">
+      <div className="container">
+        <div className="aspect-[85/94] relative max-w-24 mx-auto mb-6">
+          <Image
+            src={"/images/nowishlist.svg"}
+            sizes="50vw"
+            fill
+            className="object-contain"
+            alt={"no items in wishlist"}
+          />
+        </div>
+        <div className="">
+          <h3 className="text-center text-black text-xl lg:text-3xl font-semibold   mb-3 ">
+            {t("NoPage")}
+            {/* Oops! We couldn&apos;t find what you were looking for! */}
+          </h3>
+          <p className="text-center text-zinc-500 text-sm  lg:text-lg leading-tight">
+          {/* Don&apos;t give up, try and modify your search! */}
+          {t('NoDataP')}
+          </p>
+        </div>
+      </div>
+    </section>
   );
-}
+};
+
+export default NotFound;

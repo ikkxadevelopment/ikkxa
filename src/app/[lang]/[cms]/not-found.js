@@ -14,6 +14,7 @@ import Link from "next/link";
 // "use client";
 import Image from "@/components/Image/image";
 import { useTranslations } from "next-intl";
+import { IoMdArrowForward } from "react-icons/io";
 
 const NotFound = () => {
   const t = useTranslations("Index");
@@ -34,10 +35,22 @@ const NotFound = () => {
             {t("NoPage")}
             {/* Oops! We couldn&apos;t find what you were looking for! */}
           </h3>
-          <p className="text-center text-zinc-500 text-sm  lg:text-lg leading-tight">
+          <p className="text-center text-zinc-500 text-sm  lg:text-lg leading-tight max-w-[800px] mb-5 mx-auto">
           {/* Don&apos;t give up, try and modify your search! */}
-          {t('NoDataP')}
+         
+          {t('Nopagep')}
           </p>
+          <div className="text-center">
+          <Link
+              href={`/`}
+              className="text-black inline-flex text-base font-medium items-center"
+            >
+              {t("BackToHome")}
+              <span className="ms-2">
+                <IoMdArrowForward />
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

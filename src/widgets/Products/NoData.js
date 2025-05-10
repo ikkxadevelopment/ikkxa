@@ -20,23 +20,16 @@ import { IoMdArrowForward } from "react-icons/io";
           </div>
           <div className="">
             <h3 className="text-center text-black text-xl lg:text-3xl font-semibold   mb-3 ">
-              {t("NoPage")}
+            {t("NoPage")}
+
               {/* Oops! We couldn&apos;t find what you were looking for! */}
             </h3>
             <p className="text-center text-zinc-500 text-sm  lg:text-lg leading-tight">
             {/* Don&apos;t give up, try and modify your search! */}
-            {t('Nopagep')}
+            {t('NoDataP')}
             </p>
 
-            <Link
-              href={`/`}
-              className="text-black inline-flex text-base font-medium items-center"
-            >
-              {t("BackToHome")}
-              <span className="ms-2">
-                <IoMdArrowForward />
-              </span>
-            </Link>
+        
 
 
           </div>

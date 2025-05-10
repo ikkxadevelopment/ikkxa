@@ -1,13 +1,33 @@
 "use client"
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import BlogPaginate from "./BlogPaginate";
+import { BLOG } from "@/constants/apiRoutes";
+import { useLocale } from "next-intl";
+import useSWR from "swr";
 
-const BlogListing = ({ data }) => {
+
+const BlogListing = ({ }) => {
+  const lang = useLocale();
+  const [locale, country] = lang.split('-');
+  const [blogsData, setBlogsData] = useState([])
+  const [paginationData, setPaginationData] = useState({});
+  const url = `${BLOG}?page=1&lang=${locale}&slug=jalabiya&sort=newest`
+
+  const { data, error } = useSWR(url, {
+    onSuccess: (data) => {
+      if (data) {
+        const blogResult = data?.results?.blogs
+        setPaginationData(blogResult)
+        setBlogsData(blogResult?.data)
+      }
+    },
+  });
+
 	return (
-		<section className={`bg-neutral-100 lg:pb-[100px]`} id="BlogListing"> 
+		<section  id="BlogListing"> 
 			<div className="container">
 				<Suspense fallback="Loading">
-					<BlogPaginate datas={data} tags={null} />
+					<BlogPaginate datas={blogsData} tags={null} paginationData={paginationData} />
 				</Suspense>
 			</div>
 		</section>

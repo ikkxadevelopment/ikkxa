@@ -4,7 +4,9 @@ import { SwiperSlide } from "swiper/react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-export default function Tags({ selectedTag, setSelectedTag, tags }) {
+export default function saTags({ selectedTag, setSelectedTag, tags }) {
+    console.log("tags00000000000000",tags);
+    
     const t = useTranslations('Index')
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -15,7 +17,7 @@ export default function Tags({ selectedTag, setSelectedTag, tags }) {
         if (selectedOption ===null) {
             params.delete("tags");
             params.delete("page");
-            setSelectedTag(null)
+            setSelectedTag(null)    
             router.push(`${pathname}?${params.toString()}`, {scroll: false});
           } else {
             params.set("tags", selectedOption);
@@ -39,12 +41,12 @@ export default function Tags({ selectedTag, setSelectedTag, tags }) {
             <Slider customSettings={customSettings} className={` w-100 h-100 `} >
                 <SwiperSlide className={``} style={{ width: "fit-content" }}>
                     <div role="button" className={`px-5 py-[9px] border-b font-medium   ${selectedTag === null ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} onClick={() => {
-                        handleTag(null)}}>{t('All')}</div>
+                        handleTag(null)}}>All</div>
                 </SwiperSlide>
-                {tags?.data?.map((item, i) => {
+                {tags?.map((item, i) => {
                     return (
                         <SwiperSlide className={``} style={{ width: "fit-content" }} key={i}>
-                            <div role="button" className={`px-5 py-[9px] border-b font-medium    ${selectedTag === item?.slug ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} id={item?.slug} onClick={() =>  handleTag(item?.slug)}>{item?.name}</div>
+                            <div role="button" className={`px-5 py-[9px] border-b font-medium    ${selectedTag === item?.slug ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} id={item?.slug} onClick={() =>  handleTag(item?.slug)}>{item?.title}</div>
                         </SwiperSlide>
                     )
                 })}

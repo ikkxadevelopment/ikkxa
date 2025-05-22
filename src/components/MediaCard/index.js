@@ -16,7 +16,7 @@ export default function MediaCard({ data, isSm = false, isLg = false, isPopular 
       </>}
       
         <div className="aspect-[470/263] relative bg-white w-full">
-          {data?.thumbnail && <Image src={data?.thumbnail} fill className="object-cover" alt={`${data?.title}`} />}
+          {data?.thumbnail && <Image src={data?.thumbnail} fill className="object-cover" alt={data?.title} />}
         </div>
       <div className={`flex flex-col justify-between relative z-20 h-full  ${isSm ? "pt-3 pb-4" : isPopular ? "pt-6 pb-4" : "pt-4 pb-8"}`}>
         <div>

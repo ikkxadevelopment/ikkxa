@@ -5,7 +5,6 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 export default function saTags({ selectedTag, setSelectedTag, tags }) {
-    console.log("tags00000000000000",tags);
     
     const t = useTranslations('Index')
     const searchParams = useSearchParams();
@@ -41,7 +40,7 @@ export default function saTags({ selectedTag, setSelectedTag, tags }) {
             <Slider customSettings={customSettings} className={` w-100 h-100 `} >
                 <SwiperSlide className={``} style={{ width: "fit-content" }}>
                     <div role="button" className={`px-5 py-[9px] border-b font-medium   ${selectedTag === null ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} onClick={() => {
-                        handleTag(null)}}>All</div>
+                        handleTag(null)}}>{t('All')}</div>
                 </SwiperSlide>
                 {tags?.map((item, i) => {
                     return (

@@ -3,84 +3,22 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useSWR, { useSWRConfig } from "swr";
-import { BLOG, BLOGS, CATEGORIES } from "@/constants/apiRoutes";
+import { BLOG, BLOG_CATEGORY, BLOGS, CATEGORIES } from "@/constants/apiRoutes";
 import { useSearchParams } from "next/navigation";
 import Pagination from "./Pagination";
 
 import Tags from "./Tags";
 import MediaCard from "@/components/MediaCard";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
-const data = [
-    {
-      id: 2,
-      slug: "jalabiya",
-      status: 1,
-      created_at: "2024-03-12T17:33:00.000000Z",
-      updated_at: "2024-03-13T03:52:21.000000Z",
-      title: "Jalabiya",
-      current_language: [
-        {
-          id: 2,
-          blog_category_id: 2,
-          lang: "en",
-          title: "Jalabiya",
-          meta_title: "Jalabiya",
-          meta_description: "Jalabiya",
-          created_at: "2024-03-12T17:33:00.000000Z",
-          updated_at: "2024-03-12T17:55:06.000000Z"
-        },
-        {
-          id: 3,
-          blog_category_id: 2,
-          lang: "ar",
-          title: "جلابية",
-          meta_title: "جلابية",
-          meta_description: "جلابية",
-          created_at: "2024-03-12T17:55:23.000000Z",
-          updated_at: "2024-03-12T17:55:23.000000Z"
-        }
-      ]
-    },
-    {
-      id: 1,
-      slug: "abaya",
-      status: 1,
-      created_at: "2024-03-12T17:27:13.000000Z",
-      updated_at: "2024-03-12T17:27:13.000000Z",
-      title: "Abaya",
-      current_language: [
-        {
-          id: 1,
-          blog_category_id: 1,
-          lang: "en",
-          title: "Abaya",
-          meta_title: "Abaya",
-          meta_description: "Abaya",
-          created_at: "2024-03-12T17:27:13.000000Z",
-          updated_at: "2024-03-12T18:12:25.000000Z"
-        },
-        {
-          id: 4,
-          blog_category_id: 1,
-          lang: "ar",
-          title: "عباية",
-          meta_title: "عباية",
-          meta_description: "عباية",
-          created_at: "2024-03-12T17:55:42.000000Z",
-          updated_at: "2024-03-12T17:55:42.000000Z"
-        }
-      ]
-    }
-  ];
-  
-  
 
 export default function BlogPaginate({ datas, paginationData }) {
-    console.log("blogssssssssssssssss",datas);
+    const t = useTranslations("Index");
     const lang = useLocale();
     const [locale, country] = lang.split('-');
+    const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
+
     const [page, setPage] = useState(1);
     const [selectedTag, setSelectedTag] = useState(null);
     const [tags, setTags] = useState([]);
@@ -89,11 +27,10 @@ export default function BlogPaginate({ datas, paginationData }) {
 
     const tag = searchParams.get("tags")
     const pages = searchParams.get("page")
-
     const getLocalizedCategories = (data, lang) => {
         const categories = data ?? [];
       
-        return categories.map(category => {
+        return categories?.map(category => {
           const localized = category.current_language.find(item => item.lang === lang);
           return {
             slug: category.slug,
@@ -102,17 +39,33 @@ export default function BlogPaginate({ datas, paginationData }) {
         });
       };
 
+    const loadData = async () => {
+      if (tag !== null) {
+        mutate(`${BLOG}?page=1&lang=${locale}&slug=${tag}&sort=newest`);
+        setSelectedTag(tag);
+      }
+
+      if (pages !== null) {
+        mutate(`${BLOG}?page=${pages}&lang=${locale}&slug=${selectedTag}&sort=newest`);
+        setPage(pages);
+      }
+
+      if (tags?.length === 0) {
+        try {
+          const categoryData = await fetcher(`${baseUrl}${BLOG_CATEGORY}`);
+          const localized = getLocalizedCategories(categoryData?.results?.categories?.data, locale);
+          setTags(localized);
+        } catch (err) {
+          console.error("Failed to fetch category data", err);
+        }
+      }
+    };
+
+
     useEffect(() => {
-        if (tag !== null) {
-          mutate(`${BLOG}?page=1&lang=${locale}&slug=${tag}&sort=newest`)
-            setSelectedTag(tag)
-        }
-        if (pages !== null) {
-          mutate(`${BLOG}?page=${pages}&lang=${locale}&slug=${selectedTag}&sort=newest`)
-            setPage(pages)
-        }
-        setTags(getLocalizedCategories(data,locale))
-    }, [tag,pages])
+      loadData();
+    }, [tag, pages]);
+
 
     // const query = qs.stringify({
     //     populate: 'cover',
@@ -148,7 +101,7 @@ export default function BlogPaginate({ datas, paginationData }) {
             <div className="grid grid-cols-12 mb-4 lg:mb-7 items-end">
                 <div className="col-span-8">
                     <h1 className=" text-3xl lg:text-6xl font-semibold  lg:leading-tight  bg-gradient-to-r from-[#242E49]  to-[#5B95F9] bg-clip-text text-transparent font-condensed ">
-                        Blogs
+                      {t('Blogs')}
                     </h1>
                 </div>
                 <div className="col-span-4">

@@ -273,6 +273,9 @@
       "Delivery":"Delivery",
       "TotalPrice":"Total Price",
       "AllProducts":"All Products",
-      "New":"New"
+      "New":"New",
+      "ReadMore":"ReadMore",
+      "Blogs":"Blogs",
+      "All":"All"
     }
   }

@@ -4,6 +4,7 @@ import BlogPaginate from "./BlogPaginate";
 import { BLOG } from "@/constants/apiRoutes";
 import { useLocale } from "next-intl";
 import useSWR from "swr";
+import { useSearchParams } from "next/navigation";
 
 
 const BlogListing = ({ }) => {
@@ -11,7 +12,9 @@ const BlogListing = ({ }) => {
   const [locale, country] = lang.split('-');
   const [blogsData, setBlogsData] = useState([])
   const [paginationData, setPaginationData] = useState({});
-  const url = `${BLOG}?page=1&lang=${locale}&slug=jalabiya&sort=newest`
+  const searchParams = useSearchParams();
+  const tag = searchParams.get("tags")
+  const url = tag ? `${BLOG}?page=1&lang=${locale}&slug=${tag}&sort=newest` : `${BLOG}?page=1&lang=${locale}&sort=newest`
 
   const { data, error } = useSWR(url, {
     onSuccess: (data) => {

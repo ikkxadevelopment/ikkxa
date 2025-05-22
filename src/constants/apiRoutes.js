@@ -94,3 +94,4 @@ export const CONTACT="save-contactus"
 
 export const BLOG="blogs"
 export const BLOG_CATEGORY="load/blog-categories"
+export const BLOG_DETAIL="blog-details"

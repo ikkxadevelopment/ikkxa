@@ -4,7 +4,7 @@ import { SwiperSlide } from "swiper/react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-export default function saTags({ selectedTag, setSelectedTag, tags }) {
+export default function Tags({ selectedTag, setSelectedTag, tags }) {
     
     const t = useTranslations('Index')
     const searchParams = useSearchParams();

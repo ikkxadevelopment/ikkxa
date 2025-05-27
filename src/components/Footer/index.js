@@ -337,7 +337,7 @@ export default function Footer({ data, menu }) {
             </div>
             <div className=" lg:text-end">
               <p className="text-black  text-xs md:text-sm   ">
-                {t('DesignedBy')} <span className="text-blue-700  ">{t('BCOMMERCE')}</span>
+                {t('DesignedBy')} <a href="https://adaminnovations.in/" target="_blank" className="text-blue-700  ">Adam Innovations</a>
               </p>
             </div>
           </div>

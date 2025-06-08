@@ -1,0 +1,6 @@
+{
+  "middleware": {
+    "geo": true,
+    "regions": ["all"]
+  }
+}

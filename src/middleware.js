@@ -1,8 +1,45 @@
+import { getToken } from "next-auth/jwt";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
+import { NextResponse } from "next/server";
+
+const middleware = async (req, ev) => {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  const protectedPaths = ['/profile', '/orders'];
+  const isProtectedRoute = protectedPaths.some((path) =>
+    req.nextUrl.pathname.includes(path)
+  );
+
+  // Check geo location
+  const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
+
+
+  const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
+  const newPathname = `/${currentLocale}-${countryCode}`;
+
+  // if (!req.nextUrl.pathname.startsWith(newPathname)) {
+  //   return NextResponse.redirect(new URL(newPathname, req.url));
+  // }
+
+  return createMiddleware(routing)(req, ev);
+};
+
+export default middleware;
+
+export const config = {
+  matcher: [
+    '/',
+    '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
+    '/((?!api|_next|_vercel|.*\\..*).*)'
+  ]
+};
+
 /*-------------------last one start--------------*/
+// import { NextResponse } from "next/server";
 // import { getToken } from "next-auth/jwt";
 // import createMiddleware from "next-intl/middleware";
 // import { routing } from "@/i18n/routing";
-// import { NextResponse } from "next/server";
 
 // const middleware = async (req, ev) => {
 //   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -12,15 +49,21 @@
 //     req.nextUrl.pathname.includes(path)
 //   );
 
-//   // Check geo location
-//   const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
+//   // 1. Check if manual country is set in cookie
+//   const manualCountry = req.cookies.get("country")?.value;
 
-
+//   // 2. Use manual country if available, otherwise use geo country
+//   const countryCode = manualCountry || req.geo?.country || 'SA'; // Default to SA
 //   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
+
 //   const newPathname = `/${currentLocale}-${countryCode}`;
 
-//   if (!req.nextUrl.pathname.startsWith(newPathname)) {
-//     return NextResponse.redirect(new URL(newPathname, req.url));
+//   // 3. Redirect if not already on the right locale-country path
+//   const expectedPrefix = `/${currentLocale}-${countryCode}`;
+//   if (!req.nextUrl.pathname.startsWith(expectedPrefix)) {
+//     const cleanedPath = req.nextUrl.pathname.replace(/^\/(en|ar)(-[A-Z]{2})?/, '');
+//     const redirectUrl = new URL(expectedPrefix + cleanedPath, req.url);
+//     return NextResponse.redirect(redirectUrl);
 //   }
 
 //   return createMiddleware(routing)(req, ev);
@@ -31,54 +74,11 @@
 // export const config = {
 //   matcher: [
 //     '/',
-//     '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
+//     '/(en-SA|en-AE|ar-SA|ar-AE)/:path*',
 //     '/((?!api|_next|_vercel|.*\\..*).*)'
 //   ]
 // };
 /*--------------Last one end---------------------*/
-
-import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
-import createMiddleware from "next-intl/middleware";
-import { routing } from "@/i18n/routing";
-
-const middleware = async (req, ev) => {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-  const protectedPaths = ['/profile', '/orders'];
-  const isProtectedRoute = protectedPaths.some((path) =>
-    req.nextUrl.pathname.includes(path)
-  );
-
-  // 1. Check if manual country is set in cookie
-  const manualCountry = req.cookies.get("country")?.value;
-
-  // 2. Use manual country if available, otherwise use geo country
-  const countryCode = manualCountry || req.geo?.country || 'SA'; // Default to SA
-  const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
-
-  const newPathname = `/${currentLocale}-${countryCode}`;
-
-  // 3. Redirect if not already on the right locale-country path
-  const expectedPrefix = `/${currentLocale}-${countryCode}`;
-  if (!req.nextUrl.pathname.startsWith(expectedPrefix)) {
-    const cleanedPath = req.nextUrl.pathname.replace(/^\/(en|ar)(-[A-Z]{2})?/, '');
-    const redirectUrl = new URL(expectedPrefix + cleanedPath, req.url);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  return createMiddleware(routing)(req, ev);
-};
-
-export default middleware;
-
-export const config = {
-  matcher: [
-    '/',
-    '/(en-SA|en-AE|ar-SA|ar-AE)/:path*',
-    '/((?!api|_next|_vercel|.*\\..*).*)'
-  ]
-};
 
 
 

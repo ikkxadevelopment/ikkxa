@@ -37,10 +37,10 @@
 // };
 /*--------------Last one end---------------------*/
 
+import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
-import { NextResponse } from "next/server";
 
 const middleware = async (req, ev) => {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -50,20 +50,22 @@ const middleware = async (req, ev) => {
     req.nextUrl.pathname.includes(path)
   );
 
-  // Get geo country from Vercel
-  const countryCode = req.geo?.country || req.headers.get('x-country') || 'SA';
-console.log("countryCode===============>>>",countryCode);
+  // 1. Check if manual country is set in cookie
+  const manualCountry = req.cookies.get("country")?.value;
 
+  // 2. Use manual country if available, otherwise use geo country
+  const countryCode = manualCountry || req.geo?.country || 'SA'; // Default to SA
   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
+
   const newPathname = `/${currentLocale}-${countryCode}`;
 
-  // Redirect to full locale-country path if not already there
-  if (!req.nextUrl.pathname.startsWith(newPathname)) {
-    console.log("middleware in if",newPathname);
-    
-    return NextResponse.redirect(new URL(newPathname, req.url));
+  // 3. Redirect if not already on the right locale-country path
+  const expectedPrefix = `/${currentLocale}-${countryCode}`;
+  if (!req.nextUrl.pathname.startsWith(expectedPrefix)) {
+    const cleanedPath = req.nextUrl.pathname.replace(/^\/(en|ar)(-[A-Z]{2})?/, '');
+    const redirectUrl = new URL(expectedPrefix + cleanedPath, req.url);
+    return NextResponse.redirect(redirectUrl);
   }
-console.log("middlewareeeeeeeeeeeeeeee=",newPathname);
 
   return createMiddleware(routing)(req, ev);
 };
@@ -77,6 +79,7 @@ export const config = {
     '/((?!api|_next|_vercel|.*\\..*).*)'
   ]
 };
+
 
 
 

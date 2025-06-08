@@ -41,7 +41,8 @@ export function LangSwitcher() {
 
   const handleChange = (event) => {
     const value = event.target.value;
-    setSelectedCountry(event.target.value);
+    setSelectedCountry(value);
+    document.cookie = `country=${value}; path=/; max-age=31536000`;
     onSelectChange(`${locale}-${value}`);
     handleLogOut()
   };

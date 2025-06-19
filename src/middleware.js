@@ -21,8 +21,9 @@ const middleware = async (req, ev) => {
   // 1. Check cookie (manual override)
   const cookieCountry = req.cookies.get("country")?.value;
 
-  // 2. Check geo (if no cookie)
-  const geoCountry = req.geo?.country || 'SA';
+  // 2. Check geo (if no cookie) and limit to AE or SA only
+  const geoCountryRaw = req.geo?.country || 'SA';
+  const geoCountry = ['AE', 'SA'].includes(geoCountryRaw) ? geoCountryRaw : 'SA';
 
   const finalCountry = urlCountry || cookieCountry || geoCountry;
   const expectedPrefix = `/${urlLocale}-${finalCountry}`;
@@ -67,3 +68,42 @@ export const config = {
     '/((?!api|_next|_vercel|.*\\..*).*)'
   ]
 };
+
+/*-------------------last one start--------------*/
+// import { getToken } from "next-auth/jwt";
+// import createMiddleware from "next-intl/middleware";
+// import { routing } from "@/i18n/routing";
+// import { NextResponse } from "next/server";
+
+// const middleware = async (req, ev) => {
+//   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+//   const protectedPaths = ['/profile', '/orders'];
+//   const isProtectedRoute = protectedPaths.some((path) =>
+//     req.nextUrl.pathname.includes(path)
+//   );
+
+//   // Check geo location
+//   const countryCode = req.geo?.country || 'SA'; // Default to Saudi Arabia if geo is unavailable
+
+
+//   const currentLocale = req.nextUrl.pathname.startsWith('/ar') ? 'ar' : 'en';
+//   const newPathname = /${currentLocale}-${countryCode};
+
+//   if (!req.nextUrl.pathname.startsWith(newPathname)) {
+//     return NextResponse.redirect(new URL(newPathname, req.url));
+//   }
+
+//   return createMiddleware(routing)(req, ev);
+// };
+
+// export default middleware;
+
+// export const config = {
+//   matcher: [
+//     '/',
+//     '/(en-SA|en-AR|ar-SA|ar-AE)/:path*',
+//     '/((?!api|_next|_vercel|.\\..).*)'
+//   ]
+// };
+/*--------------Last one end---------------------*/

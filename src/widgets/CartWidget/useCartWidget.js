@@ -105,7 +105,7 @@ export const useCartWidget = () => {
     }
     const url = `${ADD_CART}`;
     const postOptions = getPostOptions("POST",token); // Token is needed
-      
+    const data = await apiFetcher(url, formData, postOptions, country);
     // await mutate(`${GET_CART}lang=${locale}&token=true`); 
     return data;
   }

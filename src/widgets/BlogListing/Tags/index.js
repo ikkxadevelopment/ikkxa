@@ -39,13 +39,13 @@ export default function Tags({ selectedTag, setSelectedTag, tags }) {
         <div>
             <Slider customSettings={customSettings} className={` w-100 h-100 `} >
                 <SwiperSlide className={``} style={{ width: "fit-content" }}>
-                    <div role="button" className={`px-5 py-[9px] border-b font-medium   ${selectedTag === null ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} onClick={() => {
+                    <div role="button" className={`px-5 py-[9px] border-b font-medium   ${selectedTag === null ? "border-[#fdba74] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} onClick={() => {
                         handleTag(null)}}>{t('All')}</div>
                 </SwiperSlide>
                 {tags?.map((item, i) => {
                     return (
                         <SwiperSlide className={``} style={{ width: "fit-content" }} key={i}>
-                            <div role="button" className={`px-5 py-[9px] border-b font-medium    ${selectedTag === item?.slug ? "border-[#1164F2] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} id={item?.slug} onClick={() =>  handleTag(item?.slug)}>{item?.title}</div>
+                            <div role="button" className={`px-5 py-[9px] border-b font-medium    ${selectedTag === item?.slug ? "border-[#fdba74] bg-white" : "border-[#D0D0D0]  bg-transparent"}`} id={item?.slug} onClick={() =>  handleTag(item?.slug)}>{item?.title}</div>
                         </SwiperSlide>
                     )
                 })}

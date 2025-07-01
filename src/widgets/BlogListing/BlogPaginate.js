@@ -100,7 +100,7 @@ export default function BlogPaginate({ datas, paginationData }) {
         <div >
             <div className="grid grid-cols-12 mb-4 lg:mb-7 items-end">
                 <div className="col-span-8">
-                    <h1 className=" text-3xl lg:text-6xl font-semibold  lg:leading-tight  bg-gradient-to-r from-[#242E49]  to-[#5B95F9] bg-clip-text text-transparent font-condensed ">
+                    <h1 className=" text-3xl lg:text-6xl font-semibold  lg:leading-tight  bg-gradient-to-r from-[#242E49]  to-[#fdba74] bg-clip-text text-transparent font-condensed ">
                       {t('Blogs')}
                     </h1>
                 </div>

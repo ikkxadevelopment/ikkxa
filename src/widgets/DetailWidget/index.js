@@ -51,8 +51,11 @@ const [blogLanguage, setBlogLanguage] = useState([])
           <p className=" text-primary text-sm font-semibold  leading-none mb-2"><Link href={`/`} className="uppercase">{t('Home')}</Link> / <Link href={`/blogs`} className="uppercase">{t('Blogs')}</Link></p>
          
             <div className="">
-              <h1 className="  text-3xl lg:text-5xl xl:text-6xl font-semibold  lg:leading-normal xl:leading-tight bg-gradient-to-r from-[#242E49]  to-[#242E49] bg-clip-text text-transparent font-condensed mb-1 lg:mb-1">{blogData?.title}</h1>
-              <div className="text-neutral-500 text-base">{blogData?.created_at && `Published on ${new Date(blogData?.created_at).toLocaleDateString('en-GB')}`}</div>
+              <h1 className="  text-3xl lg:text-5xl xl:text-6xl font-semibold  lg:leading-normal xl:leading-tight bg-gradient-to-r from-[#242E49]  to-[#242E49] bg-clip-text text-transparent font-condensed mb-1 lg:mb-2">{blogData?.title}</h1>
+              <div className="grid gap-2 grid-cols-1 md:grid-cols-2 text-neutral-500 text-base">
+                <div>{blogData?.created_at && `Published by ${blogData?.user?.full_name??"Author"}`}</div>
+                <div className="md:text-right">{blogData?.created_at && `Published on ${new Date(blogData?.created_at).toLocaleDateString('en-GB')}`}</div>
+              </div>
             </div>
             {/* <div className="col-span-12 lg:col-span-3">
               <div className="lg:text-end">

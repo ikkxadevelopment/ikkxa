@@ -29,6 +29,7 @@ import { useLocale, useTranslations } from "next-intl";
 import getCurrency from "@/hooks/getCurrency";
 import getBaseUrl from "@/hooks/getBaseUrl";
 import { useRouter } from "@/i18n/routing";
+import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
 const CheckoutWidget = () => {
@@ -360,7 +361,13 @@ const CheckoutWidget = () => {
               >
                 <RadioGroupItem value="tabby" id="tabby" />
                 <div className="flex items-center w-full justify-between">
-                  <div>
+                  <TabbyPromoWithButton
+                    price={checkoutData?.total_payable}
+                    publicKey="pk_xyz"
+                    merchantCode={lang}
+                    currency={currency}
+                  />
+                  {/* <div>
                     <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                       {" "}
                       Tabby –  {t('SplitYourPayment')}
@@ -375,7 +382,7 @@ const CheckoutWidget = () => {
                       className="object-contain"
                       alt="tabby logo"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </Label>
 

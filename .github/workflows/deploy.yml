@@ -75,11 +75,11 @@ jobs:
           cd $DEPLOY_PATH
           
           # Clone or pull the repository
-          if [ ! -d "Ikxxa-Frondend" ]; then
-            git clone -b $BRANCH https://oauth2:${{ secrets.GH_TOKEN }}@github.com/thamjeedpbr/Ikxxa-Frondend.git
-            cd Ikxxa-Frondend
+          if [ ! -d "ikkxa" ]; then
+            git clone -b $BRANCH https://oauth2:${{ secrets.GH_TOKEN }}git@github.com:ikkxadevelopment/ikkxa.git
+            cd ikkxa
           else
-            cd Ikxxa-Frondend
+            cd ikkxa
             git fetch origin
             git checkout $BRANCH
             git pull origin $BRANCH

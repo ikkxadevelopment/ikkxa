@@ -76,7 +76,7 @@ jobs:
           
           # Clone or pull the repository
           if [ ! -d "ikkxa" ]; then
-            git clone -b $BRANCH https://oauth2:${{ secrets.GH_TOKEN }}git@github.com:ikkxadevelopment/ikkxa.git
+            git clone -b $BRANCH https://oauth2:${{ secrets.GH_TOKEN }}git@github.com/ikkxadevelopment/ikkxa.git
             cd ikkxa
           else
             cd ikkxa

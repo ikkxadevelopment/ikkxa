@@ -1,0 +1,111 @@
+name: CI/CD Pipeline with Docker
+
+on:
+  push:
+    branches: [ development, production ]
+  pull_request:
+    branches: [ development, production ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Set environment variables
+      run: |
+        if [[ $GITHUB_REF == 'refs/heads/development' ]]; then
+          echo "DOCKER_COMPOSE_FILE=docker-compose.dev.yml" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENV=development" >> $GITHUB_ENV
+        else
+          echo "DOCKER_COMPOSE_FILE=docker-compose.prod.yml" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENV=production" >> $GITHUB_ENV
+        fi
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
+
+    - name: Build Docker image
+      run: docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} build
+
+    - name: Run Docker container for testing
+      run: docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
+
+    - name: Verify Docker container is running
+      run: docker ps
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/development' || github.ref == 'refs/heads/production'
+    steps:
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          # Set environment-specific variables
+          if [[ ${{ github.ref }} == 'refs/heads/development' ]]; then
+            DEPLOY_PATH=/root/ikxxa/frontend/development
+            COMPOSE_FILE=docker-compose.dev.yml
+            BRANCH=development
+          else
+            DEPLOY_PATH=/root/ikxxa/frontend/production
+            COMPOSE_FILE=docker-compose.prod.yml
+            BRANCH=production
+          fi
+          
+          # Debug information
+          echo "Deploying from branch: $BRANCH"
+          echo "Deploy path: $DEPLOY_PATH"
+          echo "Using compose file: $COMPOSE_FILE"
+          
+          # Create directory if it doesn't exist
+          mkdir -p $DEPLOY_PATH
+          cd $DEPLOY_PATH
+          
+          # Clone or pull the repository
+          if [ ! -d "Ikxxa-Frondend" ]; then
+            git clone -b $BRANCH https://oauth2:${{ secrets.GH_TOKEN }}@github.com/thamjeedpbr/Ikxxa-Frondend.git
+            cd Ikxxa-Frondend
+          else
+            cd Ikxxa-Frondend
+            git fetch origin
+            git checkout $BRANCH
+            git pull origin $BRANCH
+            git reset --hard origin/$BRANCH
+          fi
+
+          # Verify current branch
+          echo "Current git branch:"
+          git branch --show-current
+
+          # Stop any existing containers
+          docker-compose -f $COMPOSE_FILE down || true
+
+          # Build and start new containers
+          docker-compose -f $COMPOSE_FILE build --no-cache
+          docker-compose -f $COMPOSE_FILE up -d
+
+          # Health check
+          sleep 10
+          if ! docker-compose -f $COMPOSE_FILE ps | grep -q "Up"; then
+            echo "Deployment failed!"
+            exit 1
+          fi
+
+          # Show running containers
+          docker ps
+
+          # Clean up old images
+          docker system prune -f

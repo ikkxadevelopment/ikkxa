@@ -1,0 +1,22 @@
+# docker-compose.prod.yml
+version: '3'
+
+services:
+  nextjs-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    # command: npm run dev
+    restart: unless-stopped
+    

@@ -18,7 +18,7 @@ const getCurrency = () => {
             currency = <i className="icon-riyal "></i>; 
             break;
         case 'AE':
-            currency =  <span className='inline-block me-1'><Dirham className="text-[12px]"/></span>; 
+            currency =  <span className='inline-block me-0.5'><Dirham className="text-[12px]"/></span>; 
             break;
         default:
             currency = <i className="icon-riyal "></i>; 

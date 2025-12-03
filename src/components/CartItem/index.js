@@ -143,10 +143,10 @@ export default function CartItem({ data, isSidebar }) {
                 <div className="flex items-center">
                   {width >= 992 && <Counter data={data} />}
                   <div className="lg:ml-3 text-zinc-800 text-sm lg:text-base font-semibold ">
-                    {data?.formatted_sub_total / data?.quantity} {currency}
+                    {currency}{data?.formatted_sub_total / data?.quantity} 
                     {!isSidebar && (
                       <span className="ml-1 text-gray-400 text-sm font-semibold line-through">
-                        {data?.formatted_price} {currency}
+                      {currency}   {data?.formatted_price}
                       </span>
                     )}
                   </div>

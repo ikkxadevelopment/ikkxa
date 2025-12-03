@@ -53,7 +53,6 @@ const CheckoutWidget = () => {
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
-  console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData");
   const handleTamaraCheckout = async () => {
     // setLoading(true);
     // setError(null);
@@ -361,18 +360,21 @@ const CheckoutWidget = () => {
               >
                 <RadioGroupItem value="tabby" id="tabby" />
                 <div className="flex items-center w-full justify-between">
-                  <TabbyPromoWithButton
+                  {/* <TabbyPromoWithButton
                     price={checkoutData?.total_payable}
                     publicKey="pk_xyz"
                     merchantCode={lang}
                     currency={currency}
-                  />
-                  {/* <div>
+                  /> */}
+                  <div>
                     <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                       {" "}
-                      Tabby –  {t('SplitYourPayment')}
+                      Tabby
                     </h5>
-                   
+                   <p className="text-[#9e9e9e] text-xs">
+                      {" "}
+                      {t('SplitYourPayment')}
+                    </p>
                   </div>
 
                   <div className="aspect-[46/17] w-12 relative">
@@ -382,7 +384,7 @@ const CheckoutWidget = () => {
                       className="object-contain"
                       alt="tabby logo"
                     />
-                  </div> */}
+                  </div>
                 </div>
               </Label>
 

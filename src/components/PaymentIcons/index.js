@@ -9,7 +9,7 @@ export default function PaymetnIcons() {
             key={i}
             className="rounded border border-zinc-300  relative w-12 h-6"
           >
-            <Image src={item?.img} className="" fill alt=""/>
+            <Image src={item?.img} className="object-contain" fill alt=""/>
           </div>
         );
       })}
@@ -23,8 +23,20 @@ const payments = [
   },
   {
     img: "/images/icon-master.png",
+
+    
+  },{
+    img: "/images/tamara_logo.png",
+
+    
+  },{
+    img: "/images/tabby_logo.png",
+
+    
   },
+
 ];
+ 
 // {
   //   img: "/images/icon-apple.png",
   // },

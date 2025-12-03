@@ -58,7 +58,7 @@ export default function OrderSummary({ data }) {
           <p className="text-black text-sm">{t("Subtotal")}</p>
           <p className="text-black text-sm ">
             {" "}
-            {data?.formatted_sub_total} {currency}
+            {currency} {data?.sub_total}   
           </p>
         </div>
 
@@ -66,7 +66,7 @@ export default function OrderSummary({ data }) {
           <p className="text-black text-sm">{t("Discount")}</p>
           <p className="text-sm text-[#00b553]">
             {" "}
-            -{data?.discount} {currency}
+            -{currency} {data?.discount}      
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default function OrderSummary({ data }) {
             <p className="text-black text-sm">{t("CouponDiscount")}</p>
             <p className="text-sm text-[#00b553]">
               {" "}
-              -{data?.coupon_discount} {currency}
+              -{currency} {data?.coupon_discount} 
             </p>
           </div>
         )}
@@ -88,7 +88,7 @@ export default function OrderSummary({ data }) {
               <span className="text-sm text-[#00b553]">{t("FREE")}</span>
             ) : (
               <span>
-                {data?.formatted_shipping_cost} {currency}
+                {currency} {data?.shipping_cost} 
               </span>
             )}
           </p>
@@ -98,7 +98,7 @@ export default function OrderSummary({ data }) {
           <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}</p>
           <p className="text-black text-sm ">
             {" "}
-            {data?.tax} {currency}
+            {currency} {data?.tax} 
             </p>
         </div>
       }
@@ -109,7 +109,7 @@ export default function OrderSummary({ data }) {
         <p className="text-black text-base font-semibold">{t("Total")}</p>
         <p className="text-black text-base font-semibold">
           {" "}
-          {data?.formatted_total} {currency}
+          {currency} {data?.total_payable} 
         </p>
       </div>
       {defaultAddress && session?.status === "authenticated" ? (
@@ -118,7 +118,6 @@ export default function OrderSummary({ data }) {
             className="w-full btn btn-grad btn-lg lg:mb-3 "
             onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code?couponApplied?.coupon_code:""}`)}
           >
-            {console.log(couponApplied,"couponApplied")}
             {loading ? `${t("Loading")}` : `${t("ProceedToCheckout")}`}
           </button>
         </div>

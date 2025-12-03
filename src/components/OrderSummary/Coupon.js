@@ -35,7 +35,6 @@ export default function Coupon({ data, setCouponApplied, session }) {
     } else {
       setCouponApplied({});
     }
-    console.log(appliedData, "appliedData");
   }, [appliedData]);
   //   const couponId = appliedData?.data[0]?.coupon_id;
   const validationSchema = Yup.object({

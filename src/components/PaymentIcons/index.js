@@ -9,7 +9,7 @@ export default function PaymetnIcons() {
             key={i}
             className="rounded border border-zinc-300  relative w-12 h-6"
           >
-            <Image src={item?.img} className="" fill alt=""/>
+            <Image src={item?.img} className="object-contain" fill alt=""/>
           </div>
         );
       })}
@@ -19,18 +19,30 @@ export default function PaymetnIcons() {
 
 const payments = [
   {
-    img: "/images/icon-apple.png",
-  },
-  {
     img: "/images/icon-visa.png",
   },
   {
     img: "/images/icon-master.png",
+
+    
+  },{
+    img: "/images/tamara_logo.png",
+
+    
+  },{
+    img: "/images/tabby_logo.png",
+
+    
   },
-  {
-    img: "/images/icon-gpay.png",
-  },
-  {
-    img: "/images/icon-samsung.png",
-  },
+
 ];
+ 
+// {
+  //   img: "/images/icon-apple.png",
+  // },
+  // {
+  //   img: "/images/icon-gpay.png",
+  // },
+  // {
+  //   img: "/images/icon-samsung.png",
+  // },

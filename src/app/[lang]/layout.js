@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { getFooter, getGlobal, getMenuData } from "@/lib/getHome";
 import { GoogleTagManager } from '@next/third-parties/google' 
 import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ["latin"] ,
   weight: ['300', '400', '500', '600', '700']});
@@ -41,6 +42,10 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
+      <Script
+        src="https://checkout.tabby.ai/tabby-promo.js"
+        strategy="beforeInteractive" // Ensures it loads before any React runs
+      />
       <body className={locale === "ar" ? fontArab.className : inter.className}>
       <GoogleTagManager gtmId="GTM-TR3CTMHB" />
       <NextIntlClientProvider messages={messages}>

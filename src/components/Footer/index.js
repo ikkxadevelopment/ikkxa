@@ -10,14 +10,19 @@ import { FaLinkedinIn } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { LiaSnapchat } from "react-icons/lia";
 import PaymetnIcons from "../PaymentIcons";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { EnquireModal } from "../EnquireForm/EnquireModal";
 import { FaTiktok } from "react-icons/fa";
+
+import Image from "../Image/image";
 
 export default function Footer({ data, menu }) {
   const t = useTranslations("Index");
   const footerMenu = data?.message?.menu?.footer_menu;
   const social = data?.message?.social_links;
+  const locale = useLocale();
+  const country = locale.split("-")[1];
+  console.log(country,"sfgsdff");
   
   return (
     <footer>
@@ -254,7 +259,21 @@ export default function Footer({ data, menu }) {
                 )
               })}
             </div>
-            <div className="flex flex-col lg:flex-row justify-between lg:items-center mt-16 space-y-3">
+              {country === "AE" && (
+            <div className="">
+
+                <div className="relative w-32 aspect-[16/9] ">
+                  <Image
+                    src="/images/partners/fazaa.png"
+                    alt="Fazaa Partner"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+            </div>
+
+              )}
+            <div className={`flex flex-col lg:flex-row justify-between lg:items-center ${country === "AE" ? 'mt-2' : 'mt-10'} space-y-3`}>
               <PaymetnIcons />
               <div className="justify-start items-start gap-[13px] inline-flex ">
                 {social?.facebook_link?.length>0 && (
@@ -337,7 +356,7 @@ export default function Footer({ data, menu }) {
             </div>
             <div className=" lg:text-end">
               <p className="text-black  text-xs md:text-sm   ">
-                {t('DesignedBy')} <a href="https://adaminnovations.in/" target="_blank" className="text-blue-700  ">Adam Innovations</a>
+                {t('DesignedBy')} <span className="text-blue-700  ">{t('BCOMMERCE')}</span>
               </p>
             </div>
           </div>

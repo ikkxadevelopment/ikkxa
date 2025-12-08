@@ -29,6 +29,7 @@ import { useLocale, useTranslations } from "next-intl";
 import getCurrency from "@/hooks/getCurrency";
 import getBaseUrl from "@/hooks/getBaseUrl";
 import { useRouter } from "@/i18n/routing";
+import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
 const CheckoutWidget = () => {
@@ -52,7 +53,6 @@ const CheckoutWidget = () => {
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
-  console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData");
   const handleTamaraCheckout = async () => {
     // setLoading(true);
     // setError(null);
@@ -360,12 +360,21 @@ const CheckoutWidget = () => {
               >
                 <RadioGroupItem value="tabby" id="tabby" />
                 <div className="flex items-center w-full justify-between">
+                  {/* <TabbyPromoWithButton
+                    price={checkoutData?.total_payable}
+                    publicKey="pk_xyz"
+                    merchantCode={lang}
+                    currency={currency}
+                  /> */}
                   <div>
                     <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                       {" "}
-                      Tabby –  {t('SplitYourPayment')}
+                      Tabby
                     </h5>
-                   
+                   <p className="text-[#9e9e9e] text-xs">
+                      {" "}
+                      {t('SplitYourPayment')}
+                    </p>
                   </div>
 
                   <div className="aspect-[46/17] w-12 relative">

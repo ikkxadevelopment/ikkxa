@@ -1,3 +1,4 @@
+import Dirham from '@/components/Dirham';
 import nookies from 'nookies';
 
 const getCurrency = () => {
@@ -17,7 +18,7 @@ const getCurrency = () => {
             currency = <i className="icon-riyal "></i>; 
             break;
         case 'AE':
-            currency = 'AED'; 
+            currency =  <span className='inline-block me-0.5'><Dirham className="text-[12px]"/></span>; 
             break;
         default:
             currency = <i className="icon-riyal "></i>; 

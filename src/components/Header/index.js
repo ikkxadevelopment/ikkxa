@@ -344,23 +344,24 @@ const uae ="+971507187565"
               <Search />
               <LangSwitcher />
 
-              <Link
-                href={`/wishlist`}
-                className="rounded-md px-1 py-2 text-lg text-center relative"
-              >
-                {/* { wishlistLength > 0 &&
-                  <span className="absolute -top-[2px] text-white text-xs font-medium  px-1 bg-stone-900 rounded-2xl border border-white flex-col justify-center items-center gap-2 inline-flex">
-                    {wishlistLength}
-                  </span>
-                } */}
-                <span className="flex justify-center mb-2">
-                  {" "}
-                  <BsHeart />{" "}
-                </span>
-                <span className="block text-xs leading-none font-semibold text-nowrap">
-                  {t("Wishlist")}
-                </span>
-              </Link>
+             <Link
+  href="/wishlist"
+  onClick={(e) => {
+    if (session?.status === "unauthenticated") {
+      e.preventDefault();      
+      setIsOpen(true);         
+    }
+  }}
+  className="rounded-md px-1 py-2 text-lg text-center relative"
+>
+  <span className="flex justify-center mb-2">
+    <BsHeart />
+  </span>
+  <span className="block text-xs leading-none font-semibold text-nowrap">
+    {t("Wishlist")}
+  </span>
+</Link>
+
               <Link
                 href={`/cart`}
                 className="rounded-md px-1 py-2 text-lg text-center relative"

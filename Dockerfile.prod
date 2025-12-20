@@ -1,0 +1,40 @@
+FROM node:18-alpine AS builder
+
+# Install sharp dependencies
+RUN apk add --no-cache vips-dev build-base
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies including sharp
+RUN npm install sharp
+RUN npm install
+
+# Copy all files
+COPY . .
+COPY .env.production .env
+# Build the application
+RUN npm run build
+
+# Production image
+FROM node:18-alpine
+
+# Install sharp dependencies in production image
+RUN apk add --no-cache vips-dev
+
+WORKDIR /app
+
+# Copy necessary files from builder
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Expose the port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]

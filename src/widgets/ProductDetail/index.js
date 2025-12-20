@@ -39,6 +39,7 @@ import { IoCopyOutline } from "react-icons/io5";
 import { useToast } from "@/hooks/use-toast";
 import { Suspense, useEffect, useRef } from "react";
 import useHeaderSecond from "@/hooks/useHeaderSecond";
+import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 
 export default function ProductDetail({ data, isOutOfStock }) {
   const t = useTranslations("Index");
@@ -48,7 +49,7 @@ export default function ProductDetail({ data, isOutOfStock }) {
   // useHeaderSecondary(true);
   const datas = data?.results;
   const currency = getCurrency();
-
+  const lang = useLocale();
 
 
   // const structuredData = {
@@ -406,7 +407,15 @@ export default function ProductDetail({ data, isOutOfStock }) {
                 <div className="mb-3">
                   <PaymetnIcons />
                 </div>
-                <EmiComponent price={productDetail?.disPrice} type="tabby" />
+                <div>
+                <TabbyPromoWithButton
+                  price={productDetail?.disPrice}
+                  publicKey="pk_xyz"
+                  merchantCode={lang}
+                  currency={currency}
+                />
+                </div>
+                {/* <EmiComponent price={productDetail?.disPrice} type="tabby" /> */}
                 <EmiComponent price={productDetail?.disPrice} type="tamara" />
 
                 <div className="justify-start items-center gap-3 inline-flex">

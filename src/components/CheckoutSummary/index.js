@@ -26,7 +26,7 @@ export default function CheckoutSummary({ data, isCod }) {
           </p>
           <p className="text-black text-sm ">
             {" "}
-            {data?.sub_total} {currency}
+            {currency}{data?.sub_total} 
           </p>
         </div>
 
@@ -35,7 +35,7 @@ export default function CheckoutSummary({ data, isCod }) {
           <p className="text-black text-sm">{t('Discount')}</p>
           <p className="text-sm text-[#00b553]">
             {" "}
-            -{data?.discount} {currency}
+            -{currency}{data?.discount} 
           </p>
         </div>
         {data?.ikkxa_discount>0&&
@@ -43,7 +43,7 @@ export default function CheckoutSummary({ data, isCod }) {
           <p className="text-black text-sm">IKKXA {t('Discount')}</p>
           <p className="text-sm text-[#00b553]">
             {" "}
-            -{data?.ikkxa_discount} {currency}
+            -{currency}{data?.ikkxa_discount} 
           </p>
         </div>
 }
@@ -56,7 +56,7 @@ export default function CheckoutSummary({ data, isCod }) {
               <span className="text-sm text-[#00b553]">{t("FREE")}</span>
             ) : (
               <span>
-                {data?.shipping_cost} {currency}
+                {currency}{data?.shipping_cost} 
               </span>
             )}
           </p>
@@ -66,7 +66,7 @@ export default function CheckoutSummary({ data, isCod }) {
           <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}</p>
           <p className="text-black text-sm ">
             {" "}
-            {data?.total_tax} {currency}
+            {currency}{data?.total_tax} 
           </p>
         </div>
 
@@ -75,7 +75,7 @@ export default function CheckoutSummary({ data, isCod }) {
             <p className="text-black text-sm">{t('Charge')}</p>
             <p className="text-black text-sm ">
               {" "}
-              {data?.plus_cod_charge} {currency}
+              {currency}{data?.plus_cod_charge} 
             </p>
           </div>
         )}
@@ -85,7 +85,7 @@ export default function CheckoutSummary({ data, isCod }) {
         <p className="text-black text-base font-semibold">{t('Total')}</p>
         <p className="text-black text-base font-semibold">
           {" "}
-          {isCod?(data?.total_payable+data?.plus_cod_charge):data?.total_payable} {currency}
+          {currency}{isCod?(data?.total_payable+data?.plus_cod_charge):data?.total_payable}     
         </p>
       </div>
 

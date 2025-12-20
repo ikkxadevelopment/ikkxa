@@ -52,13 +52,125 @@ const CheckoutWidget = () => {
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
-  console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData");
+
+  const getCheckoutPayload = () => {
+    const defaultQuantity = checkoutData?.items?.map(item => ({
+      id: item.id,
+      quantity: item.quantity,
+      title: item.title,
+      unit_price: item.price,
+      reference_id: item.id
+    })) 
+    if (country === "SA") {
+      return {
+          payment_type: 0,
+          sub_total: checkoutData?.sub_total,
+          discount_offer: checkoutData?.discount,
+          shipping_tax: checkoutData?.shipping_cost,
+          tax: checkoutData?.total_tax,
+          coupon_discount: checkoutData?.coupon_discount,
+          total: checkoutData?.total_payable,
+          trx_id: checkoutData?.trx_id,
+          quantity: defaultQuantity.map(item => ({ id: item.id, quantity: item.quantity })),
+          coupon_code: "",
+          coupon: [],
+          checkout_method: 2,
+          shipping_address: address,
+          billing_address: address,
+          buy_now: 0
+      };
+    } else if (country === "AE") {
+      const checkoutPayload = {
+      payment: {
+        amount: checkoutData?.total_payable,        // Required
+        currency: "AED",                            // Required
+        description: "Order Payment",
+        buyer: {
+          name: address?.name || "Customer",
+          email: address?.email,
+          phone: address?.phone_no?.replace("+971", "0") // Tabby requires numeric format
+        },
+
+        //Added required fields
+        shipping_address: {
+          city: address?.city || "Dubai",
+          address: address?.address || "Dubai",
+          zip: address?.zip || "00000"
+        },
+
+        order: {
+          reference_id: checkoutData?.trx_id,
+          updated_at: new Date().toISOString(),      //Required
+          items:
+            checkoutData?.items?.map((item) => ({
+              title: item.title,
+              quantity: item.quantity,
+              unit_price: item.price,
+              reference_id: item.id,
+              category: item.category || "General"    //Required by Tabby
+            })) || [
+              {
+                title: "Product Title",
+                quantity: 1,
+                unit_price: checkoutData?.sub_total,
+                reference_id: 3167,
+                category: "General"
+              }
+            ]
+        },
+
+        //Required minimal buyer history
+        buyer_history: {
+          registered_since: new Date().toISOString(),
+          loyalty_level: 0
+        },
+
+        //Required minimal order history
+        order_history: [
+          {
+            purchased_at: new Date().toISOString(),
+            amount: checkoutData?.total_payable,
+            status: "new",
+            payment_method: "card",
+            buyer: {
+              name: address?.name || "Customer",
+              email: address?.email,
+              phone: address?.phone_no?.replace("+971", "0")
+            },
+            shipping_address: {
+              city: address?.city || "Dubai",
+              address: address?.address || "Dubai",
+              zip: address?.zip || "00000"
+            },
+            items:
+              checkoutData?.items?.map((item) => ({
+                title: item.title,
+                quantity: item.quantity,
+                unit_price: item.price,
+                reference_id: item.id,
+                category: item.category || "General"
+              }))
+          }
+        ],
+
+        merchant_urls: {
+          success: `${window.location.origin}/cart`,
+          cancel: `${window.location.origin}/cart`,
+          failure: `${window.location.origin}/cart`
+        }
+      },
+
+      //These must be outside "payment"
+      lang: "en",
+      merchant_code: "IGTARE"
+    };
+    } else {
+      throw new Error("Unsupported region");
+    }
+  }
+
+
   const handleTamaraCheckout = async () => {
-    // setLoading(true);
-    // setError(null);
-
- 
-
     const checkoutPayload = {
       payment_type: 0,
       sub_total: checkoutData?.sub_total,
@@ -103,49 +215,174 @@ const CheckoutWidget = () => {
   };
 
   const handleTabbyCheckout = async () => {
+    
+    const payload = getCheckoutPayload()
     try {
-      const session = await getSession();
-      const token = session?.accessToken;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
-          "Content-Type": "application/json", // Set content type
-        },
-      };
-
-      const data = {
-        payment_type: 0,
-        sub_total: checkoutData?.sub_total,
-        discount_offer: checkoutData?.discount,
-        shipping_tax: checkoutData?.shipping_cost,
-        tax: checkoutData?.total_tax,
-        coupon_discount: checkoutData?.coupon_discount,
-        total: checkoutData?.total_payable,
-        trx_id: checkoutData?.trx_id,
-        quantity: [
-          {
-            id: 3167,
-            quantity: 1,
+        const session = await getSession();
+        const token = session?.accessToken;
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in Authorization header
+            "Content-Type": "application/json", // Set content type
           },
-        ],
-        coupon_code: "",
-        coupon: [],
-        checkout_method: 2,
-        shipping_address: address,
-        billing_address: address,
-        buy_now: 0,
-      };
+        };
 
-      
+        // const checkoutPayload = {
+        //   payment: {
+        //     amount: checkoutData?.total_payable,  // Required
+        //     currency: "AED",                      // REQUIRED for UAE
+        //     description: "Order Payment",
+        //     buyer: {
+        //       name: address?.name || "Customer",
+        //       email: address?.email,
+        //       phone: address?.phone_no
+        //     },
+        //     order: {
+        //       reference_id: checkoutData?.trx_id,  // Your order ID
+        //       items: checkoutData?.items?.map((item) => ({
+        //         title: item.title,
+        //         quantity: item.quantity,
+        //         unit_price: item.price,
+        //         reference_id: item.id
+        //       })) || [
+        //         {
+        //           title: "Product Title",
+        //           quantity: 1,
+        //           unit_price: checkoutData?.sub_total,
+        //           reference_id: 3167
+        //         }
+        //       ]
+        //     },
+        //     merchant_urls: {
+        //       success: `${window.location.origin}/cart`,
+        //       cancel: `${window.location.origin}/cart`,
+        //       failure: `${window.location.origin}/cart`
+        //     }
+        //   }
+        // };
 
-      const response = await axios.get(
-        `${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
-        data,
-        config
-      );
+        const checkoutPayload = {
+          payment: {
+            amount: checkoutData?.total_payable,        // Required
+            currency: "AED",                            // Required
+            description: "Order Payment",
+            buyer: {
+              name: address?.name || "Customer",
+              email: address?.email,
+              phone: address?.phone_no?.replace("+971", "0") // Tabby requires numeric format
+            },
 
-      if (response?.data?.success) {
-        router.push(response?.data?.message);
+            shipping_address: {
+              city: address?.city || "Dubai",
+              address: address?.address || "Dubai",
+              zip: address?.zip || "00000"
+            },
+
+            order: {
+              reference_id: checkoutData?.trx_id,
+              updated_at: new Date().toISOString(),
+              items:
+                checkoutData?.items?.map((item) => ({
+                  title: item.title,
+                  quantity: item.quantity,
+                  unit_price: item.price,
+                  reference_id: item.id,
+                  category: item.category || "General" 
+                })) || [
+                  {
+                    title: "Product Title",
+                    quantity: 1,
+                    unit_price: checkoutData?.sub_total,
+                    reference_id: 3167,
+                    category: "General"
+                  }
+                ]
+            },
+
+            buyer_history: {
+              registered_since: new Date().toISOString(),
+              loyalty_level: 0
+            },
+
+            order_history: [
+              {
+                purchased_at: new Date().toISOString(),
+                amount: checkoutData?.total_payable,
+                status: "new",
+                payment_method: "card",
+                buyer: {
+                  name: address?.name || "Customer",
+                  email: address?.email,
+                  phone: address?.phone_no?.replace("+971", "0")
+                },
+                shipping_address: {
+                  city: address?.city || "Dubai",
+                  address: address?.address || "Dubai",
+                  zip: address?.zip || "00000"
+                },
+                items:
+                  checkoutData?.items?.map((item) => ({
+                    title: item.title,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                    reference_id: item.id,
+                    category: item.category || "General"
+                  }))
+              }
+            ],
+
+            merchant_urls: {
+              success: `${window.location.origin}/cart`,
+              cancel: `${window.location.origin}/cart`,
+              failure: `${window.location.origin}/cart`
+            }
+          },
+
+          lang: "en",
+          merchant_code: "IGTARE"
+        };
+
+
+        if(country === "AE"){
+          const response = await fetch("/api/tabby-checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(checkoutPayload)
+          });
+
+          const result = await response.json();
+          
+          if (!response.ok || !result.success) {
+            console.error(result.error?.message);
+            // alert(result.error?.message || "Tabby failed");
+            return;
+          }
+
+        const tabbyData = result.data;
+        //  Check Tabby status
+        if (tabbyData.status !== "created") {
+          // alert("Tabby checkout not created");
+          return;
+        }
+
+        const installment = tabbyData.configuration?.available_products?.installments?.[0];
+
+        if (!installment?.web_url) {
+          alert("Tabby installments not available");
+          return;
+        }
+
+        //  Redirect
+        window.location.href = installment.web_url;
+        // window.open(installment.web_url, "_blank");
+      } else {
+          const response = await axios.post(`${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
+          data,
+          config
+        );
+        if (response?.data?.success) {
+          router.push(response?.data?.message);
+        }
       }
     } catch (error) {
       // setError(error);
@@ -218,6 +455,7 @@ const CheckoutWidget = () => {
   if(success) {
     router.push(`/checkout/order-success?id=${order_id}`);
   }
+      console.log("datadata===========>>>",address);
 
   return (
     <section className="bg-stone-50 pt-4 lg:bg-white">

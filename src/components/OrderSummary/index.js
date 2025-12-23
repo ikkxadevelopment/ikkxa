@@ -58,7 +58,7 @@ export default function OrderSummary({ data }) {
           <p className="text-black text-sm">{t("Subtotal")}</p>
           <p className="text-black text-sm ">
             {" "}
-            {currency} {data?.sub_total}   
+            {currency} {data?.sub_total}
           </p>
         </div>
 
@@ -66,17 +66,17 @@ export default function OrderSummary({ data }) {
           <p className="text-black text-sm">{t("Discount")}</p>
           <p className="text-sm text-[#00b553]">
             {" "}
-            -{currency} {data?.discount}      
+            -{currency} {data?.discount}
           </p>
         </div>
 
-       
+
         {data?.coupon_discount && (
           <div className="flex justify-between mb-2">
             <p className="text-black text-sm">{t("CouponDiscount")}</p>
             <p className="text-sm text-[#00b553]">
               {" "}
-              -{currency} {data?.coupon_discount} 
+              -{currency} {data?.coupon_discount}
             </p>
           </div>
         )}
@@ -88,20 +88,20 @@ export default function OrderSummary({ data }) {
               <span className="text-sm text-[#00b553]">{t("FREE")}</span>
             ) : (
               <span>
-                {currency} {data?.shipping_cost} 
+                {currency} {data?.shipping_cost}
               </span>
             )}
           </p>
         </div>
-        {data?.tax>0&&
-        <div className="flex justify-between ">
-          <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}</p>
-          <p className="text-black text-sm ">
-            {" "}
-            {currency} {data?.tax} 
+        {data?.tax > 0 &&
+          <div className="flex justify-between ">
+            <p className="text-black text-sm">{t("VATInclusive")}{country === 'SA' ? t("Inclusive") : ""}</p>
+            <p className="text-black text-sm ">
+              {" "}
+              {currency} {data?.tax}
             </p>
-        </div>
-      }
+          </div>
+        }
 
 
       </div>
@@ -109,14 +109,16 @@ export default function OrderSummary({ data }) {
         <p className="text-black text-base font-semibold">{t("Total")}</p>
         <p className="text-black text-base font-semibold">
           {" "}
-          {currency} {data?.total_payable} 
+          {/* {currency} {data?.total_payable} */}
+          {currency} {data?.total}
+
         </p>
       </div>
       {defaultAddress && session?.status === "authenticated" ? (
         <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
           <button
             className="w-full btn btn-grad btn-lg lg:mb-3 "
-            onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code?couponApplied?.coupon_code:""}`)}
+            onClick={() => handleCheckout(defaultAddress?.id, `${couponApplied?.coupon_code ? couponApplied?.coupon_code : ""}`)}
           >
             {loading ? `${t("Loading")}` : `${t("ProceedToCheckout")}`}
           </button>

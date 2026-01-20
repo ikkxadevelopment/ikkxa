@@ -47,6 +47,7 @@ const CheckoutWidget = () => {
   const [locale, country] = lang.split('-');
   const baseUrl = getBaseUrl(country);
   const defaultAddress = checkoutData?.shipping_address;
+  const tabbyUrl=checkoutData?.tabby?.payment_url;
 
   useEffect(() => {
     setAddress(defaultAddress);
@@ -685,7 +686,26 @@ const CheckoutWidget = () => {
             </div>
             <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
               {paymentMethod === "tabby" && (
-                <button
+              <>
+              {country === "AE"? 
+              <>
+              {tabbyUrl&&
+              <a
+                target="_blank"
+                  href={`${tabbyUrl}`}
+                  className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
+                >
+                  {t('PlaceOrderWith')}{" "}
+                  <div className="aspect-[46/17] w-12 relative ms-2">
+                    <Image
+                      src={"/images/tabby_logo.png"}
+                      fill
+                      className="object-contain"
+                      alt="tabby logo"
+                    />
+                  </div>
+                </a>}</>:
+               <button
                   href={`${checkoutData?.tabby_checkout_url}`}
                   onClick={() => handleTabbyCheckout()}
                   className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
@@ -699,7 +719,10 @@ const CheckoutWidget = () => {
                       alt="tabby logo"
                     />
                   </div>
-                </button>
+                </button> }
+              
+              </>
+            
               )}
               {paymentMethod === "tamara" && (
                 <button

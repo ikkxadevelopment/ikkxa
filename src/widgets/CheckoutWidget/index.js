@@ -15,7 +15,7 @@ import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { getSession, useSession } from "next-auth/react";
 import { useSWRConfig } from "swr";
-import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT,NGENIUS_CHECKOUT } from "@/constants/apiRoutes";
+import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT,NGENIUS_CHECKOUT,STRIPE_CHECKOUT } from "@/constants/apiRoutes";
 import axios from "axios";
 import OrderPending from "./OrderPending";
 import OrderSuccess from "./OrderSuccess";
@@ -229,40 +229,6 @@ const CheckoutWidget = () => {
           },
         };
 
-        // const checkoutPayload = {
-        //   payment: {
-        //     amount: checkoutData?.total_payable,  // Required
-        //     currency: "AED",                      // REQUIRED for UAE
-        //     description: "Order Payment",
-        //     buyer: {
-        //       name: address?.name || "Customer",
-        //       email: address?.email,
-        //       phone: address?.phone_no
-        //     },
-        //     order: {
-        //       reference_id: checkoutData?.trx_id,  // Your order ID
-        //       items: checkoutData?.items?.map((item) => ({
-        //         title: item.title,
-        //         quantity: item.quantity,
-        //         unit_price: item.price,
-        //         reference_id: item.id
-        //       })) || [
-        //         {
-        //           title: "Product Title",
-        //           quantity: 1,
-        //           unit_price: checkoutData?.sub_total,
-        //           reference_id: 3167
-        //         }
-        //       ]
-        //     },
-        //     merchant_urls: {
-        //       success: `${window.location.origin}/cart`,
-        //       cancel: `${window.location.origin}/cart`,
-        //       failure: `${window.location.origin}/cart`
-        //     }
-        //   }
-        // };
-
         const checkoutPayload = {
           payment: {
             amount: checkoutData?.total_payable,        // Required
@@ -450,14 +416,19 @@ const CheckoutWidget = () => {
     // return data;
   };
 
-
+const handlePaymentRedirect = async () => {
+  try {
+    window.location.href = `${baseUrl}${STRIPE_CHECKOUT}?trx_id=${checkoutData?.trx_id}&payment_mode=api&code=${checkoutData?.code}&curr=${currency}`;
+  } catch (error) {
+    console.error("Payment redirect failed:", error);
+  }
+};
 
   // if (loading) return <OrderPending address={address} />;
   // if (success) return <OrderSuccess address={address} />;
   if(success) {
     router.push(`/checkout/order-success?id=${order_id}`);
   }
-      console.log("datadata===========>>>",address);
 
   return (
     <section className="bg-stone-50 pt-4 lg:bg-white">
@@ -678,6 +649,28 @@ const CheckoutWidget = () => {
                   </div>
                 </div>
               </Label>
+              <Label
+                htmlFor="stripe"
+                className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
+              >
+                <RadioGroupItem value="stripe" id="stripe" />
+                <div className="flex items-center w-full justify-between">
+                  <div>
+                    <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                      {" "}
+                      {t('stripe')}
+                    </h5>
+                    {/* <p className="text-[#9e9e9e] text-xs">
+                      {" "}
+                      {t('stripe')}
+                    </p> */}
+                  </div>
+
+                  <div className="text-2xl relative">
+                    {/* <PiMoney /> */}
+                  </div>
+                </div>
+              </Label>
             </RadioGroup>
           </div>
           <div className="flex-col-auto w-full lg:w-[28%] lg:px-4">
@@ -764,6 +757,15 @@ const CheckoutWidget = () => {
                       alt="tabby logo"
                     />
                   </div> */}
+                </button>
+              )}
+
+              {paymentMethod === "stripe"  && (
+                <button
+                  className="w-full btn btn-grad btn-lg lg:mb-3 "
+                  onClick={handlePaymentRedirect}
+                >
+                  {t('PlaceOrderWith')} {t('stripe')}
                 </button>
               )}
               {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">

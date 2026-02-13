@@ -28,8 +28,8 @@ const fetcher = url => axios.get(url).then(res => res.data);
 const fetcherWithToken = async (url, options = {}) => {
     // const { token } = options;
     const cookies = nookies.get(null);
-    const locale = cookies['NEXT_LOCALE']; 
-    const country=locale.split('-')[1]
+    const locale = cookies['NEXT_LOCALE'];
+    const country = locale.split('-')[1]
 
     const BaseURL = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
     const session = await getSession();
@@ -53,7 +53,6 @@ const apiFetcher = async (url, data = null, options, country) => {
     const method = options?.method?.toLowerCase();
     const headers = options?.headers;
 
-    console.log(headers, "is here");
     try {
         const res = await axios[method](`${BaseURL}${url}`, data !== null ? data : {}, { headers });
         return res.data;

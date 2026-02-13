@@ -12,16 +12,16 @@ export async function generateMetadata({ params: { product, lang } }) {
   const meta_base = data?.results?.product?.language_product;
   const openGraphImage = data?.results?.product?.product_meta_image
     ? [
-        {
-          url: data?.results?.product?.product_meta_image,
-          alt: meta_base?.meta_title,
-        },
-      ]
+      {
+        url: data?.results?.product?.product_meta_image,
+        alt: meta_base?.meta_title,
+      },
+    ]
     : [];
-  const canonicalUrl = `https://ikkxa.com/en-SA/products/${meta?.slug}`;
+  const canonicalUrl = `https://ikkxa.com/${locale}-${country}/products/${meta?.slug}`;
   return {
-    title: meta_base?.meta_title||data?.results?.product?.language_product?.name,
-    description: meta_base?.meta_description||data?.results?.product?.short_description,
+    title: meta_base?.meta_title || data?.results?.product?.language_product?.name,
+    description: meta_base?.meta_description || data?.results?.product?.short_description,
     // keywords: data?.results?.product?.product_meta_keywords,
     alternates: {
       canonical: canonicalUrl,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params: { product, lang } }) {
       },
     },
     metadataBase: new URL('https://ikkxa.com'),
-  
+
     robots: {
       index: true,
       follow: true,
@@ -63,9 +63,9 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
   const structuredData = {
     "@context": "https://schema.org/",
     "@type": "Product",
-    name:  data?.results?.product?.language_product?.name,
+    name: data?.results?.product?.language_product?.name,
     image: data?.results?.product?.gallery?.large,
-    description:data?.results?.product?.short_description,
+    description: data?.results?.product?.short_description,
     sku: data?.results?.product?.product_stock?.sku,
     brand: {
       "@type": "Brand",
@@ -78,10 +78,10 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
       price: data?.results?.product?.stock[0]?.product?.discount_percentage,
       priceValidUntil: data?.results?.product?.special_discount_end,
       itemCondition: "https://schema.org/NewCondition",
-      availability: `https://schema.org/${isOutOfStock?"OutOfStock":"InStock"}`,
+      availability: `https://schema.org/${isOutOfStock ? "OutOfStock" : "InStock"}`,
     },
   };
-  
+
   if (!data) return notFound();
   return (
     <>
@@ -92,12 +92,12 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
         />
       </Head> */}
       <main className="min-h-screen  pt-[58px] md:pt-20">
-      <Script
-      id="structuredData"
+        <Script
+          id="structuredData"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <ProductDetail data={data}  isOutOfStock={isOutOfStock}/>
+        <ProductDetail data={data} isOutOfStock={isOutOfStock} />
       </main>
     </>
   );

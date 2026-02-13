@@ -5,15 +5,18 @@ import Header from "@/components/Header";
 import GlobalProviders from "@/components/GlobalProviders";
 import Footer from "@/components/Footer";
 import { NextIntlClientProvider } from "next-intl";
-import {getMessages} from 'next-intl/server';
+import { getMessages } from 'next-intl/server';
 import { Toaster } from "@/components/ui/toaster";
 import { getFooter, getGlobal, getMenuData } from "@/lib/getHome";
-import { GoogleTagManager } from '@next/third-parties/google' 
+import { GoogleTagManager } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
+import MetaPixel from "@/components/MetaPixel";
 
-const inter = Inter({ subsets: ["latin"] ,
-  weight: ['300', '400', '500', '600', '700']});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ['300', '400', '500', '600', '700']
+});
 
 const fontArab = Noto_Kufi_Arabic({
   subsets: ['arabic'],
@@ -30,7 +33,7 @@ const fontArab = Noto_Kufi_Arabic({
 
 export default async function RootLayout({
   children,
-  params: { session,lang, ...params },
+  params: { session, lang, ...params },
 }) {
   const messages = await getMessages();
   const [locale, country] = lang.split('-');
@@ -46,20 +49,25 @@ export default async function RootLayout({
         src="https://checkout.tabby.ai/tabby-promo.js"
         strategy="beforeInteractive" // Ensures it loads before any React runs
       />
+      <head>
+        <meta property="fb:pixel_id" content={"851173184222165"} />
+      </head>
       <body className={locale === "ar" ? fontArab.className : inter.className}>
-      <GoogleTagManager gtmId="GTM-TR3CTMHB" />
-      <NextIntlClientProvider messages={messages}>
-        <GlobalProviders session={session} >
-            <Header data={data} menu={menuData?.data}/>
+        <GoogleTagManager gtmId="GTM-TR3CTMHB" />
+        <NextIntlClientProvider messages={messages}>
+          <GlobalProviders session={session} >
+            <Header data={data} menu={menuData?.data} />
             {children}
-            <Footer data={data} menu={footerData?.data}/>
+            <Footer data={data} menu={footerData?.data} />
             <Toaster />
-        </GlobalProviders>
+          </GlobalProviders>
         </NextIntlClientProvider>
         <Analytics />
+        <MetaPixel />
+
       </body>
       <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TR3CTMHB"
-height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe></noscript>
+        height="0" width="0" style={{ display: "none", visibility: "hidden" }}></iframe></noscript>
     </html>
   );
 }

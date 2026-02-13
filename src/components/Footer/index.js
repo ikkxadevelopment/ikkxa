@@ -22,18 +22,17 @@ export default function Footer({ data, menu }) {
   const social = data?.message?.social_links;
   const locale = useLocale();
   const country = locale.split("-")[1];
-  console.log(country,"sfgsdff");
-  
+
   return (
     <footer>
       <div className="lg:hidden">
         <Tabs defaultValue="tab0" className="w-full">
           <TabsList className="w-full overflow-x-auto">
-            {menu?.map((item, i)=>{
-              return(
+            {menu?.map((item, i) => {
+              return (
                 <TabsTrigger value={`tab${i}`} key={i} className="w-full">
-                {item?.title}
-              </TabsTrigger>
+                  {item?.title}
+                </TabsTrigger>
               )
             })}
             {/* <TabsTrigger value="general" className="w-full">
@@ -46,9 +45,9 @@ export default function Footer({ data, menu }) {
               Useful links
             </TabsTrigger> */}
           </TabsList>
-          {menu?.map((item, i)=>{
-              return(
-                <TabsContent value={`tab${i}`}  key={i}>
+          {menu?.map((item, i) => {
+            return (
+              <TabsContent value={`tab${i}`} key={i}>
                 <div className="container">
                   <ul className="grid grid-cols-2 py-3">
                     {item?.links?.map((linkItem, index) => {
@@ -66,9 +65,9 @@ export default function Footer({ data, menu }) {
                   </ul>
                 </div>
               </TabsContent>
-               
-              )
-            })}
+
+            )
+          })}
           {/* <TabsContent value="general">
             <div className="container">
               <ul className="grid grid-cols-2 py-3">
@@ -156,7 +155,7 @@ export default function Footer({ data, menu }) {
                 </Link>
               </div>
               <div className="text-right">
-                <EnquireModal/>
+                <EnquireModal />
                 {/* <Link href={`tel:${data?.message?.footer_data?.footer_contact_phone}`} className="justify-start items-center gap-5  inline-flex">
                   <div className="w-[63.54px] h-[63.54px] relative rounded-full border-2 text-2xl border-neutral-200 flex items-center justify-center">
                     <BsSuitcaseLg />
@@ -238,29 +237,29 @@ export default function Footer({ data, menu }) {
                 </ul>
               </div> */}
 
-              {menu?.map((item, i)=>{
-                return(
+              {menu?.map((item, i) => {
+                return (
                   <div key={i}>
-                <h3 className=" text-black text-sm font-semibold mb-2 ">
-                  {item?.title}
-                </h3>
-                <ul className="">
-                  {item?.links?.map((linkItem, index)=>{
-                    return(
-                      <li className="mb-2" key={index}>
-                      <Link href={`${linkItem?.url}`} className=" text-black text-sm  ">
-                        {linkItem?.label}
-                      </Link>
-                    </li>
-                    )
-                  })}
-                </ul>
-              </div>
+                    <h3 className=" text-black text-sm font-semibold mb-2 ">
+                      {item?.title}
+                    </h3>
+                    <ul className="">
+                      {item?.links?.map((linkItem, index) => {
+                        return (
+                          <li className="mb-2" key={index}>
+                            <Link href={`${linkItem?.url}`} className=" text-black text-sm  ">
+                              {linkItem?.label}
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
                 )
               })}
             </div>
-              {country === "AE" && (
-            <div className="">
+            {country === "AE" && (
+              <div className="">
 
                 <div className="relative w-32 aspect-[16/9] ">
                   <Image
@@ -270,13 +269,13 @@ export default function Footer({ data, menu }) {
                     className="object-contain"
                   />
                 </div>
-            </div>
+              </div>
 
-              )}
+            )}
             <div className={`flex flex-col lg:flex-row justify-between lg:items-center ${country === "AE" ? 'mt-2' : 'mt-10'} space-y-3`}>
               <PaymetnIcons />
               <div className="justify-start items-start gap-[13px] inline-flex ">
-                {social?.facebook_link?.length>0 && (
+                {social?.facebook_link?.length > 0 && (
                   <a
                     href={social.facebook_link}
                     target="_blank"
@@ -285,7 +284,7 @@ export default function Footer({ data, menu }) {
                     <FaFacebookF />
                   </a>
                 )}
-                {social?.twitter_link?.length>0 && (
+                {social?.twitter_link?.length > 0 && (
                   <a
                     href={social.twitter_link}
                     target="_blank"
@@ -294,7 +293,7 @@ export default function Footer({ data, menu }) {
                     <RiTwitterXLine />
                   </a>
                 )}
-                {social?.linkedin_link?.length>0 && (
+                {social?.linkedin_link?.length > 0 && (
                   <a
                     href={social.linkedin_link}
                     target="_blank"
@@ -303,7 +302,7 @@ export default function Footer({ data, menu }) {
                     <FaLinkedinIn />
                   </a>
                 )}
-                {social?.instagram_link?.length>0 && (
+                {social?.instagram_link?.length > 0 && (
                   <a
                     href={social.instagram_link}
                     target="_blank"
@@ -312,8 +311,8 @@ export default function Footer({ data, menu }) {
                     <FaInstagram />
                   </a>
                 )}
-            
-                {social?.youtube_link?.length>0 && (
+
+                {social?.youtube_link?.length > 0 && (
                   <a
                     href={social.youtube_link}
                     target="_blank"
@@ -322,7 +321,7 @@ export default function Footer({ data, menu }) {
                     <FaYoutube />
                   </a>
                 )}
-                {social?.snapchat_link?.length>0 && (
+                {social?.snapchat_link?.length > 0 && (
                   <a
                     href={social.snapchat_link}
                     target="_blank"
@@ -331,7 +330,7 @@ export default function Footer({ data, menu }) {
                     <LiaSnapchat />
                   </a>
                 )}
-                {social?.tiktok_link?.length>0 && (
+                {social?.tiktok_link?.length > 0 && (
                   <a
                     href={social.tiktok_link}
                     target="_blank"
@@ -366,28 +365,28 @@ export default function Footer({ data, menu }) {
   );
 }
 
-const footer =[{
-  title:"General",
-  links:[{
-    title:"Home",
-    url:"/"
-  },{
-    title:"Home",
-    url:"/"
-  },{
-    title:"Home",
-    url:"/"
+const footer = [{
+  title: "General",
+  links: [{
+    title: "Home",
+    url: "/"
+  }, {
+    title: "Home",
+    url: "/"
+  }, {
+    title: "Home",
+    url: "/"
   }]
-},{
-  title:"Policies",
-  links:[{
-    title:"Home",
-    url:"/"
-  },{
-    title:"Home",
-    url:"/"
-  },{
-    title:"Home",
-    url:"/"
+}, {
+  title: "Policies",
+  links: [{
+    title: "Home",
+    url: "/"
+  }, {
+    title: "Home",
+    url: "/"
+  }, {
+    title: "Home",
+    url: "/"
   }]
 }]

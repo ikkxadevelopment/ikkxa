@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "@/components/Image/image";
 import { GET_CART, MOYASAR_REDIRECT, ORDER_CHECKOUT } from "@/constants/apiRoutes";

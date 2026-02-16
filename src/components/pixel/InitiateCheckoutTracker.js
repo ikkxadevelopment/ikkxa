@@ -10,8 +10,8 @@ export default function InitiateCheckoutTracker({ cart }) {
         // Fire InitiateCheckout on checkout page load
         trackInitiateCheckout({
             id: cart?.trx_id,
-            content_ids: cart?.order_details.map(item => item?.id),
-            contents: cart?.order_details.map(item => ({
+            content_ids: cart?.order_details?.map(item => item?.id),
+            contents: cart?.order_details?.map(item => ({
                 id: item?.id,
                 quantity: item?.quantity,
                 variation: item?.variation,

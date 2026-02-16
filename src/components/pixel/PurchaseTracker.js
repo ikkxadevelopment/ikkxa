@@ -15,13 +15,13 @@ export default function PurchaseTracker({ order }) {
         // 1. Not already tracked (ref check)
         // 2. Not in sessionStorage (refresh check)
         // 3. Payment is successful
-        if (!hasTracked.current && !alreadyTracked && order.status === 'paid') {
+        if (!hasTracked.current && !alreadyTracked && order?.status === 'paid') {
             trackPurchase({
-                value: order.total,
-                currency: order.currency, // 'AED' or 'SAR'
-                content_ids: order.items.map(item => item.id),
+                value: order?.total,
+                currency: order?.currency, // 'AED' or 'SAR'
+                content_ids: order?.items?.map(item => item.id),
                 content_type: 'product',
-                contents: order.items.map(item => ({
+                contents: order?.items?.map(item => ({
                     id: item.id,
                     quantity: item.quantity,
                 })),

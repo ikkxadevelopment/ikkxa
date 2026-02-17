@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { trackInitiateCheckout } from '@/lib/metaPixel';
 
 export default function InitiateCheckoutTracker({ cart }) {
-    console.log("cartaaa", cart);
 
     useEffect(() => {
         // Fire InitiateCheckout on checkout page load

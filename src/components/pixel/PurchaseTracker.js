@@ -8,7 +8,7 @@ export default function PurchaseTracker({ order }) {
 
     useEffect(() => {
         // Check if already tracked to prevent duplicate on refresh
-        const trackedKey = `fb_pixel_purchase_${order.id}`;
+        const trackedKey = `fb_pixel_purchase_${order?.id}`;
         const alreadyTracked = sessionStorage.getItem(trackedKey);
 
         // Fire ONLY if:

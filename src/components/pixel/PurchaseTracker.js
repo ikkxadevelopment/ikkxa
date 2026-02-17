@@ -31,10 +31,10 @@ export default function PurchaseTracker({ order }) {
             sessionStorage.setItem(trackedKey, 'true');
             hasTracked.current = true;
 
-            console.log('🎉 Purchase event fired for order:', order.id);
+            console.log('🎉 Purchase event fired for order:', order?.id);
         } else if (alreadyTracked) {
-            console.log('⚠️ Purchase already tracked for order:', order.id);
-        } else if (order.status !== 'paid') {
+            console.log('⚠️ Purchase already tracked for order:', order?.id);
+        } else if (order?.status !== 'paid') {
             console.log('⚠️ Order not paid, Purchase event not fired');
         }
     }, [order]);

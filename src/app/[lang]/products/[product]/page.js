@@ -18,7 +18,7 @@ export async function generateMetadata({ params: { product, lang } }) {
       },
     ]
     : [];
-  const canonicalUrl = `https://ikkxa.com/${locale}-${country}/products/${meta?.slug}`;
+  const canonicalUrl = `https://www.ikkxa.com/${locale}-${country}/products/${meta?.slug}`;
   return {
     title: meta_base?.meta_title || data?.results?.product?.language_product?.name,
     description: meta_base?.meta_description || data?.results?.product?.short_description,
@@ -30,7 +30,7 @@ export async function generateMetadata({ params: { product, lang } }) {
         [`ar-${country}`]: `/ar-${country}`,
       },
     },
-    metadataBase: new URL('https://ikkxa.com'),
+    metadataBase: new URL('https://www.ikkxa.com'),
 
     robots: {
       index: true,
@@ -73,7 +73,7 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
     },
     offers: {
       "@type": "Offer",
-      url: `https://ikkxa.com/${locale}-${country}/products/${data?.results?.product?.slug}`,
+      url: `https://www.ikkxa.com/${locale}-${country}/products/${data?.results?.product?.slug}`,
       priceCurrency: "SAR",
       price: data?.results?.product?.stock[0]?.product?.discount_percentage,
       priceValidUntil: data?.results?.product?.special_discount_end,

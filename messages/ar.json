@@ -133,6 +133,7 @@
     "Delivered": "تم التوصيل",
     "Cancelled": "تم الإلغاء",
     "Returned": "تم الإرجاع",
+    "PickedUp":"تم تاكيد الطلب",
     "NoDataFound": "لا توجد بيانات",
     "Pending": "قيد الانتظار",
     "OnTheWay": "في الطريق",

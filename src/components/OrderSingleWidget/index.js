@@ -17,7 +17,7 @@ import getCurrency from "@/hooks/getCurrency";
 
 export default function OrderSingleWidget({ slug }) {
   const lang = useLocale();
-    const t = useTranslations("Index");
+  const t = useTranslations("Index");
   const currency = getCurrency();
   const [locale, country] = lang.split("-");
   const [trackData, setTrackData] = useState(null);
@@ -103,7 +103,7 @@ export default function OrderSingleWidget({ slug }) {
       case "picked_up":
         return (
           <span className="status delivered text-[#044bae] font-semibold">
-            {t('Returned')}
+            {t('PickedUp')}
           </span>
         );
     }
@@ -311,10 +311,10 @@ export default function OrderSingleWidget({ slug }) {
             <div className="col-span-12 lg:col-span-2 lg:text-end">
               {/* "order_return_status": "CANCELLED" */}
 
-              {item?.order_return_status === null? (
+              {item?.order_return_status === null ? (
                 <>
                   {resData?.order_status === "delivered" &&
-                  resData?.is_return_eligible === true ? (
+                    resData?.is_return_eligible === true ? (
                     <OrderItemReturnModal
                       data={item}
                       orderId={resData?.id}
@@ -328,7 +328,7 @@ export default function OrderSingleWidget({ slug }) {
                     />
                   ) : null}
                 </>
-              ):<p>{item?.order_return_status}</p>}
+              ) : <p>{item?.order_return_status}</p>}
 
               {/* {console.log(resData,"itememem")} */}
             </div>
@@ -410,7 +410,7 @@ export default function OrderSingleWidget({ slug }) {
           </li>
           <li className="justify-between items-center flex mb-2">
             <div className="text-stone-500 text-sm font-medium ">
-              {t("VATInclusive")}{country === 'SA'? t("Inclusive"):""}
+              {t("VATInclusive")}{country === 'SA' ? t("Inclusive") : ""}
             </div>
             <div className="w-56 text-end text-stone-500 text-sm font-medium ">
               {resData?.formatted_tax} {currency}

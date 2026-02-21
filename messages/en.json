@@ -133,6 +133,7 @@
       "Delivered":"Delivered",
       "Cancelled":"Cancelled",
       "Returned":"Returned",
+      "PickedUp":"Picked Up",
       "NoDataFound":"No data found",
       "Pending":"Pending",
       "OnTheWay":"On the way",

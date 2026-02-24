@@ -11,6 +11,7 @@ import { apiFetcher } from '@/utils/fetcher';
 import { fetcherWithToken } from "@/utils/fetcher";
 import { useLocale, useTranslations } from 'next-intl';
 import useGetDeviceType from '@/hooks/useGetDeviceType';
+import { trackAddToCart } from '@/lib/metaPixel';
 
 export const useCartWidget = () => {
   const session = useSession();
@@ -27,7 +28,7 @@ export const useCartWidget = () => {
   const [variantOpen, setIsVariantOpen] = useState(false)
 
 
-  const [openLogin, setOpenLogin] =  useRecoilState(loginIsOpen);
+  const [openLogin, setOpenLogin] = useRecoilState(loginIsOpen);
   const [cartCount, setCartCount] = useRecoilState(cartCountState);
   const { mutate } = useSWRConfig();
 
@@ -37,15 +38,15 @@ export const useCartWidget = () => {
   const [locale, country] = lang.split('-');
   const getPostOptions = (method, token = null) => {
     const options = {
-        method: method, //['POST' or 'PUT' or 'GET' or 'DELETE' ]
-        headers: {
-            'Content-Type': 'application/json',
-        },
+      method: method, //['POST' or 'PUT' or 'GET' or 'DELETE' ]
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
 
     // Only add the Authorization header if the token is provided
     if (token) {
-        options.headers.Authorization = `Bearer ${token}`;
+      options.headers.Authorization = `Bearer ${token}`;
     }
 
     return options;
@@ -69,7 +70,7 @@ export const useCartWidget = () => {
   const getVariantByProductID = (productID) => {
     const product = selectedVariant.find(item => item.productID === productID);
     return product ? product.variant : null;
-}
+  }
 
   const findProductInSelectedVariant = (productId) => {
     return selectedVariant?.find(item => item.productID === productId);
@@ -82,59 +83,71 @@ export const useCartWidget = () => {
       console.error('cartState is not an array:', cart); // Debugging line
       return null; // or false
     }
-  
+
     // Find the product in the cart
     const product = cart.find(item => item.product_id === productId && item.variant === variant);
-    
+
     // Return the found product or null if not found
     return product || null; // or return false;
   };
-  
+
   const isStockAvailable = (cartProduct, selectedProduct) => {
     return cartProduct.quantity < selectedProduct.stock;
   };
 
-  const addCartItem = async (id, quantity, token, variant, variants_ids=null, trx_id) => {
+  const addCartItem = async (id, quantity, token, variant, variants_ids = null, trx_id) => {
     const formData = {
-        'product_id': id,
-        'quantity': quantity,
-        'token': true,
-        "trx_id": trx_id,
-        'variants_name':variant,
-        'variants_ids':variants_ids
+      'product_id': id,
+      'quantity': quantity,
+      'token': true,
+      "trx_id": trx_id,
+      'variants_name': variant,
+      'variants_ids': variants_ids
     }
     const url = `${ADD_CART}`;
-    const postOptions = getPostOptions("POST",token); // Token is needed
+    const postOptions = getPostOptions("POST", token); // Token is needed
     const data = await apiFetcher(url, formData, postOptions, country);
     // await mutate(`${GET_CART}lang=${locale}&token=true`); 
     return data;
   }
 
-  const addItem = async (item, variant=null, variant_id=null, count=1) => {
+  const addItem = async (item, variant = null, variant_id = null, count = 1) => {
     setIsLoading(true)
     try {
-        let trxId = fetchTrxId()
-        const res = await addCartItem(item, count, authToken, variant, variant_id, trxId);
-        if(res.success){
-          if (session?.status === "unauthenticated" && !trxId && res.data?.trx_id) {
-            localStorage.setItem("guestToken", res.data.trx_id);
-            mutate(`${GET_CART}lang=${locale}&trx_id=${res.data?.trx_id}`); 
-          } else {
-            mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`); 
-          }
-          
-          
+      let trxId = fetchTrxId()
+      const res = await addCartItem(item, count, authToken, variant, variant_id, trxId);
+      if (res.success) {
+        trackAddToCart({
+          content_name: item?.name,
+          content_ids: [item?.id],
+          content_type: 'product',
+          value: item?.price,
+          currency: item?.currency,
+        });
+        if (session?.status === "unauthenticated" && !trxId && res.data?.trx_id) {
+          localStorage.setItem("guestToken", res.data.trx_id);
+          console.log(item, "asasfee");
 
-          setCartCount(cartCount + count)
-          setIsOpen(true);
-          if(width < 992){
-            setSelectedVariant([])
-            setIsVariantOpen(false)
-          }
-          setErrorMessages({})
+
+
+
+          mutate(`${GET_CART}lang=${locale}&trx_id=${res.data?.trx_id}`);
         } else {
-          handleOutOfStock()
+          mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
         }
+
+
+
+        setCartCount(cartCount + count)
+        setIsOpen(true);
+        if (width < 992) {
+          setSelectedVariant([])
+          setIsVariantOpen(false)
+        }
+        setErrorMessages({})
+      } else {
+        handleOutOfStock()
+      }
       // }
     } catch (error) {
       console.error(error);
@@ -143,7 +156,7 @@ export const useCartWidget = () => {
     }
   };
 
-  
+
   const handleOutOfStock = () => {
     // Clear selected variants and error messages for small screens
     if (width < 992) {
@@ -151,7 +164,7 @@ export const useCartWidget = () => {
       setErrorMessages({});
       setIsVariantOpen(false)
     }
-  
+
     toast({
       variant: "destructive",
       description: `${t("ProductIsOutOfStock")}`,
@@ -161,15 +174,15 @@ export const useCartWidget = () => {
   const removeItem = async (id) => {
     try {
       let trxId = fetchTrxId()
-        const res = await removeCartItem(id, authToken, trxId, country);
-        if(res.success){
-          setCartCount(cartCount - 1)
-          mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
-        }
-        toast({ 
-          title: `${t('ItemRemovedFromCart')}`,
-          variant: "destructive",
-        })
+      const res = await removeCartItem(id, authToken, trxId, country);
+      if (res.success) {
+        setCartCount(cartCount - 1)
+        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+      }
+      toast({
+        title: `${t('ItemRemovedFromCart')}`,
+        variant: "destructive",
+      })
       // }
     } catch (error) {
       console.error(error);
@@ -180,23 +193,23 @@ export const useCartWidget = () => {
     try {
       let trxId = fetchTrxId()
       const formData = { quantity: quantity, variant: variant, trx_id: trxId }
-    
-        const res = await updateCartItemQty(id, formData, authToken, country);
-        if(res.success){
-          mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`)
-          toast({ 
-            title: `${t('CartItemUpdated')}`,
-            variant: "success",
-            
-           })
-          return res
-        } else{
-          toast({ 
-            title: `${t('CartItemNotUpdated')}`,
-            variant: "destructive",
-          })
-          return res
-        }
+
+      const res = await updateCartItemQty(id, formData, authToken, country);
+      if (res.success) {
+        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`)
+        toast({
+          title: `${t('CartItemUpdated')}`,
+          variant: "success",
+
+        })
+        return res
+      } else {
+        toast({
+          title: `${t('CartItemNotUpdated')}`,
+          variant: "destructive",
+        })
+        return res
+      }
     } catch (error) {
       console.error(error);
     }
@@ -208,15 +221,15 @@ export const useCartWidget = () => {
     if (!selectedProduct) {
       // Set an error message if no variant is selected
       setErrorMessages({
-        [productId]:`${t("PleaseSelectVariant")}`
+        [productId]: `${t("PleaseSelectVariant")}`
       });
       return;
     }
-  
+
     const { variant, variantId } = selectedProduct; // Assuming single variant selection
     // Check if the product with this variant exists in the cart
     const cartProduct = findProductInCart(productId, variant);
-  
+
     if (cartProduct) {
       if (isStockAvailable(cartProduct, selectedProduct)) {
         addItem(productId, variant, variantId, count);
@@ -246,7 +259,7 @@ export const useCartWidget = () => {
   //     if(authToken){
   //       console.log(authToken,"authTokenauthTokenauthToken");
   //       const res = await addToWishlist(id, authToken);
-      
+
   //       console.log(res,"added to wish");
   //       toast({ 
   //         title: "Cart item not removed",
@@ -258,7 +271,7 @@ export const useCartWidget = () => {
   //     console.error(error);
   //   }
   // };
-  
+
   // useEffect(() => {
   //   // Sync cart from localStorage for guest users
   //   if (!isAuthenticated) {
@@ -276,13 +289,13 @@ export const useCartWidget = () => {
     addItem,
     removeItem,
     variantOpen, setIsVariantOpen,
-    isOpen, 
+    isOpen,
     setIsOpen,
     updateItem,
     isLoading,
     addToBag,
     findProductInSelectedVariant,
     errorMessages,
-    getVariantByProductID 
+    getVariantByProductID
   };
 };

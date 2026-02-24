@@ -44,6 +44,8 @@ const useCheckout = (data) => {
       if (result.success) {
         setCheckoutData(result.data);
         router.push("/checkout");
+
+
       }
     } catch (error) {
       setError(error);

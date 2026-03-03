@@ -32,10 +32,12 @@ import getBaseUrl from "@/hooks/getBaseUrl";
 import { useRouter } from "@/i18n/routing";
 import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 import InitiateCheckoutTracker from "@/components/pixel/InitiateCheckoutTracker";
+import { useToast } from "@/hooks/use-toast";
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
 const CheckoutWidget = () => {
   const t = useTranslations("Index");
+  const { toast } = useToast();
   const { width } = useGetDeviceType();
   const currency = getCurrency()
   const { mutate } = useSWRConfig();
@@ -454,7 +456,28 @@ const CheckoutWidget = () => {
 
 const handlePaymentRedirect = async () => {
   try {
-    window.location.href = `${baseUrl}${STRIPE_CHECKOUT}?trx_id=${checkoutData?.trx_id}&payment_mode=api&code=${checkoutData?.code}&curr=${currency}`;
+    const session = await getSession();
+      const token = session?.accessToken;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in Authorization header
+          "Content-Type": "application/json", // Set content type
+        },
+      };
+    const response = await axios.get(
+        `${baseUrl}${STRIPE_CHECKOUT}/${order_id}`,
+        config
+      );
+
+      if(response?.data?.success){
+        window.location.href = `${response?.data?.message?.url}`;
+      } else {
+          toast({
+          title: t("PleaseTryAgain"),
+          variant: "destructive",
+        });
+      }
+      
   } catch (error) {
     console.error("Payment redirect failed:", error);
   }

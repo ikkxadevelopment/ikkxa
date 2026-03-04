@@ -26,8 +26,8 @@ export async function generateMetadata({ params: { product, lang } }) {
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        [`en-${country}`]: `/en-${country}`,
-        [`ar-${country}`]: `/ar-${country}`,
+        [`en-${country}`]: `/en-${country}/products/${meta?.slug}`,
+        [`ar-${country}`]: `/ar-${country}/products/${meta?.slug}`,
       },
     },
     metadataBase: new URL('https://www.ikkxa.com'),

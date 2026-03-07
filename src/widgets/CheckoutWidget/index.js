@@ -15,12 +15,13 @@ import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { getSession, useSession } from "next-auth/react";
 import { useSWRConfig } from "swr";
-import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT, NGENIUS_CHECKOUT } from "@/constants/apiRoutes";
+import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT,NGENIUS_CHECKOUT,STRIPE_CHECKOUT } from "@/constants/apiRoutes";
 import axios from "axios";
 import OrderPending from "./OrderPending";
 import OrderSuccess from "./OrderSuccess";
 import { axiosPostWithToken } from "@/lib/getHome";
 import { PiMoney } from "react-icons/pi";
+import { FaStripe } from "react-icons/fa6";
 
 // import Moyasar from "./Moyasar";
 import dynamic from "next/dynamic";
@@ -31,10 +32,12 @@ import getBaseUrl from "@/hooks/getBaseUrl";
 import { useRouter } from "@/i18n/routing";
 import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 import InitiateCheckoutTracker from "@/components/pixel/InitiateCheckoutTracker";
+import { useToast } from "@/hooks/use-toast";
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
 const CheckoutWidget = () => {
   const t = useTranslations("Index");
+  const { toast } = useToast();
   const { width } = useGetDeviceType();
   const currency = getCurrency()
   const { mutate } = useSWRConfig();
@@ -451,7 +454,34 @@ const CheckoutWidget = () => {
     // return data;
   };
 
+const handlePaymentRedirect = async () => {
+  try {
+    const session = await getSession();
+      const token = session?.accessToken;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in Authorization header
+          "Content-Type": "application/json", // Set content type
+        },
+      };
+    const response = await axios.get(
+        `${baseUrl}${STRIPE_CHECKOUT}/${order_id}`,
+        config
+      );
 
+      if(response?.data?.success){
+        window.location.href = `${response?.data?.message?.url}`;
+      } else {
+          toast({
+          title: t("PleaseTryAgain"),
+          variant: "destructive",
+        });
+      }
+      
+  } catch (error) {
+    console.error("Payment redirect failed:", error);
+  }
+};
 
   // if (loading) return <OrderPending address={address} />;
   // if (success) return <OrderSuccess address={address} />;
@@ -683,6 +713,30 @@ const CheckoutWidget = () => {
                     </div>
                   </div>
                 </Label>
+                {country === "AE" &&
+                <Label
+                  htmlFor="stripe"
+                  className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
+                >
+                  <RadioGroupItem value="stripe" id="stripe" />
+                  <div className="flex items-center w-full justify-between">
+                    <div>
+                      <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                        {" "}
+                        {t('stripe')}
+                      </h5>
+                      {/* <p className="text-[#9e9e9e] text-xs">
+                        {" "}
+                        {t('stripe')}
+                      </p> */}
+                    </div>
+
+                    <div className="text-2xl relative">
+                      <FaStripe />
+                    </div>
+                  </div>
+                </Label>
+              }
               </RadioGroup>
             </div>
             <div className="flex-col-auto w-full lg:w-[28%] lg:px-4">
@@ -769,9 +823,18 @@ const CheckoutWidget = () => {
                       alt="tabby logo"
                     />
                   </div> */}
-                  </button>
-                )}
-                {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">
+                </button>
+              )}
+
+              {paymentMethod === "stripe" && country === "AE" && (
+                <button
+                  className="w-full btn btn-grad btn-lg lg:mb-3 "
+                  onClick={handlePaymentRedirect}
+                >
+                  {t('PlaceOrderWith')} {t('stripe')}
+                </button>
+              )}
+              {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">
                 Place Order
               </button> */}
               </div>

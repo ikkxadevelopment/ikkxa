@@ -605,7 +605,7 @@ const handlePaymentRedirect = async () => {
                       </div>
                     )}
                   </Label>}
-                {country === "AE" &&
+                {/* {country === "AE" &&
                   <Label
                     htmlFor="Network"
                     className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
@@ -627,8 +627,33 @@ const handlePaymentRedirect = async () => {
                       </div>
                     </div>
                   </Label>
-                }
+                } */}
 
+
+{country === "AE" &&
+                <Label
+                  htmlFor="stripe"
+                  className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
+                >
+                  <RadioGroupItem value="stripe" id="stripe" />
+                  <div className="flex items-center w-full justify-between">
+                    <div>
+                      <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                        {" "}
+                        {t('stripe')}
+                      </h5>
+                      {/* <p className="text-[#9e9e9e] text-xs">
+                        {" "}
+                        {t('stripe')}
+                      </p> */}
+                    </div>
+
+                    <div className="text-2xl relative">
+                      <FaStripe />
+                    </div>
+                  </div>
+                </Label>
+              }
                 <Label
                   htmlFor="tabby"
                   className="flex items-center space-x-3 w-full p-3 lg:p-6  mb-0 rounded border border-gray-200 bg-white"
@@ -713,30 +738,7 @@ const handlePaymentRedirect = async () => {
                     </div>
                   </div>
                 </Label>
-                {country === "AE" &&
-                <Label
-                  htmlFor="stripe"
-                  className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
-                >
-                  <RadioGroupItem value="stripe" id="stripe" />
-                  <div className="flex items-center w-full justify-between">
-                    <div>
-                      <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
-                        {" "}
-                        {t('stripe')}
-                      </h5>
-                      {/* <p className="text-[#9e9e9e] text-xs">
-                        {" "}
-                        {t('stripe')}
-                      </p> */}
-                    </div>
-
-                    <div className="text-2xl relative">
-                      <FaStripe />
-                    </div>
-                  </div>
-                </Label>
-              }
+              
               </RadioGroup>
             </div>
             <div className="flex-col-auto w-full lg:w-[28%] lg:px-4">

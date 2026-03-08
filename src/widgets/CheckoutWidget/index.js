@@ -640,7 +640,7 @@ const handlePaymentRedirect = async () => {
                     <div>
                       <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
                         {" "}
-                        {t('stripe')}
+                        {t('CreditCard')}/{t('debitCard')}
                       </h5>
                       {/* <p className="text-[#9e9e9e] text-xs">
                         {" "}
@@ -648,8 +648,14 @@ const handlePaymentRedirect = async () => {
                       </p> */}
                     </div>
 
-                    <div className="text-2xl relative">
-                      <FaStripe />
+                    <div className="justify-start items-start gap-1 inline-flex">
+                    {payments?.map((item, i) => {
+                            return (
+                              <div key={i} className=" relative w-12 h-6">
+                                <Image src={item?.img} className="" fill alt="" />
+                              </div>
+                            );
+                          })}
                     </div>
                   </div>
                 </Label>
@@ -766,7 +772,23 @@ const handlePaymentRedirect = async () => {
                               />
                             </div>
                           </a>}</> :
-                      <button
+<>
+<a
+                            target="_blank"
+                            href={`${tabbyUrl}`}
+                            className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
+                          >
+                            {t('PlaceOrderWith')}{" "}
+                            <div className="aspect-[46/17] w-12 relative ms-2">
+                              <Image
+                                src={"/images/tabby_logo.png"}
+                                fill
+                                className="object-contain"
+                                alt="tabby logo"
+                              />
+                            </div>
+                          </a>
+{/* <button
                         href={`${checkoutData?.tabby_checkout_url}`}
                         onClick={() => handleTabbyCheckout()}
                         className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
@@ -780,7 +802,9 @@ const handlePaymentRedirect = async () => {
                             alt="tabby logo"
                           />
                         </div>
-                      </button>}
+                      </button> */}
+</>
+                     }
 
                   </>
 
@@ -833,7 +857,8 @@ const handlePaymentRedirect = async () => {
                   className="w-full btn btn-grad btn-lg lg:mb-3 "
                   onClick={handlePaymentRedirect}
                 >
-                  {t('PlaceOrderWith')} {t('stripe')}
+                  {/* {t('PlaceOrderWith')} {t('stripe')} */}
+                  {t('PlaceOrder')}
                 </button>
               )}
               {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">

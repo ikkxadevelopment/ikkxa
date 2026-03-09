@@ -660,6 +660,7 @@ const handlePaymentRedirect = async () => {
                   </div>
                 </Label>
               }
+              {country === "SA" &&
                 <Label
                   htmlFor="tabby"
                   className="flex items-center space-x-3 w-full p-3 lg:p-6  mb-0 rounded border border-gray-200 bg-white"
@@ -693,7 +694,7 @@ const handlePaymentRedirect = async () => {
                     </div>
                   </div>
                 </Label>
-
+}
                 <Label
                   htmlFor="tamara"
                   className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"

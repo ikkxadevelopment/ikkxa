@@ -88,12 +88,12 @@ const CartWidget = () => {
               Add Item
             </button> */}
                 <div className="mt-2">
-                  <TabbyPromoWithButton
+                  {/* <TabbyPromoWithButton
                     price={calculations?.total}
                     publicKey="pk_xyz"
                     merchantCode={lang}
                     currency={currency}
-                  />
+                  /> */}
                   <PaymetnIcons />
                 </div>
               </div>

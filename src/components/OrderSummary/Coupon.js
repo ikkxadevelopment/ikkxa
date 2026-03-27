@@ -131,7 +131,7 @@ export default function Coupon({ data, setCouponApplied, session }) {
                   name="couponCode"
                   id="couponCode"
                   className="input font-semibold"
-                  //   value={values.couponCode}
+                  value={values?.couponCode ? values?.couponCode : ""}
                   disabled={appliedCoupon?.length > 0}
                   placeholder={t("EnterVoucher")}
                 />

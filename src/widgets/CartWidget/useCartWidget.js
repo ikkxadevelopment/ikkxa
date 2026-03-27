@@ -1,11 +1,12 @@
 import useSWR, { mutate, useSWRConfig } from 'swr';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { loginIsOpen, cartCountState, cartState, selectedVariantState, errorMessageProductCard, trax_id } from "@/recoil/atoms";
+import { loginIsOpen, cartCountState, cartState, selectedVariantState, errorMessageProductCard, trax_id, couponAppliedState } from "@/recoil/atoms";
 import { addCartItem, addToWishlist, removeCartItem, updateCartItemQty } from '@/lib/getHome';
 import { useSession } from 'next-auth/react';
-import { ADD_CART, ADD_WISHLIST, GET_CART } from '@/constants/apiRoutes';
+import { ADD_CART, ADD_WISHLIST, GET_CART, COUPON_REMOVE, APPLIED_COUPON } from '@/constants/apiRoutes';
+import { axiosPostWithToken } from '@/lib/getHome';
 import axios from 'axios';
 import { apiFetcher } from '@/utils/fetcher';
 import { fetcherWithToken } from "@/utils/fetcher";
@@ -24,6 +25,8 @@ export const useCartWidget = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessages, setErrorMessages] = useRecoilState(errorMessageProductCard);
   const [selectedVariant, setSelectedVariant] = useRecoilState(selectedVariantState);
+  const [couponApplied, setCouponApplied] = useRecoilState(couponAppliedState);
+  const trx = useRecoilValue(trax_id);
 
   const [variantOpen, setIsVariantOpen] = useState(false)
 
@@ -66,6 +69,23 @@ export const useCartWidget = () => {
     }
     return trxId;
   }
+
+  const removeCouponIfApplied = async (trxId) => {
+    if (!couponApplied?.coupon_id) return;
+    const effectiveTrx = trx || trxId;
+    try {
+      await axiosPostWithToken(
+        `${COUPON_REMOVE}`,
+        { coupon_id: couponApplied.coupon_id, trx_id: effectiveTrx },
+        lang
+      );
+    } catch (e) {
+      // silently ignore
+    } finally {
+      setCouponApplied(null);
+      mutate(`${APPLIED_COUPON}?trx_id=${effectiveTrx}`);
+    }
+  };
 
   const getVariantByProductID = (productID) => {
     const product = selectedVariant.find(item => item.productID === productID);
@@ -126,14 +146,11 @@ export const useCartWidget = () => {
         });
         if (session?.status === "unauthenticated" && !trxId && res.data?.trx_id) {
           localStorage.setItem("guestToken", res.data.trx_id);
-          console.log(item, "asasfee");
-
-
-
-
           mutate(`${GET_CART}lang=${locale}&trx_id=${res.data?.trx_id}`);
+          await removeCouponIfApplied(res.data.trx_id);
         } else {
           mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+          await removeCouponIfApplied(trxId);
         }
 
 
@@ -176,8 +193,9 @@ export const useCartWidget = () => {
       let trxId = fetchTrxId()
       const res = await removeCartItem(id, authToken, trxId, country);
       if (res.success) {
-        setCartCount(cartCount - 1)
+        setCartCount(cartCount - 1);
         mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+        await removeCouponIfApplied(trxId);
       }
       toast({
         title: `${t('ItemRemovedFromCart')}`,
@@ -196,11 +214,11 @@ export const useCartWidget = () => {
 
       const res = await updateCartItemQty(id, formData, authToken, country);
       if (res.success) {
-        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`)
+        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+        await removeCouponIfApplied(trxId);
         toast({
           title: `${t('CartItemUpdated')}`,
           variant: "success",
-
         })
         return res
       } else {

@@ -14,6 +14,7 @@ import { loginIsOpen, trax_id } from "@/recoil/atoms";
 import useSWR, { useSWRConfig } from "swr";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Coupon({ data, setCouponApplied, session }) {
   const lang = useLocale();
@@ -21,6 +22,7 @@ export default function Coupon({ data, setCouponApplied, session }) {
   const [isLoginOpen, setIsLoginOpen] = useRecoilState(loginIsOpen);
   const t = useTranslations("Index");
   const trx = useRecoilValue(trax_id);
+  const { toast } = useToast();
   const [appliedCoupon, setAppliedCoupon] = useState({});
   const { data: appliedData, error: appliedError } = useSWR(
     `${APPLIED_COUPON}?trx_id=${trx}`
@@ -58,22 +60,32 @@ export default function Coupon({ data, setCouponApplied, session }) {
       );
 
       if (result.status) {
-        // console.log("removeeddd");
         mutate(`${GET_CART}lang=${locale}&token=true`);
         mutate(`${APPLIED_COUPON}?trx_id=${trx}`);
         resetForm({ values: { couponCode: "" } });
         setAppliedCoupon({});
         setCouponApplied({});
-        window.location.reload(); // Refresh the window
+        toast({
+          title: t("CouponRemoved") || "Coupon Removed",
+          description: t("CouponRemovedSuccess") || "Coupon has been removed successfully.",
+        });
+        window.location.reload();
       } else {
-        console.log("sdfsdf");
+        toast({
+          title: t("Error") || "Error",
+          description: t("CouponRemoveFailed") || "Failed to remove coupon. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       const apiErrorMessage =
         error.response?.data?.message ||
         "Something went wrong. Please try again.";
-    } finally {
-      console.log("sdfsdf");
+      toast({
+        title: t("Error") || "Error",
+        description: apiErrorMessage,
+        variant: "destructive",
+      });
     }
   };
 

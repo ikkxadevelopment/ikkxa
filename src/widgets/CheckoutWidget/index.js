@@ -517,6 +517,8 @@ const handlePaymentRedirect = async () => {
             </>
           )}
         </div>
+
+        {console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData")}
         <div className="container lg:max-w-[1200px]">
           <div className="flex flex-wrap lg:-mx-4">
             <div className="flex-col-auto w-full lg:w-[72%] lg:px-4">
@@ -650,6 +652,8 @@ const handlePaymentRedirect = async () => {
                         {" "}
                         {t('SplitYourPayment')}
                       </p>
+                      {tabbyUrl===false ? <p className="text-[#b02828] text-xs">{checkoutData?.tabby?.message}</p>:null}
+                      
                     </div>
 
                     <div className="aspect-[46/17] w-12 relative">

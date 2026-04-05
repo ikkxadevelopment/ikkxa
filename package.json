@@ -1,5 +1,5 @@
 {
-  "name": "bcommerce",
+  "name": "ikkxa",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -58,6 +58,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "0.6.6",
     "@types/node": "20.14.11",
     "@types/react": "18.3.3",
     "eslint": "^8",

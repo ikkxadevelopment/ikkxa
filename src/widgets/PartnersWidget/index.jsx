@@ -26,7 +26,7 @@ export default function PartnersWidget() {
           </h3>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
           {partners.map((item) => (
             <div
               key={item.id}

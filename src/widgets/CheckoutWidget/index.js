@@ -31,6 +31,7 @@ import getCurrency from "@/hooks/getCurrency";
 import getBaseUrl from "@/hooks/getBaseUrl";
 import { useRouter } from "@/i18n/routing";
 import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
+import TabbyCardSnippet from "@/components/TabbyCardSnippet/TabbyCardSnippet";
 import InitiateCheckoutTracker from "@/components/pixel/InitiateCheckoutTracker";
 import { useToast } from "@/hooks/use-toast";
 // const Moyasar = dynamic(() => import('./Moyasar'));
@@ -633,38 +634,37 @@ const handlePaymentRedirect = async () => {
 
                 <Label
                   htmlFor="tabby"
-                  className="flex items-center space-x-3 w-full p-3 lg:p-6  mb-0 rounded border border-gray-200 bg-white"
+                  className="flex flex-col w-full p-3 lg:p-6 mb-0 rounded border border-gray-200 bg-white"
                 >
-                  <RadioGroupItem value="tabby" id="tabby" />
-                  <div className="flex items-center w-full justify-between">
-                    {/* <TabbyPromoWithButton
-                    price={checkoutData?.total_payable}
-                    publicKey="pk_xyz"
-                    merchantCode={lang}
-                    currency={currency}
-                  /> */}
-                    <div>
-                      <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
-                        {" "}
-                        {t('PayLaterTabby')}
-                      </h5>
-                      <p className="text-[#9e9e9e] text-xs">
-                        {" "}
-                        {t('SplitYourPayment')}
-                      </p>
-                      {tabbyUrl===false ? <p className="text-[#b02828] text-xs">{checkoutData?.tabby?.message}</p>:null}
-                      
-                    </div>
-
-                    <div className="aspect-[46/17] w-12 relative">
-                      <Image
-                        src={"/images/tabby_logo.png"}
-                        fill
-                        className="object-contain"
-                        alt="tabby logo"
-                      />
+                  <div className="flex items-center space-x-3 w-full">
+                    <RadioGroupItem value="tabby" id="tabby" />
+                    <div className="flex items-center w-full justify-between">
+                      <div>
+                        <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                          {t('PayLaterTabby')}
+                        </h5>
+                        <p className="text-[#9e9e9e] text-xs">
+                          {t('SplitYourPayment')}
+                        </p>
+                        {tabbyUrl === false ? <p className="text-[#b02828] text-xs">{checkoutData?.tabby?.message}</p> : null}
+                      </div>
+                      <div className="aspect-[46/17] w-12 relative">
+                        <Image
+                          src={"/images/tabby_logo.png"}
+                          fill
+                          className="object-contain"
+                          alt="tabby logo"
+                        />
+                      </div>
                     </div>
                   </div>
+                  {paymentMethod === 'tabby' && (
+                    <TabbyCardSnippet
+                      price={checkoutData?.total_payable}
+                      publicKey={process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY || 'pk_xyz'}
+                      merchantCode={lang}
+                    />
+                  )}
                 </Label>
 
                 <Label

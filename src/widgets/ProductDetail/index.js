@@ -416,9 +416,9 @@ export default function ProductDetail({ data, isOutOfStock }) {
                   <div>
                     <TabbyPromoWithButton
                       price={productDetail?.disPrice}
-                      publicKey="pk_xyz"
+                      publicKey={process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY || 'pk_xyz'}
                       merchantCode={lang}
-                      currency={currency}
+                      source="product"
                     />
                   </div>
                   {/* <EmiComponent price={productDetail?.disPrice} type="tabby" /> */}

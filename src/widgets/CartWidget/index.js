@@ -90,9 +90,9 @@ const CartWidget = () => {
                 <div className="mt-2">
                   <TabbyPromoWithButton
                     price={calculations?.total}
-                    publicKey="pk_xyz"
+                    publicKey={process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY || 'pk_xyz'}
                     merchantCode={lang}
-                    currency={currency}
+                    source="cart"
                   />
                   <PaymetnIcons />
                 </div>

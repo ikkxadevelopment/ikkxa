@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 const CURRENCY_MAP = { AE: 'AED', SA: 'SAR', KW: 'KWD' };
 
-const TabbyPromoWithButton = ({ price, publicKey, merchantCode, source = 'product' }) => {
+const TabbyCardSnippet = ({ price, publicKey, merchantCode }) => {
   const [lang, region] = (merchantCode || '').split('-');
   const currency = CURRENCY_MAP[region] || 'AED';
   const formattedPrice = region === 'KW'
@@ -12,25 +12,22 @@ const TabbyPromoWithButton = ({ price, publicKey, merchantCode, source = 'produc
     : parseFloat(price).toFixed(2);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.TabbyPromo) {
-      new window.TabbyPromo({
-        selector: '#TabbyPromo',
+    if (typeof window !== 'undefined' && window.TabbyCard) {
+      new window.TabbyCard({
+        selector: '#TabbyCard',
         currency,
         price: formattedPrice,
         lang: lang || 'en',
-        source,
         shouldInheritBg: false,
         publicKey,
         merchantCode: region,
       });
     }
-  }, [price, publicKey, merchantCode, source]);
+  }, [price, publicKey, merchantCode]);
 
   return (
-    <div className="tabby-promo-container mb-4">
-      <div id="TabbyPromo" className="tabby-promo-widget" />
-    </div>
+    <div id="TabbyCard" className="mt-3" />
   );
 };
 
-export default TabbyPromoWithButton;
+export default TabbyCardSnippet;

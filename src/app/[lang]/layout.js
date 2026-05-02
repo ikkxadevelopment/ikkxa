@@ -47,7 +47,11 @@ export default async function RootLayout({
     <html lang={locale} dir={direction}>
       <Script
         src="https://checkout.tabby.ai/tabby-promo.js"
-        strategy="beforeInteractive" // Ensures it loads before any React runs
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://checkout.tabby.ai/tabby-card.js"
+        strategy="beforeInteractive"
       />
       <head>
         <meta property="fb:pixel_id" content={"851173184222165"} />

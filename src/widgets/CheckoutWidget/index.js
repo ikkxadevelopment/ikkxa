@@ -15,7 +15,7 @@ import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
 import { getSession, useSession } from "next-auth/react";
 import { useSWRConfig } from "swr";
-import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT,NGENIUS_CHECKOUT,STRIPE_CHECKOUT } from "@/constants/apiRoutes";
+import { APPLIED_COUPON, TABBY_CHECKOUT, TAMARA_CHECKOUT, NGENIUS_CHECKOUT, STRIPE_CHECKOUT } from "@/constants/apiRoutes";
 import axios from "axios";
 import OrderPending from "./OrderPending";
 import OrderSuccess from "./OrderSuccess";
@@ -455,9 +455,9 @@ const CheckoutWidget = () => {
     // return data;
   };
 
-const handlePaymentRedirect = async () => {
-  try {
-    const session = await getSession();
+  const handlePaymentRedirect = async () => {
+    try {
+      const session = await getSession();
       const token = session?.accessToken;
       const config = {
         headers: {
@@ -465,24 +465,24 @@ const handlePaymentRedirect = async () => {
           "Content-Type": "application/json", // Set content type
         },
       };
-    const response = await axios.get(
+      const response = await axios.get(
         `${baseUrl}${STRIPE_CHECKOUT}/${order_id}`,
         config
       );
 
-      if(response?.data?.success){
+      if (response?.data?.success) {
         window.location.href = `${response?.data?.message?.url}`;
       } else {
-          toast({
+        toast({
           title: t("PleaseTryAgain"),
           variant: "destructive",
         });
       }
-      
-  } catch (error) {
-    console.error("Payment redirect failed:", error);
-  }
-};
+
+    } catch (error) {
+      console.error("Payment redirect failed:", error);
+    }
+  };
 
   // if (loading) return <OrderPending address={address} />;
   // if (success) return <OrderSuccess address={address} />;
@@ -519,7 +519,7 @@ const handlePaymentRedirect = async () => {
           )}
         </div>
 
-        {console.log(checkoutData,"checkoutDatacheckoutDatacheckoutDatacheckoutData")}
+        {console.log(checkoutData, "checkoutDatacheckoutDatacheckoutDatacheckoutData")}
         <div className="container lg:max-w-[1200px]">
           <div className="flex flex-wrap lg:-mx-4">
             <div className="flex-col-auto w-full lg:w-[72%] lg:px-4">
@@ -718,29 +718,29 @@ const handlePaymentRedirect = async () => {
                   </div>
                 </Label>
                 {country === "AE" &&
-                <Label
-                  htmlFor="stripe"
-                  className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
-                >
-                  <RadioGroupItem value="stripe" id="stripe" />
-                  <div className="flex items-center w-full justify-between">
-                    <div>
-                      <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
-                        {" "}
-                        {t('stripe')}
-                      </h5>
-                      {/* <p className="text-[#9e9e9e] text-xs">
+                  <Label
+                    htmlFor="stripe"
+                    className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
+                  >
+                    <RadioGroupItem value="stripe" id="stripe" />
+                    <div className="flex items-center w-full justify-between">
+                      <div>
+                        <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
+                          {" "}
+                          {t('stripe')}
+                        </h5>
+                        {/* <p className="text-[#9e9e9e] text-xs">
                         {" "}
                         {t('stripe')}
                       </p> */}
-                    </div>
+                      </div>
 
-                    <div className="text-2xl relative">
-                      <FaStripe />
+                      <div className="text-2xl relative">
+                        <FaStripe />
+                      </div>
                     </div>
-                  </div>
-                </Label>
-              }
+                  </Label>
+                }
               </RadioGroup>
             </div>
             <div className="flex-col-auto w-full lg:w-[28%] lg:px-4">
@@ -754,7 +754,6 @@ const handlePaymentRedirect = async () => {
                       <>
                         {tabbyUrl &&
                           <a
-                            target="_blank"
                             href={`${tabbyUrl}`}
                             className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
                           >
@@ -827,18 +826,18 @@ const handlePaymentRedirect = async () => {
                       alt="tabby logo"
                     />
                   </div> */}
-                </button>
-              )}
+                  </button>
+                )}
 
-              {paymentMethod === "stripe" && country === "AE" && (
-                <button
-                  className="w-full btn btn-grad btn-lg lg:mb-3 "
-                  onClick={handlePaymentRedirect}
-                >
-                  {t('PlaceOrderWith')} {t('stripe')}
-                </button>
-              )}
-              {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">
+                {paymentMethod === "stripe" && country === "AE" && (
+                  <button
+                    className="w-full btn btn-grad btn-lg lg:mb-3 "
+                    onClick={handlePaymentRedirect}
+                  >
+                    {t('PlaceOrderWith')} {t('stripe')}
+                  </button>
+                )}
+                {/* <button className="w-full btn btn-grad btn-lg lg:mb-3 ">
                 Place Order
               </button> */}
               </div>

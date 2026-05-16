@@ -35,14 +35,14 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
   const AddressSchema = Yup.object().shape({
     name: Yup.string().required(`${t("NameIsRequired")}`),
     email: Yup.string().required(`${t("EmailIsRequired")}`),
-    // phone_no: Yup.string().required("Mobile number is required"),
     country_id: Yup.string().required(`${t('CountryIsRequired')}`),
     state_id: Yup.string().required(`${t('StateIsRequired')}`),
     city_id: Yup.string().required(`${t("CityIsRequired")}`),
     street: Yup.string().required(`${t("StreetIsRequired")}`),
     postal_code: Yup.string().required(`${t('PostCodeIsRequired')}`),
-    // building: Yup.string().required("City is required"),
-    // type: Yup.string().required("City is required"),
+    national_address: country === "SA"
+      ? Yup.string().required(`${t('NationalAddressIsRequired')}`)
+      : Yup.string(),
   });
 
   const formik = useFormik({
@@ -57,6 +57,7 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
       street: data?.street || "",
       type: data?.type || "",
       postal_code: data?.postal_code || "",
+      national_address: data?.national_address || "",
       default: data?.default_shipping || 0,
     },
     validationSchema: AddressSchema,
@@ -289,7 +290,7 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
 
             {/* Postal Code */}
             <div>
-              <Label htmlFor="lastName">{t('PostalCode')}*</Label>
+              <Label htmlFor="postal_code">{t('PostalCode')}*</Label>
               <Input
                 id="postal_code"
                 name="postal_code"
@@ -302,6 +303,30 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
                 <div className="text-red-500">{formik.errors.postal_code}</div>
               ) : null}
             </div>
+
+            {/* Short National Address – mandatory in KSA */}
+            {country === "SA" && (
+              <div className="col-span-2">
+                <Label htmlFor="national_address">
+                  {t('NationalAddress')}*
+                </Label>
+                <Input
+                  id="national_address"
+                  name="national_address"
+                  value={formik.values.national_address}
+                  onChange={(e) =>
+                    formik.setFieldValue("national_address", e.target.value.toUpperCase())
+                  }
+                  onBlur={formik.handleBlur}
+                  placeholder={t('NationalAddressPlaceholder')}
+                  maxLength={8}
+                  className="col-span-3 uppercase"
+                />
+                {formik.touched.national_address && formik.errors.national_address ? (
+                  <div className="text-red-500">{formik.errors.national_address}</div>
+                ) : null}
+              </div>
+            )}
 
 
             <div className="mb-4">

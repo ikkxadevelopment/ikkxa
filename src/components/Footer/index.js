@@ -350,7 +350,7 @@ export default function Footer({ data, menu }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-1  border-t border-zinc-100 py-3 lg:py-4">
             <div>
               <p className=" text-black text-xs md:text-sm  ">
-                {t('Copyright')}
+                {t('Copyright', { year: new Date().getFullYear() })}
               </p>
             </div>
             <div className=" lg:text-end">

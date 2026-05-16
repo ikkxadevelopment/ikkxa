@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import Image from "../Image/image";
 import { GoHeart, GoHeartFill } from "react-icons/go";
@@ -19,8 +20,8 @@ export default function ProductCard({ data, isWishlist }) {
   const t = useTranslations('Index')
   const currency = getCurrency();
   const { selectVariant } = useProductCard();
-  const pid=isWishlist?data?.id:data?.id
-  const { handleWishlist, hasWishlist } = useWishlistWidget({data, isWishlist});
+  const pid = isWishlist ? data?.id : data?.id
+  const { handleWishlist, hasWishlist } = useWishlistWidget({ data, isWishlist });
   const [errorMessages, setErrorMessages] = useRecoilState(
     errorMessageProductCard
   );
@@ -33,7 +34,7 @@ export default function ProductCard({ data, isWishlist }) {
   return (
     <div className="group">
       <div className="relative overflow-hidden">
-        { width >= 992 ?
+        {width >= 992 ?
           <RadioGroup className="border transition-all  duration-500 translate-y-4 opacity-0  transform group-hover:opacity-100  group-hover:translate-y-0 inline-flex px-1 rounded-md items-center py-1 justify-center space-x-[4px] absolute bottom-[4px] -translate-x-[50%] left-[50%] w-auto  z-50  gap-0 bg-white ">
             {data &&
               data?.stock?.map((option) => (
@@ -74,68 +75,70 @@ export default function ProductCard({ data, isWishlist }) {
           className="relative bg-slate-50 overflow-hidden rounded-sm"
         >
           {/* <div className='inline-block absolute top-2 font-semibold start-2 bg-red-600 text-white rounded-sm text-[10px] z-10 px-2 py-1'>BEST SELLING</div> */}
-          <button onClick={()=>{handleWishlist(pid)}} className="w-[32.22px] h-[32.22px] border-gray-50 flex-col justify-center items-center  inline-flex absolute top-2 font-semibold end-2 bg-white text-[#C87739] rounded-full z-10 px-2 py-1">
-           {hasWishlist||isWishlist? <GoHeartFill />:  <GoHeart /> }
+          <button onClick={() => { handleWishlist(pid) }} className="w-[32.22px] h-[32.22px] border-gray-50 flex-col justify-center items-center  inline-flex absolute top-2 font-semibold end-2 bg-white text-[#C87739] rounded-full z-10 px-2 py-1">
+            {hasWishlist || isWishlist ? <GoHeartFill /> : <GoHeart />}
           </button>
           <Link
-          href={`/products/${data?.slug}`}
-          className="aspect-portrait block relative bg-slate-50 overflow-hidden rounded-sm"
-        >
-          {(data?.discount_percentage!==data?.price)&&
-          <span className="text-xs absolute bottom-0 left-0 font-semibold  px-2 py-[2px] text-[#F2432D] bg-[#FCEFEE] inline-block z-10">
-           {
-  data?.special_discount_type === "flat" 
-  ? (
-    <>
-      {t('Save')}  <span>{currency}</span> {data?.discount_amount}
-    </>
-  )
-  : `${offerPerc}% ${t('Off')}`
-}
+            href={`/products/${data?.slug}`}
+            scroll={false}
+            className="aspect-portrait block relative bg-slate-50 overflow-hidden rounded-sm"
+          >
+            {(data?.discount_percentage !== data?.price) &&
+              <span className="text-xs absolute bottom-0 left-0 font-semibold  px-2 py-[2px] text-[#F2432D] bg-[#FCEFEE] inline-block z-10">
+                {
+                  data?.special_discount_type === "flat"
+                    ? (
+                      <>
+                        {t('Save')}  <span>{currency}</span> {data?.discount_amount}
+                      </>
+                    )
+                    : `${offerPerc}% ${t('Off')}`
+                }
 
-          </span>
-}
-          <Image
-              src={`${data?.image_url||data?.image_190x230}`}
+              </span>
+            }
+            <Image
+              src={`${data?.image_url || data?.image_190x230}`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 50vw"
               className="object-cover"
               fill
               alt={`${data?.product_name}`}
             />
-        </Link>
+          </Link>
         </div>
       </div>
       <div className="py-2">
-      <Link
-          href={`/products/${data?.slug}`}>
-        <h4 className="text-sm font-normal line-clamp-2 mb-2">
-          {data?.product_name}
-        </h4>
-        <p className=" text-base font-semibold mb-2 ">
-          <span className="text-neutral-800 font-normal text-sm">
-          {/* <i className="icon-riyal text-sm"></i> */}
-            {currency}
+        <Link
+          href={`/products/${data?.slug}`}
+          scroll={false}>
+          <h4 className="text-sm font-normal line-clamp-2 mb-2">
+            {data?.product_name}
+          </h4>
+          <p className=" text-base font-semibold mb-2 ">
+            <span className="text-neutral-800 font-normal text-sm">
+              {/* <i className="icon-riyal text-sm"></i> */}
+              {currency}
             </span>{" "}
-          {data?.discount_percentage}
-          {(data?.discount_percentage!==data?.price)&&
-               <>
-                   <span className="text-neutral-400 text-xs font-semibold line-through ml-1">
-            {data?.price}
-          </span>
-          <span className="text-xs  px-2 py-[2px] text-[#38ae04]  inline-block z-10">
-            {offerPerc}% {t('Off')}
-          </span>
-               </>}
-      
-        </p>
+            {data?.discount_percentage}
+            {(data?.discount_percentage !== data?.price) &&
+              <>
+                <span className="text-neutral-400 text-xs font-semibold line-through ml-1">
+                  {data?.price}
+                </span>
+                <span className="text-xs  px-2 py-[2px] text-[#38ae04]  inline-block z-10">
+                  {offerPerc}% {t('Off')}
+                </span>
+              </>}
+
+          </p>
         </Link>
-        {data?.current_stock<5&&
-        <p className=" text-[10px] font-semibold flex items-center ">
-          <span className="text-xs text-[#F2432D] me-1">
-            <SlHandbag />
-          </span>
-          {t('Only')} {data?.current_stock} {t('leftInStock')}
-        </p>
+        {data?.current_stock < 5 &&
+          <p className=" text-[10px] font-semibold flex items-center ">
+            <span className="text-xs text-[#F2432D] me-1">
+              <SlHandbag />
+            </span>
+            {t('Only')} {data?.current_stock} {t('leftInStock')}
+          </p>
         }
         {errorMessages[data.id] && (
           <p className="text-xs" style={{ color: "red" }}>{errorMessages[data.id]}</p>

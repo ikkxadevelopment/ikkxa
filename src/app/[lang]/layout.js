@@ -33,6 +33,7 @@ const fontArab = Noto_Kufi_Arabic({
 
 export default async function RootLayout({
   children,
+  modal,
   params: { session, lang, ...params },
 }) {
   const messages = await getMessages();
@@ -62,6 +63,7 @@ export default async function RootLayout({
           <GlobalProviders session={session} >
             <Header data={data} menu={menuData?.data} />
             {children}
+            {modal}
             <Footer data={data} menu={footerData?.data} />
             <Toaster />
           </GlobalProviders>

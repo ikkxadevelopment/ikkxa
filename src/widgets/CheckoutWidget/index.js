@@ -9,7 +9,7 @@ import Image from "@/components/Image/image";
 import AppBack from "@/components/AppBack";
 import { useRecoilState } from "recoil";
 import { checkoutDataState } from "@/recoil/atoms";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import useCheckout from "@/components/OrderSummary/useCheckout";
 import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
@@ -34,6 +34,26 @@ import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWi
 import TabbyCardSnippet from "@/components/TabbyCardSnippet/TabbyCardSnippet";
 import InitiateCheckoutTracker from "@/components/pixel/InitiateCheckoutTracker";
 import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from "next/navigation";
+import { buildTabbyMerchantUrls } from "./tabbyMessages";
+import { Banner } from "@/components/ui/banner";
+
+const TABBY_STATUS_PALETTE = {
+  failure: [
+    "rgba(220,38,38,0.85)",
+    "rgba(239,68,68,0.75)",
+    "transparent",
+    "rgba(220,38,38,0.85)",
+    "transparent",
+  ],
+  cancel: [
+    "rgba(245,158,11,0.85)",
+    "rgba(251,191,36,0.75)",
+    "transparent",
+    "rgba(245,158,11,0.85)",
+    "transparent",
+  ],
+};
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
 const CheckoutWidget = () => {
@@ -53,12 +73,35 @@ const CheckoutWidget = () => {
   const baseUrl = getBaseUrl(country);
   const defaultAddress = checkoutData?.shipping_address;
   const tabbyUrl = checkoutData?.tabby?.payment_url;
+  const searchParams = useSearchParams();
+  const tabbyStatus = searchParams.get("tabby_status");
+  const tabbyMessage = searchParams.get("message");
 
   useEffect(() => {
     setAddress(defaultAddress);
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
+
+  const tabbyStatusReportedRef = useRef(false);
+  useEffect(() => {
+    if (tabbyStatusReportedRef.current) return;
+    if (tabbyStatus !== "cancel" && tabbyStatus !== "failure") return;
+    if (!order_id) return;
+    tabbyStatusReportedRef.current = true;
+    (async () => {
+      try {
+        const session = await getSession();
+        const token = session?.accessToken;
+        await axios.get(
+          `${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
+          token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+        );
+      } catch (err) {
+        console.error("Tabby status report failed:", err);
+      }
+    })();
+  }, [tabbyStatus, order_id, baseUrl, locale]);
 
   const getCheckoutPayload = () => {
     const defaultQuantity = checkoutData?.items?.map(item => ({
@@ -160,15 +203,14 @@ const CheckoutWidget = () => {
             }
           ],
 
-          merchant_urls: {
-            success: `${window.location.origin}/cart`,
-            cancel: `${window.location.origin}/cart`,
-            failure: `${window.location.origin}/cart`
-          }
+          merchant_urls: buildTabbyMerchantUrls(window.location.origin, lang, {
+            cancelMessage: t("RejectTabbyCancel"),
+            failureMessage: t("RejectTabbyGeneral"),
+          })
         },
 
         //These must be outside "payment"
-        lang: "en",
+        lang: locale === "ar" ? "ar" : "en",
         merchant_code: "IGTARE"
       };
     } else {
@@ -338,14 +380,13 @@ const CheckoutWidget = () => {
             }
           ],
 
-          merchant_urls: {
-            success: `${window.location.origin}/cart`,
-            cancel: `${window.location.origin}/cart`,
-            failure: `${window.location.origin}/cart`
-          }
+          merchant_urls: buildTabbyMerchantUrls(window.location.origin, lang, {
+            cancelMessage: t("RejectTabbyCancel"),
+            failureMessage: t("RejectTabbyGeneral"),
+          })
         },
 
-        lang: "en",
+        lang: locale === "ar" ? "ar" : "en",
         merchant_code: "IGTARE"
       };
 
@@ -497,8 +538,21 @@ const CheckoutWidget = () => {
         <InitiateCheckoutTracker cart={checkoutData} />
       </Suspense>
 
-      <section className="bg-stone-50 pt-4 lg:bg-white">
+      <section className="bg-stone-50 lg:bg-white">
         <AppBack route={"/cart"} title={"Checkout"} />
+        {tabbyStatus && tabbyMessage && (
+          <Banner
+            variant="rainbow"
+            height="auto"
+            rainbowColors={
+              TABBY_STATUS_PALETTE[tabbyStatus] || TABBY_STATUS_PALETTE.cancel
+            }
+            className={`mb-4 py-3 shadow-sm ${tabbyStatus === "failure" ? "text-red-900" : "text-amber-900"
+              }`}
+          >
+            <span role="alert">{tabbyMessage}</span>
+          </Banner>
+        )}
         <div className="container lg:max-w-[992px]">
           {width >= 992 && (
             <>

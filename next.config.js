@@ -7,6 +7,25 @@
 const withNextIntl = require('next-intl/plugin')('./src/i18n/request.js');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // NEXT_PUBLIC_* vars are inlined at build time by webpack.
+    // They must be present here (or in a tracked .env file) because
+    // Cloudflare Pages wrangler.toml [vars] are runtime-only and are
+    // NOT available to `next build` for static inlining.
+    env: {
+        NEXT_PUBLIC_BASE_URL: 'https://test.ikkxa.com/web-api/',
+        NEXT_PUBLIC_BASE_URL_IMG: 'https://test.ikkxa.com/public/',
+        NEXT_PUBLIC_API_BASE_URL_AE: 'https://test.ikkxa.com/web-api/',
+        NEXT_PUBLIC_API_BASE_URL_SA: 'https://test.ikkxa.com/web-api/',
+        // NEXT_PUBLIC_MOYASAR_PUBLIC_API_KEY and NEXT_PUBLIC_MOYASAR_SECRET_API_KEY
+        // use pk_live_/sk_live_ prefixes that trigger GitHub push-protection.
+        // They are set as encrypted Secrets in the Cloudflare Pages dashboard
+        // (Settings → Variables and Secrets) so they are injected at both
+        // build time and runtime without being committed to the repo.
+        //
+        // NEXT_PUBLIC_API_KEY is similarly managed as a Dashboard Secret.
+        // If any of these are absent at build time the values will be undefined
+        // but the application will still load; payment/API features will degrade.
+    },
     images: {
         remotePatterns: [
             {

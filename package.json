@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cf:patch-worker": "node scripts/patch-worker.cjs"
   },
   "dependencies": {
     "@next/third-parties": "^15.1.5",

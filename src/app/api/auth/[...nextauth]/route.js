@@ -327,6 +327,27 @@ const handler = async (req, ctx) => {
       status: result?.status ?? null,
       has_set_cookie: !!result?.headers?.get?.("set-cookie"),
     });
+
+    // If NextAuth returned a 5xx (it caught the error internally but
+    // returned a server-error response), augment the body with our trace
+    // so we can see what went wrong without needing Worker logs.
+    if (result?.status >= 500) {
+      let originalBody = "";
+      try {
+        originalBody = await result.clone().text();
+      } catch (_) {}
+      const augmented = {
+        status_from_nextauth: result.status,
+        original_body_first_500_chars: (originalBody || "").slice(0, 500),
+        original_body_length: (originalBody || "").length,
+        logger_error: lastTrace.error,
+        steps: lastTrace.steps,
+      };
+      return new Response(JSON.stringify(augmented, null, 2), {
+        status: 500,
+        headers: { "Content-Type": "application/json", "x-debug-augmented": "1" },
+      });
+    }
     return result;
   } catch (err) {
     lastTrace.error = {

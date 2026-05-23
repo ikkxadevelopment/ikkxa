@@ -1,16 +1,13 @@
 
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 
 const middleware = async (req, ev) => {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-  const protectedPaths = ['/profile', '/orders'];
-  const isProtectedRoute = protectedPaths.some((path) =>
-    req.nextUrl.pathname.includes(path)
-  );
+  // NOTE: previously called getToken() here, but the result was never used
+  // (isProtectedRoute was set but never gated anything) and getToken() uses
+  // NextAuth's default JWE decode which crashes on Cloudflare Workers
+  // (`crypto.createCipheriv is not implemented yet`). Removed for safety.
 
   // Extract current locale & country from the URL (e.g., /en-SA)
   const pathname = req.nextUrl.pathname;

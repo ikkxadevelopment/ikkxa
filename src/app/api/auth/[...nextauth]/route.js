@@ -5,6 +5,95 @@ import { cookies } from "next/headers";
 import { OTP_VERIFY, SOCIAL_LOGIN } from "@/constants/apiRoutes";
 
 // ---------------------------------------------------------------------------
+// Cloudflare Workers-safe JWT encode/decode.
+//
+// NextAuth v4's default JWT encode uses jose.EncryptJWT with A256GCM, which
+// transitively calls Node's `crypto.createCipheriv`. Cloudflare's `unenv`
+// polyfill does NOT implement createCipheriv, so the default path crashes
+// with "[unenv] crypto.createCipheriv is not implemented yet!" on Workers.
+//
+// We swap it for HS256-signed JWTs using WebCrypto's SubtleCrypto.sign,
+// which is available natively on every Workers runtime. The session token
+// is signed (tamper-proof) but not encrypted; that's the standard JWS
+// model and is appropriate for our OTP-issued session payload.
+// ---------------------------------------------------------------------------
+const DEFAULT_MAX_AGE = 30 * 24 * 60 * 60; // 30 days
+
+const _enc = new TextEncoder();
+const _dec = new TextDecoder();
+
+const b64uEncode = (buf) => {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  let s = "";
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+};
+
+const b64uDecode = (str) => {
+  let s = String(str).replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bin = atob(s);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+};
+
+const importHmacKey = (secret) =>
+  crypto.subtle.importKey(
+    "raw",
+    _enc.encode(String(secret || "")),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+
+const workerJwtEncode = async ({ token = {}, secret, maxAge = DEFAULT_MAX_AGE }) => {
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    ...token,
+    iat: now,
+    exp: now + (maxAge || DEFAULT_MAX_AGE),
+    jti:
+      (typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID()) ||
+      Math.random().toString(36).slice(2),
+  };
+  const headerB64 = b64uEncode(
+    _enc.encode(JSON.stringify({ alg: "HS256", typ: "JWT" }))
+  );
+  const payloadB64 = b64uEncode(_enc.encode(JSON.stringify(payload)));
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const key = await importHmacKey(secret);
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    _enc.encode(signingInput)
+  );
+  return `${signingInput}.${b64uEncode(sig)}`;
+};
+
+const workerJwtDecode = async ({ token, secret }) => {
+  if (!token) return null;
+  try {
+    const parts = String(token).split(".");
+    if (parts.length !== 3) return null;
+    const [headerB64, payloadB64, sigB64] = parts;
+    const key = await importHmacKey(secret);
+    const ok = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      b64uDecode(sigB64),
+      _enc.encode(`${headerB64}.${payloadB64}`)
+    );
+    if (!ok) return null;
+    const payload = JSON.parse(_dec.decode(b64uDecode(payloadB64)));
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch (_e) {
+    return null;
+  }
+};
+
+// ---------------------------------------------------------------------------
 // Debug helpers — kept while we're stabilising on Cloudflare Workers.
 // ---------------------------------------------------------------------------
 const lastTrace = { steps: [], error: null };
@@ -259,8 +348,15 @@ export const authOptions = {
       }
     },
   },
-  session: { strategy: "jwt" },
-  jwt: { secret: process.env.NEXTAUTH_SECRET },
+  session: { strategy: "jwt", maxAge: DEFAULT_MAX_AGE },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+    maxAge: DEFAULT_MAX_AGE,
+    // WebCrypto-based HS256 — bypasses the unenv createCipheriv crash on
+    // Cloudflare Workers. See top of file for context.
+    encode: workerJwtEncode,
+    decode: workerJwtDecode,
+  },
   secret: process.env.NEXTAUTH_SECRET,
   // Surface NextAuth-internal errors so they bubble up to our wrapper.
   events: {

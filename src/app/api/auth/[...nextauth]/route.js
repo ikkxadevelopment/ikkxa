@@ -43,7 +43,30 @@ const handler = async (req, ctx) => {
       ? process.env.NEXT_PUBLIC_API_BASE_URL_SA
       : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
 
-  return await NextAuth(req, ctx, {
+  // TEMP DEBUG: surface env presence + any caught error so we can see what's
+  // crashing the credentials callback on Cloudflare Workers. Remove once fixed.
+  const debugEnv = {
+    has_NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
+    has_NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || null,
+    has_GOOGLE_CLIENT_ID: !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    has_GOOGLE_CLIENT_SECRET: !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+    baseUrl: baseUrl || null,
+    locale: nextLocale,
+  };
+  console.log("[auth-debug] env:", JSON.stringify(debugEnv));
+
+  // Expose env presence via a debug-only path so we can inspect from the browser
+  // without needing access to Worker logs.
+  if (req?.url && new URL(req.url).pathname.endsWith("/__debug")) {
+    return new Response(JSON.stringify(debugEnv, null, 2), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    return await NextAuth(req, ctx, {
     providers: [
       GoogleProvider({
         clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -212,7 +235,25 @@ const handler = async (req, ctx) => {
       secret: process.env.NEXTAUTH_SECRET,
     },
     secret: process.env.NEXTAUTH_SECRET,
-  });
+    });
+  } catch (err) {
+    // TEMP DEBUG: surface the real error so we can see what's crashing on
+    // Cloudflare Workers (otherwise OpenNext just returns an empty 500).
+    console.error("[auth-debug] crash:", err);
+    return new Response(
+      JSON.stringify({
+        error: "auth_handler_crash",
+        message: err?.message || String(err),
+        name: err?.name || null,
+        stack: err?.stack || null,
+        env: debugEnv,
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 };
 
 export { handler as GET, handler as POST };

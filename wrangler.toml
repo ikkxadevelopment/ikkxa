@@ -1,11 +1,19 @@
 name = "ikkxa"
+main = ".open-next/worker.js"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".open-next"
 
-# Runtime variables available to the Cloudflare Worker (next-auth server side).
+# Cloudflare Workers + Static Assets deployment (via @opennextjs/cloudflare).
+# In this mode Cloudflare serves /_next/static, /_next/media, favicon, etc.
+# directly from the assets store BEFORE the Worker runs, so the Pages-mode
+# patch-worker hack is NOT needed here.
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# Runtime variables available to the Worker (next-auth server side).
 # NEXTAUTH_SECRET and GOOGLE_CLIENT_SECRET are set as encrypted Secrets
-# in the Cloudflare Pages dashboard (Settings → Variables and Secrets).
+# in the Cloudflare dashboard (Settings → Variables and Secrets).
 [vars]
 NEXTAUTH_URL = "https://www.ikkxa.com"
 GOOGLE_CLIENT_ID = "810683566241-p5k1l4j4p4lvhpt7l591u2blg8umhelh.apps.googleusercontent.com"

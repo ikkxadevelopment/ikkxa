@@ -300,6 +300,15 @@
       "RejectTabbyAmountTooHigh":"This purchase is above your current spending limit with Tabby, try a smaller cart or use another payment method",
       "RejectTabbyAmountTooLow":"The purchase amount is below the minimum amount required to use Tabby, try adding more items or use another payment method",
       "stripe":"Stripe",
-      "PleaseTryAgain":"Please Try again"
+      "PleaseTryAgain":"Please Try again",
+      "SocialCommunity":"Community",
+      "SocialHeading":"Join Our World",
+      "SocialDescription":"Share your IKKXA moments and become part of our global fashion community. Tag your posts to be featured here.",
+      "SocialFollowUs":"Follow Us",
+      "SocialShopOnTheGo":"Shop on the Go",
+      "SocialDownloadOn":"Download on the",
+      "SocialAppStore":"App Store",
+      "SocialGetItOn":"Get it on",
+      "SocialGooglePlay":"Google Play"
     }
   } 

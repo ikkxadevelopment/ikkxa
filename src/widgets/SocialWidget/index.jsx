@@ -72,7 +72,7 @@ export default function SocialWidget({ data }) {
   return (
     <section className="bg-[linear-gradient(90deg,#fdba7433_37%,transparent)] min-h-[calc(100vh-60px)] flex items-center">
       <div className="container">
-        <div className="grid grid-cols-2 items-center gap-10 lg:gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10 lg:gap-16">
 
           {/* Video — left */}
           <div className="w-full mx-auto max-w-[500px]">
@@ -88,7 +88,7 @@ export default function SocialWidget({ data }) {
           </div>
 
           {/* Content — right */}
-          <div className="flex flex-col items-start text-start gap-6">
+          <div className="flex pb-10 flex-col items-start text-start gap-6">
 
             {/* Heading */}
             <div>

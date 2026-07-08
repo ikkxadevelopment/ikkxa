@@ -116,6 +116,7 @@
       "City":"City",
       "SelectCity":"Select City",
       "PostalCode":"Postal Code",
+      "PickLocationOnMap":"Pick your location on the map",
       "NationalAddress":"Short National Address",
       "NationalAddressPlaceholder":"e.g. RCAA8045",
       "Work":"Work",

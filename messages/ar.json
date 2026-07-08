@@ -116,6 +116,7 @@
     "City": "المدينة",
     "SelectCity": "اختر المدينة",
     "PostalCode": "الرمز البريدي",
+    "PickLocationOnMap": "حدد موقعك على الخريطة",
     "NationalAddress": "العنوان الوطني المختصر",
     "NationalAddressPlaceholder": "مثال: RCAA8045",
     "Work": "العمل",

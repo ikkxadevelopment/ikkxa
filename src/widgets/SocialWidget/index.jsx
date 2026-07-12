@@ -78,7 +78,7 @@ export default function SocialWidget({ data }) {
           <div className="w-full mx-auto max-w-[500px]">
             <div className="aspect-[272/352] relative">
               <video
-                src="/images/magnific_positive-smooth-cinematic_cDJVcKE0eP.mp4"
+                src={`${process.env.NEXT_PUBLIC_BASE_URL_IMG}images/magnific_positive-smooth-cinematic_cDJVcKE0eP.mp4`}
                 autoPlay
                 muted
                 playsInline

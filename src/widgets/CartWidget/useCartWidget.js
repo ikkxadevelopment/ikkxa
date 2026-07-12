@@ -115,7 +115,7 @@ export const useCartWidget = () => {
     return cartProduct.quantity < selectedProduct.stock;
   };
 
-  const addCartItem = async (id, quantity, token, variant, variants_ids = null, trx_id) => {
+  const addCartItem = async (id, quantity, token, variant, variants_ids = null, trx_id, custom_size = null) => {
     const formData = {
       'product_id': id,
       'quantity': quantity,
@@ -124,18 +124,22 @@ export const useCartWidget = () => {
       'variants_name': variant,
       'variants_ids': variants_ids
     }
+    // Optional free-text custom size — only sent when the customer typed something.
+    if (custom_size) {
+      formData.custom_size = custom_size;
+    }
     const url = `${ADD_CART}`;
     const postOptions = getPostOptions("POST", token); // Token is needed
     const data = await apiFetcher(url, formData, postOptions, country);
-    // await mutate(`${GET_CART}lang=${locale}&token=true`); 
+    // await mutate(`${GET_CART}lang=${locale}&token=true`);
     return data;
   }
 
-  const addItem = async (item, variant = null, variant_id = null, count = 1) => {
+  const addItem = async (item, variant = null, variant_id = null, count = 1, custom_size = null) => {
     setIsLoading(true)
     try {
       let trxId = fetchTrxId()
-      const res = await addCartItem(item, count, authToken, variant, variant_id, trxId);
+      const res = await addCartItem(item, count, authToken, variant, variant_id, trxId, custom_size);
       if (res.success) {
         trackAddToCart({
           content_name: item?.name,
@@ -233,7 +237,7 @@ export const useCartWidget = () => {
     }
   };
 
-  const addToBag = (productId, count) => {
+  const addToBag = (productId, count, custom_size = null) => {
     // Check if the selected variant state has this productId
     const selectedProduct = findProductInSelectedVariant(productId);
     if (!selectedProduct) {
@@ -250,7 +254,7 @@ export const useCartWidget = () => {
 
     if (cartProduct) {
       if (isStockAvailable(cartProduct, selectedProduct)) {
-        addItem(productId, variant, variantId, count);
+        addItem(productId, variant, variantId, count, custom_size);
         // Clear the error message if adding succeeds
         setErrorMessages((prevErrors) => ({
           ...prevErrors,
@@ -264,7 +268,7 @@ export const useCartWidget = () => {
       }
     } else {
       // Add product to cart if it doesn't exist
-      addItem(productId, variant, variantId, count);
+      addItem(productId, variant, variantId, count, custom_size);
       // Clear any previous error message
       setErrorMessages({
         [productId]: ""

@@ -36,7 +36,7 @@ import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import CartUnAth from "../CartUnAuth";
 
-export default function AddToCart({ data, size , count=1 }) {
+export default function AddToCart({ data, size , count=1, custom_size=null }) {
   const t = useTranslations("Index");
   const { addItem, isOpen, setIsOpen, isLoading, addToBag } = useCartWidget();
   const { cart } = useCartFetcher();
@@ -52,7 +52,7 @@ export default function AddToCart({ data, size , count=1 }) {
           className="w-full btn btn-grad btn-lg"
           // onClick={() => addItem(data)}
           onClick={() => {
-            data?.has_variant ? addToBag(data?.id, count) : addItem(data?.id, null);
+            data?.has_variant ? addToBag(data?.id, count, custom_size) : addItem(data?.id, null, null, count, custom_size);
           }}
           disabled={isLoading}
         >
@@ -63,7 +63,7 @@ export default function AddToCart({ data, size , count=1 }) {
           // onClick={() => addItem(data)}x
           className="btn btn-outline-secondary"
           onClick={() => {
-            data?.has_variant ? addToBag(data?.id, count) : addItem(data?.id, null);
+            data?.has_variant ? addToBag(data?.id, count, custom_size) : addItem(data?.id, null, null, count, custom_size);
           }}
           disabled={isLoading}
         >

@@ -80,7 +80,7 @@ export default function ProductDetail({ data, isOutOfStock }) {
   const [errorMessages, setErrorMessages] = useRecoilState(
     errorMessageProductCard
   );
-  const { productDetail, setProductDetail, count, setCount } = useProductDetail(
+  const { productDetail, setProductDetail, count, setCount, customSize, setCustomSize } = useProductDetail(
     { datas }
   );
   const customSettings = {
@@ -332,6 +332,23 @@ export default function ProductDetail({ data, isOutOfStock }) {
                   )}
                 </div>
 
+                {/* Optional free-text custom size — applies to any variant */}
+                <div className="py-3 lg:py-4 border-b border-gray-200">
+                  <label htmlFor="custom_size" className="text-stone-950 text-base font-semibold mb-2 block">
+                    {t("CustomSize")}
+                  </label>
+                  <textarea
+                    id="custom_size"
+                    name="custom_size"
+                    rows={3}
+                    value={customSize}
+                    onChange={(e) => setCustomSize(e.target.value)}
+                    placeholder={t("CustomSizePlaceholder")}
+                    className="w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400"
+                  />
+                  <p className="text-xs text-neutral-400 mt-1">{t("CustomSizeHint")}</p>
+                </div>
+
                 <div className="py-3 lg:py-4 border-b border-gray-200">
                   <h3 className=" text-base font-semibold mb-2">
                     {t("AboutThisProduct")}
@@ -403,7 +420,7 @@ export default function ProductDetail({ data, isOutOfStock }) {
               <div className="col-span-12 px-3 md:px-0 lg:col-span-3 z-10">
                 <div className="sticky top-24">
                   <div className="fixed lg:static border-t lg:border-0 lg:mb-3  bottom-0 left-0 w-full bg-white z-50 grid grid-cols-1 lg:grid-cols-1 gap-3 px-3 lg:px-0 lg:pt-0 lg:pb-0  pt-2 pb-3 shadow-md lg:shadow-none">
-                    <AddToCart size={"lg"} data={datas?.product} count={count} />
+                    <AddToCart size={"lg"} data={datas?.product} count={count} custom_size={customSize} />
                     {/* <BuyNow
                     data={datas?.product}
                     detail={productDetail}

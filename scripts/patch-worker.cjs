@@ -54,14 +54,27 @@ if (!original.includes(SEARCH)) {
 const STATIC_ASSET_HANDLER = `\
             // ── Cloudflare Pages static-asset fix ─────────────────────────────────────
             // OpenNext v1.3.x relies on Cloudflare Workers+Assets routing to serve
-            // /_next/static/ before the Worker runs.  In Pages Advanced Mode every
-            // request reaches the Worker, so we must proxy static paths to ASSETS here.
-            if (env.ASSETS) {
-                if (
-                    url.pathname.startsWith('/_next/static/') ||
-                    url.pathname.startsWith('/_next/media/')
-                ) {
+            // static files before the Worker runs.  In Pages Advanced Mode every
+            // request reaches the Worker, so we must proxy static paths to ASSETS
+            // ourselves — otherwise everything under public/ (/images, /fonts, root
+            // .svg/.png/.ico, etc.) falls through to the SSR handler and 404s.
+            if (env.ASSETS && request.method === 'GET') {
+                const p = url.pathname;
+                const isStaticAsset =
+                    p.startsWith('/_next/static/') ||
+                    p.startsWith('/_next/media/') ||
+                    p.startsWith('/images/') ||
+                    p.startsWith('/fonts/') ||
+                    // Root-level public files (favicon.ico, next.svg, robots.txt …):
+                    // any path with a file extension that isn't a Next.js internal
+                    // (/_next/image is handled separately below) or an API route.
+                    (/\\.[a-zA-Z0-9]+$/.test(p) &&
+                        !p.startsWith('/_next/') &&
+                        !p.startsWith('/api/'));
+                if (isStaticAsset) {
                     const assetResponse = await env.ASSETS.fetch(request.clone());
+                    // Fall through to SSR on 404 so dynamic .xml/.txt routes
+                    // (sitemap, robots) still work.
                     if (assetResponse.status !== 404) return assetResponse;
                 }
             }
@@ -71,4 +84,4 @@ const STATIC_ASSET_HANDLER = `\
 const patched = original.replace(SEARCH, STATIC_ASSET_HANDLER + SEARCH);
 
 fs.writeFileSync(workerPath, patched, 'utf8');
-console.log('✅  worker.js patched: /_next/static/ and /_next/media/ will be served from ASSETS binding');
+console.log('✅  worker.js patched: /_next/static/, /_next/media/, /images/, /fonts/ and root public files will be served from ASSETS binding');

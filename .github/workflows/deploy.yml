@@ -53,6 +53,8 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
+        # Default is 10m; the Docker build alone can exceed that on a cold cache.
+        command_timeout: 40m
         script: |
           # Set environment-specific variables
           if [[ ${{ github.ref }} == 'refs/heads/development' ]]; then
@@ -93,8 +95,11 @@ jobs:
           # Stop any existing containers
           docker-compose -f $COMPOSE_FILE down || true
 
-          # Build and start new containers
-          docker-compose -f $COMPOSE_FILE build --no-cache
+          # Build and start new containers.
+          # Layer caching is safe here: COPY . . invalidates on any source
+          # change, and package*.json changes invalidate the npm install
+          # layers. --no-cache forced a ~15min rebuild on every deploy.
+          docker-compose -f $COMPOSE_FILE build
           docker-compose -f $COMPOSE_FILE up -d
 
           # Health check

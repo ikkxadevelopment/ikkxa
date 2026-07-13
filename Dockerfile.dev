@@ -29,9 +29,15 @@ WORKDIR /app
 # Copy necessary files from builder
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json /app/package-lock.json ./
+
+# Install only runtime dependencies. Copying the builder's node_modules
+# drags in ~500MB of build/dev tooling (@cloudflare workerd, wrangler,
+# @aws-sdk via @opennextjs) that `next start` never uses, and the COPY
+# layer alone was slow enough to blow the CI deploy timeout.
+RUN npm ci --omit=dev
+
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
 
 # Expose the port
 EXPOSE 3000

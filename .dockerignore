@@ -1,0 +1,20 @@
+# Keep the build context small: without this file every docker build
+# ships ~2GB (node_modules, .next, .open-next, .git) to the daemon, and
+# COPY . . overwrites the image's freshly installed node_modules with the
+# host copy.
+# NOTE: .env.development and .env.production must NOT be ignored — the
+# Dockerfiles COPY them into the image.
+.git
+.github
+node_modules
+.next
+.open-next
+.wrangler
+.vercel
+.claude
+.dev.vars
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+npm-debug.log*
+*.md

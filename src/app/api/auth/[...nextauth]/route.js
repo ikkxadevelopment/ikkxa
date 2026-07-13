@@ -7,15 +7,16 @@ import { OTP_VERIFY, SOCIAL_LOGIN } from "@/constants/apiRoutes";
 // ---------------------------------------------------------------------------
 // Cloudflare Workers-safe JWT encode/decode.
 //
-// NextAuth v4's default JWT encode uses jose.EncryptJWT with A256GCM, which
+// NextAuth v4's default jwt.encode is `jose.EncryptJWT` with A256GCM, which
 // transitively calls Node's `crypto.createCipheriv`. Cloudflare's `unenv`
 // polyfill does NOT implement createCipheriv, so the default path crashes
-// with "[unenv] crypto.createCipheriv is not implemented yet!" on Workers.
+// with "[unenv] crypto.createCipheriv is not implemented yet!" on Workers
+// the moment NextAuth tries to issue a session cookie.
 //
-// We swap it for HS256-signed JWTs using WebCrypto's SubtleCrypto.sign,
-// which is available natively on every Workers runtime. The session token
-// is signed (tamper-proof) but not encrypted; that's the standard JWS
-// model and is appropriate for our OTP-issued session payload.
+// We swap in HS256-signed JWTs using WebCrypto's SubtleCrypto.sign, which
+// is available natively on Workers (and on Node 18+). Session tokens are
+// signed (tamper-proof) but not encrypted — standard JWS, appropriate for
+// our OTP-issued session payload.
 // ---------------------------------------------------------------------------
 const DEFAULT_MAX_AGE = 30 * 24 * 60 * 60; // 30 days
 
@@ -63,11 +64,7 @@ const workerJwtEncode = async ({ token = {}, secret, maxAge = DEFAULT_MAX_AGE })
   const payloadB64 = b64uEncode(_enc.encode(JSON.stringify(payload)));
   const signingInput = `${headerB64}.${payloadB64}`;
   const key = await importHmacKey(secret);
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    _enc.encode(signingInput)
-  );
+  const sig = await crypto.subtle.sign("HMAC", key, _enc.encode(signingInput));
   return `${signingInput}.${b64uEncode(sig)}`;
 };
 
@@ -94,47 +91,32 @@ const workerJwtDecode = async ({ token, secret }) => {
 };
 
 // ---------------------------------------------------------------------------
-// Debug helpers — kept while we're stabilising on Cloudflare Workers.
+// Determine the per-request API base URL from the NEXT_LOCALE cookie.
+// Called from inside `authorize` / `signIn` so we can pick the right
+// backend (SA vs AE) without rebuilding NextAuth on every request.
 // ---------------------------------------------------------------------------
-const lastTrace = { steps: [], error: null };
-const trace = (step, payload) => {
-  try {
-    lastTrace.steps.push({ step, t: Date.now(), payload });
-    if (lastTrace.steps.length > 50) lastTrace.steps.shift();
-    console.log(`[auth-trace] ${step}`, JSON.stringify(payload || {}));
-  } catch (_) {}
-};
-
 const getBaseUrlFromLocale = () => {
   try {
     const c = cookies();
     const nextLocale = c.get("NEXT_LOCALE")?.value || "ar-SA";
     const [, country] = nextLocale.split("-");
-    return {
-      baseUrl:
-        country === "SA"
-          ? process.env.NEXT_PUBLIC_API_BASE_URL_SA
-          : process.env.NEXT_PUBLIC_API_BASE_URL_AE,
-      locale: nextLocale,
-    };
-  } catch (e) {
-    return {
-      baseUrl:
-        process.env.NEXT_PUBLIC_API_BASE_URL_SA ||
-        process.env.NEXT_PUBLIC_API_BASE_URL_AE ||
-        process.env.NEXT_PUBLIC_BASE_URL,
-      locale: "ar-SA",
-    };
+    return country === "SA"
+      ? process.env.NEXT_PUBLIC_API_BASE_URL_SA
+      : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
+  } catch {
+    return (
+      process.env.NEXT_PUBLIC_API_BASE_URL_SA ||
+      process.env.NEXT_PUBLIC_API_BASE_URL_AE ||
+      process.env.NEXT_PUBLIC_BASE_URL
+    );
   }
 };
 
 // ---------------------------------------------------------------------------
-// Static auth options — built once at module load, not per request. This is
-// the canonical NextAuth v4 App Router pattern and is what works most
-// reliably on Cloudflare Workers (the Pages-Router-style `NextAuth(req, ctx,
-// options)` shape was being unstable post-authorize).
+// Providers — Credentials is always present; Google only when its env vars
+// are configured (otherwise GoogleProvider init can throw with undefined
+// credentials on stricter runtimes).
 // ---------------------------------------------------------------------------
-
 const providers = [
   CredentialsProvider({
     id: "credentials",
@@ -147,19 +129,10 @@ const providers = [
       trx_id: { label: "Transaction ID", type: "text" },
     },
     async authorize(credentials) {
-      // Reset per-request trace.
-      lastTrace.steps = [];
-      lastTrace.error = null;
-      trace("authorize_start", {
-        hasEmail: !!credentials?.email,
-        hasPhone: !!credentials?.phone,
-      });
       try {
-        const { baseUrl, locale } = getBaseUrlFromLocale();
-        trace("authorize_locale", { locale, baseUrl });
-
+        const baseUrl = getBaseUrlFromLocale();
         const trxId = credentials?.trx_id;
-        let payload = {};
+        let payload;
 
         if (credentials?.email) {
           payload = {
@@ -178,31 +151,24 @@ const providers = [
           throw new Error("Invalid login credentials");
         }
 
-        const verifyOtpResponse = await fetch(`${baseUrl}${OTP_VERIFY}`, {
+        // Use native fetch (not axios) for Workers compatibility.
+        const res = await fetch(`${baseUrl}${OTP_VERIFY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        trace("authorize_fetch_done", {
-          status: verifyOtpResponse.status,
-          ok: verifyOtpResponse.ok,
-        });
 
-        if (!verifyOtpResponse.ok) throw new Error("Invalid OTP");
+        if (!res.ok) throw new Error("Invalid OTP");
 
-        const data = await verifyOtpResponse.json();
+        const data = await res.json();
         const { token, first_name, last_name, image, phone, email } =
           data?.data || {};
 
-        trace("authorize_parsed", {
-          hasToken: !!token,
-          hasEmail: !!email,
-          hasPhone: !!phone,
-        });
-
         if (!token) throw new Error("Invalid OTP");
 
-        const user = {
+        // NextAuth requires user.id for the JWT subject claim. Use the
+        // backend-issued token as a stable per-user id.
+        return {
           id: String(token),
           token: String(token),
           phone: phone ? String(phone) : "",
@@ -211,13 +177,7 @@ const providers = [
           image: image ? String(image) : "",
           email: email ? String(email) : "",
         };
-        trace("authorize_return", { id_present: !!user.id });
-        return user;
       } catch (error) {
-        trace("authorize_error", {
-          message: error?.message,
-          name: error?.name,
-        });
         console.error("Error verifying OTP:", error);
         throw new Error("Invalid OTP");
       }
@@ -241,231 +201,85 @@ export const authOptions = {
   providers,
   callbacks: {
     async signIn({ user, account, profile }) {
-      trace("signIn_start", {
-        provider: account?.provider,
-        user_id: user?.id ?? null,
-      });
+      if (account?.provider !== "google") return true;
       try {
-        if (account?.provider === "google") {
-          const { baseUrl } = getBaseUrlFromLocale();
-          const socialLoginResponse = await fetch(
-            `${baseUrl}${SOCIAL_LOGIN}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                uid: user.id,
-                email: profile.email,
-                phone: "",
-                dob: "",
-                gender: "",
-                name: profile.name,
-                image: profile.picture,
-              }),
-            }
-          );
-          if (socialLoginResponse.ok) {
-            const data = await socialLoginResponse.json();
-            const {
-              token,
-              first_name,
-              last_name,
-              image,
-              phone,
-              email,
-              socials,
-            } = data?.data || {};
-            user.token = token;
-            user.first_name = first_name;
-            user.last_name = last_name;
-            user.image = image;
-            user.phone = phone;
-            user.email = email;
-            user.socials = socials;
-          }
-        }
-        trace("signIn_done");
-        return true;
-      } catch (error) {
-        trace("signIn_error", {
-          message: error?.message,
-          name: error?.name,
+        const baseUrl = getBaseUrlFromLocale();
+        const res = await fetch(`${baseUrl}${SOCIAL_LOGIN}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uid: user.id,
+            email: profile.email,
+            phone: "",
+            dob: "",
+            gender: "",
+            name: profile.name,
+            image: profile.picture,
+          }),
         });
-        console.error("signIn callback error:", error);
-        return true;
+        if (res.ok) {
+          const data = await res.json();
+          const {
+            token,
+            first_name,
+            last_name,
+            image,
+            phone,
+            email,
+            socials,
+          } = data?.data || {};
+          user.token = token;
+          user.first_name = first_name;
+          user.last_name = last_name;
+          user.image = image;
+          user.phone = phone;
+          user.email = email;
+          user.socials = socials;
+        }
+      } catch (error) {
+        console.error("Error during social login:", error);
       }
+      return true;
     },
     async jwt({ token, user, account, profile }) {
-      trace("jwt_start", {
-        has_user: !!user,
-        has_account: !!account,
-      });
-      try {
-        if (account && profile) {
-          token.gender = profile.gender || null;
-          token.dob = profile.birthday || null;
-        }
-        if (user) {
-          token.accessToken = user.token;
-          token.first_name = user.first_name;
-          token.last_name = user.last_name;
-          token.phone = user.phone;
-          token.image = user.image;
-          token.email = user.email;
-          if (!token.sub && user.id) token.sub = String(user.id);
-        }
-        trace("jwt_done", { sub: token?.sub ?? null });
-        return token;
-      } catch (error) {
-        trace("jwt_error", {
-          message: error?.message,
-          name: error?.name,
-          stack: error?.stack?.slice(0, 500),
-        });
-        console.error("jwt callback error:", error);
-        throw error;
+      if (account && profile) {
+        token.gender = profile.gender || null;
+        token.dob = profile.birthday || null;
       }
+      if (user) {
+        token.accessToken = user.token;
+        token.first_name = user.first_name;
+        token.last_name = user.last_name;
+        token.phone = user.phone;
+        token.image = user.image;
+        token.email = user.email;
+        if (!token.sub && user.id) token.sub = String(user.id);
+      }
+      return token;
     },
     async session({ session, token }) {
-      trace("session_start");
-      try {
-        session.user = session.user || {};
-        session.user.first_name = token.first_name;
-        session.user.last_name = token.last_name;
-        session.user.phone = token.phone;
-        session.user.image = token.image;
-        session.accessToken = token.accessToken;
-        session.user.email = token.email;
-        trace("session_done");
-        return session;
-      } catch (error) {
-        trace("session_error", {
-          message: error?.message,
-          name: error?.name,
-        });
-        console.error("session callback error:", error);
-        return session;
-      }
+      session.user = session.user || {};
+      session.user.first_name = token.first_name;
+      session.user.last_name = token.last_name;
+      session.user.phone = token.phone;
+      session.user.image = token.image;
+      session.accessToken = token.accessToken;
+      session.user.email = token.email;
+      return session;
     },
   },
   session: { strategy: "jwt", maxAge: DEFAULT_MAX_AGE },
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
     maxAge: DEFAULT_MAX_AGE,
-    // WebCrypto-based HS256 — bypasses the unenv createCipheriv crash on
-    // Cloudflare Workers. See top of file for context.
+    // WebCrypto HS256 — bypasses the unenv createCipheriv crash on
+    // Cloudflare Workers. See the top of this file for the full story.
     encode: workerJwtEncode,
     decode: workerJwtDecode,
   },
   secret: process.env.NEXTAUTH_SECRET,
-  // Surface NextAuth-internal errors so they bubble up to our wrapper.
-  events: {
-    async signIn(message) {
-      trace("event_signIn", { user_id: message?.user?.id ?? null });
-    },
-    async session(message) {
-      trace("event_session");
-    },
-  },
-  logger: {
-    error: (code, ...args) => {
-      const msg = (args[0] instanceof Error ? args[0].message : String(args[0])) || "";
-      const stack = args[0]?.stack || null;
-      trace("logger_error", { code, message: msg, stack: stack?.slice(0, 800) });
-      lastTrace.error = { code, message: msg, stack: stack?.slice(0, 800) };
-      console.error(`[next-auth][error][${code}]`, ...args);
-    },
-    warn: (code) => {
-      trace("logger_warn", { code });
-    },
-    debug: () => {},
-  },
 };
 
-// The actual NextAuth handler — canonical App Router pattern.
-const nextAuthHandler = NextAuth(authOptions);
-
-const handler = async (req, ctx) => {
-  // /api/auth/__debug — env presence check
-  const url = req?.url ? new URL(req.url) : null;
-  const pathname = url?.pathname || "";
-
-  if (pathname.endsWith("/__debug")) {
-    const debugEnv = {
-      has_NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
-      has_NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
-      NEXTAUTH_URL: process.env.NEXTAUTH_URL || null,
-      has_GOOGLE_CLIENT_ID: !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      has_GOOGLE_CLIENT_SECRET: !!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
-      has_API_BASE_URL_SA: !!process.env.NEXT_PUBLIC_API_BASE_URL_SA,
-      has_API_BASE_URL_AE: !!process.env.NEXT_PUBLIC_API_BASE_URL_AE,
-      providers_count: providers.length,
-      pattern: "canonical-app-router",
-    };
-    return new Response(JSON.stringify(debugEnv, null, 2), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  if (pathname.endsWith("/__debug-last")) {
-    return new Response(JSON.stringify(lastTrace, null, 2), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  trace("request_in", { method: req?.method, pathname });
-
-  try {
-    const result = await nextAuthHandler(req, ctx);
-    trace("nextauth_returned", {
-      status: result?.status ?? null,
-      has_set_cookie: !!result?.headers?.get?.("set-cookie"),
-    });
-
-    // If NextAuth returned a 5xx (it caught the error internally but
-    // returned a server-error response), augment the body with our trace
-    // so we can see what went wrong without needing Worker logs.
-    if (result?.status >= 500) {
-      let originalBody = "";
-      try {
-        originalBody = await result.clone().text();
-      } catch (_) {}
-      const augmented = {
-        status_from_nextauth: result.status,
-        original_body_first_500_chars: (originalBody || "").slice(0, 500),
-        original_body_length: (originalBody || "").length,
-        logger_error: lastTrace.error,
-        steps: lastTrace.steps,
-      };
-      return new Response(JSON.stringify(augmented, null, 2), {
-        status: 500,
-        headers: { "Content-Type": "application/json", "x-debug-augmented": "1" },
-      });
-    }
-    return result;
-  } catch (err) {
-    lastTrace.error = {
-      message: err?.message || String(err),
-      name: err?.name || null,
-      stack: err?.stack?.slice(0, 2000) || null,
-    };
-    trace("nextauth_crash", lastTrace.error);
-    console.error("[auth-debug] crash:", err);
-    return new Response(
-      JSON.stringify(
-        {
-          error: "auth_handler_crash",
-          ...lastTrace.error,
-          steps: lastTrace.steps,
-        },
-        null,
-        2
-      ),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-};
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && cp -r public .open-next/public || true",
     "start": "next start",
     "lint": "next lint",
     "cf:patch-worker": "node scripts/patch-worker.cjs"
@@ -33,6 +33,7 @@
     "formik": "^2.4.6",
     "input-otp": "^1.2.4",
     "intersection-observer": "^0.12.2",
+    "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.394.0",
@@ -45,6 +46,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18",
     "react-icons": "^5.2.1",
+    "react-leaflet": "^4.2.1",
     "react-phone-number-input": "^3.4.5",
     "react-range-slider-input": "^3.0.7",
     "recoil": "^0.7.7",

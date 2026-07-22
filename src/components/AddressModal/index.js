@@ -19,6 +19,16 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { useLocale, useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+import { reverseGeocode, fuzzyFindByName } from "@/lib/geocode";
+
+// Leaflet needs the browser; load the picker client-side only.
+const MapPicker = dynamic(() => import("./MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-64 w-full animate-pulse rounded-md border border-gray-200 bg-stone-100" />
+  ),
+});
 
 export function AddressModal({ data, mode, isOpen, setIsOpen }) {
   const t = useTranslations("Index");
@@ -35,14 +45,14 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
   const AddressSchema = Yup.object().shape({
     name: Yup.string().required(`${t("NameIsRequired")}`),
     email: Yup.string().required(`${t("EmailIsRequired")}`),
-    // phone_no: Yup.string().required("Mobile number is required"),
     country_id: Yup.string().required(`${t('CountryIsRequired')}`),
     state_id: Yup.string().required(`${t('StateIsRequired')}`),
     city_id: Yup.string().required(`${t("CityIsRequired")}`),
     street: Yup.string().required(`${t("StreetIsRequired")}`),
     postal_code: Yup.string().required(`${t('PostCodeIsRequired')}`),
-    // building: Yup.string().required("City is required"),
-    // type: Yup.string().required("City is required"),
+    national_address: country === "SA"
+      ? Yup.string().required(`${t('NationalAddressIsRequired')}`)
+      : Yup.string(),
   });
 
   const formik = useFormik({
@@ -57,6 +67,9 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
       street: data?.street || "",
       type: data?.type || "",
       postal_code: data?.postal_code || "",
+      national_address: data?.national_address || "",
+      latitude: data?.latitude || "",
+      longitude: data?.longitude || "",
       default: data?.default_shipping || 0,
     },
     validationSchema: AddressSchema,
@@ -105,6 +118,54 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
     }
   }, [data]);
 
+  // Holds geocoded state/city names waiting for their dropdown lists to load.
+  const [pendingGeo, setPendingGeo] = useState(null);
+
+  // Called when a point is picked on the map: store coords + reverse-geocode the rest.
+  const handleMapPick = async ({ lat, lng }) => {
+    formik.setFieldValue("latitude", lat);
+    formik.setFieldValue("longitude", lng);
+
+    const geo = await reverseGeocode(lat, lng, locale);
+    if (!geo) return;
+
+    if (geo.street) formik.setFieldValue("street", geo.street);
+    if (geo.building) formik.setFieldValue("building", geo.building);
+    if (geo.postal_code) formik.setFieldValue("postal_code", geo.postal_code);
+
+    // Match country now (its list is already loaded); defer state/city until their
+    // dependent lists load (see effects below).
+    const matchedCountry = fuzzyFindByName(countries, geo.country);
+    if (matchedCountry) {
+      formik.setFieldValue("country_id", String(matchedCountry.id));
+      setCountryId(matchedCountry.id);
+      formik.setFieldValue("state_id", "");
+      formik.setFieldValue("city_id", "");
+    }
+    setPendingGeo({ state: geo.state, city: geo.city });
+  };
+
+  // Resolve state name -> id once the states list for the picked country loads.
+  useEffect(() => {
+    if (!pendingGeo?.state || !states?.length) return;
+    const match = fuzzyFindByName(states, pendingGeo.state);
+    if (match) {
+      formik.setFieldValue("state_id", String(match.id));
+      setStateId(match.id);
+    }
+    setPendingGeo((prev) => (prev ? { ...prev, state: null } : prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [states, pendingGeo?.state]);
+
+  // Resolve city name -> id once the cities list for the picked state loads.
+  useEffect(() => {
+    if (!pendingGeo?.city || !cities?.length) return;
+    const match = fuzzyFindByName(cities, pendingGeo.city);
+    if (match) formik.setFieldValue("city_id", String(match.id));
+    setPendingGeo((prev) => (prev ? { ...prev, city: null } : prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cities, pendingGeo?.city]);
+
   return (
     <Dialog
       open={isOpen}
@@ -121,253 +182,258 @@ export function AddressModal({ data, mode, isOpen, setIsOpen }) {
            {mode === "edit" ? "Edit" : "Add Address"}
         </button>
       </DialogTrigger> */}
-      <DialogContent className="h-screen md:h-auto sm:max-w-[640px] p-10 rounded-none lg:rounded-none lg:p-10 ">
+      <DialogContent className="w-full h-full md:h-auto md:max-w-[850px] lg:max-w-[1050px] p-6 md:p-10 rounded-none md:rounded-xl overflow-y-auto max-h-screen md:max-h-[90vh]">
         <DialogHeader>
-          <h3 className="text-black text-xl font-semibold">
+          <h3 className="text-black text-xl font-semibold mb-4">
             {mode === "edit" ? "Edit Address" : `${t('AddAddress')}`}
           </h3>
           <form onSubmit={formik.handleSubmit}>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <div>
-              <Label htmlFor="name">{t('Name')}*</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="col-span-3"
-              />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="text-red-500">{formik.errors.name}</div>
-              ) : null}
-            </div>
-            <div>
-              <Label htmlFor="email">{t('Email')}*</Label>
-              <Input
-                id="email"
-                name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="col-span-3"
-              />
-              {formik.touched.email && formik.errors.email ? (
-                <div className="text-red-500">{formik.errors.email}</div>
-              ) : null}
-            </div>
-            <div className="col-span-2">
-              <Label htmlFor="mobile">{t('MobileNumber')}*</Label>
-              <PhoneInput
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                international
-              countries={["AE", "SA"]} 
-                countryCallingCodeEditable={false}
-                defaultCountry={country}
-                value={formik.values.phone_no}
-                disabled={data?.data?.phone}
-                onChange={(value) => formik.setFieldValue("phone_no", value)}
-                // onChange={(value) => handlePhoneChange(value, 'phone_no')}
-                onBlur={formik.handleBlur}
-                // onChange={(value) =>
-                //   handlePhoneChange(value, "phone")
-                // }
-              />
-              {formik.touched.phone_no && formik.errors.phone_no ? (
-                <div className="text-red-500">{formik.errors.phone_no}</div>
-              ) : null}
-            </div>
-
-
-            <div className="col-span-2">
-              <Label htmlFor="building_no">{t('Building')} {t('Number')} / {t('Name')}</Label>
-              <Input
-                id="building"
-                name="building"
-                value={formik.values.building}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder=""
-                className="col-span-3"
-              />
-
-            </div>
-            <div className="col-span-2">
-              <Label htmlFor="street" >{t('Street')} {t('Name')} / {t('Area')}*</Label>
-              <Input
-                id="street"
-                name="street"
-                value={formik.values.street}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                placeholder=""
-                className="col-span-3"
-              />
-              {formik.touched.street && formik.errors.street ? (
-                <div className="text-red-500">{formik.errors.street}</div>
-              ) : null}
-            </div>
-            {/* Country Select */}
-            <div>
-              <Label htmlFor="country">{t('Country')}*</Label>
-              <select
-                id="country"
-                name="country_id"
-                value={formik.values.country_id}
-                onChange={(e) => {
-                  formik.handleChange(e);
-                  setCountryId(e.target.value); // Load states based on selected country
-                  formik.setFieldValue('stateId', ''); // Reset state and city when country changes
-                  formik.setFieldValue('cityId', '');
-                }}
-                onBlur={formik.handleBlur}
-                className="w-full"
-              >
-                <option value="">{t('SelectCountry')}</option>
-                {countries && countries?.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
-              {formik.touched.country_id && formik.errors.country_id ? (
-                <div className="text-red-500">{formik.errors.country_id}</div>
-              ) : null}
-            </div>
-
-            {/* State Select */}
-            <div>
-              <Label htmlFor="state">{t('State')}*</Label>
-              <select
-                id="state"
-                name="state_id"
-                value={formik.values.state_id}
-                onChange={(e) => {
-                  formik.handleChange(e);
-                  setStateId(e.target.value); // Load cities based on selected state
-                  formik.setFieldValue('cityId', ''); // Reset city when state changes
-                }}
-                onBlur={formik.handleBlur}
-                className="w-full"
-                disabled={!countryId}
-              >
-                <option value="">{t('SelectState')}</option>
-                {states?.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-              {formik.touched.state_id && formik.errors.state_id ? (
-                <div className="text-red-500">{formik.errors.state_id}</div>
-              ) : null}
-            </div>
-
-            {/* City Select */}
-            <div>
-              <Label htmlFor="city">{t('City')}*</Label>
-              <select
-                id="city"
-                name="city_id"
-                value={formik.values.city_id}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full"
-                disabled={!stateId}
-              >
-                <option value="">{t('SelectCity')}</option>
-                {cities?.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-              {formik.touched.city_id && formik.errors.city_id ? (
-                <div className="text-red-500">{formik.errors.city_id}</div>
-              ) : null}
-            </div>
-
-            {/* Postal Code */}
-            <div>
-              <Label htmlFor="lastName">{t('PostalCode')}*</Label>
-              <Input
-                id="postal_code"
-                name="postal_code"
-                value={formik.values.postal_code}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="col-span-3"
-              />
-              {formik.touched.postal_code && formik.errors.postal_code ? (
-                <div className="text-red-500">{formik.errors.postal_code}</div>
-              ) : null}
-            </div>
-
-
-            <div className="mb-4">
-              <RadioGroup defaultValue={formik.values.type} onValueChange={(value) => formik.setFieldValue('type', value)} name="type" className="flex" >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="home" id="r1" />
-                  <Label className="mb-0" htmlFor="r1">{t('Home')}</Label>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-4">
+              {/* Left Column: Form Fields */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                <div>
+                  <Label htmlFor="name">{t('Name')}*</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.name && formik.errors.name ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>
+                  ) : null}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="work" id="r2" />
-                  <Label className="mb-0" htmlFor="r2">{t('Work')}</Label>
+                <div>
+                  <Label htmlFor="email">{t('Email')}*</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.email && formik.errors.email ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.email}</div>
+                  ) : null}
                 </div>
-              </RadioGroup>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="mobile">{t('MobileNumber')}*</Label>
+                  <PhoneInput
+                    className="flex rounded-md border border-input bg-background px-3 py-2 text-sm w-full"
+                    international
+                    countries={["AE", "SA"]} 
+                    countryCallingCodeEditable={false}
+                    defaultCountry={country}
+                    value={formik.values.phone_no}
+                    disabled={data?.data?.phone}
+                    onChange={(value) => formik.setFieldValue("phone_no", value)}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.phone_no && formik.errors.phone_no ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.phone_no}</div>
+                  ) : null}
+                </div>
 
+                <div>
+                  <Label htmlFor="building">{t('Building')} {t('Number')} / {t('Name')}</Label>
+                  <Input
+                    id="building"
+                    name="building"
+                    value={formik.values.building}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="street">{t('Street')} {t('Name')} / {t('Area')}*</Label>
+                  <Input
+                    id="street"
+                    name="street"
+                    value={formik.values.street}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder=""
+                  />
+                  {formik.touched.street && formik.errors.street ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.street}</div>
+                  ) : null}
+                </div>
+
+                {/* Country Select */}
+                <div>
+                  <Label htmlFor="country">{t('Country')}*</Label>
+                  <select
+                    id="country"
+                    name="country_id"
+                    value={formik.values.country_id}
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                      setCountryId(e.target.value); // Load states based on selected country
+                      formik.setFieldValue('stateId', ''); // Reset state and city when country changes
+                      formik.setFieldValue('cityId', '');
+                    }}
+                    onBlur={formik.handleBlur}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">{t('SelectCountry')}</option>
+                    {countries && countries?.map((country) => (
+                      <option key={country.id} value={country.id}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formik.touched.country_id && formik.errors.country_id ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.country_id}</div>
+                  ) : null}
+                </div>
+
+                {/* State Select */}
+                <div>
+                  <Label htmlFor="state">{t('State')}*</Label>
+                  <select
+                    id="state"
+                    name="state_id"
+                    value={formik.values.state_id}
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                      setStateId(e.target.value); // Load cities based on selected state
+                      formik.setFieldValue('cityId', ''); // Reset city when state changes
+                    }}
+                    onBlur={formik.handleBlur}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!countryId}
+                  >
+                    <option value="">{t('SelectState')}</option>
+                    {states?.map((state) => (
+                      <option key={state.id} value={state.id}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formik.touched.state_id && formik.errors.state_id ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.state_id}</div>
+                  ) : null}
+                </div>
+
+                {/* City Select */}
+                <div>
+                  <Label htmlFor="city">{t('City')}*</Label>
+                  <select
+                    id="city"
+                    name="city_id"
+                    value={formik.values.city_id}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={!stateId}
+                  >
+                    <option value="">{t('SelectCity')}</option>
+                    {cities?.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formik.touched.city_id && formik.errors.city_id ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.city_id}</div>
+                  ) : null}
+                </div>
+
+                {/* Postal Code */}
+                <div>
+                  <Label htmlFor="postal_code">{t('PostalCode')}*</Label>
+                  <Input
+                    id="postal_code"
+                    name="postal_code"
+                    value={formik.values.postal_code}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.postal_code && formik.errors.postal_code ? (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.postal_code}</div>
+                  ) : null}
+                </div>
+
+                {/* Short National Address – mandatory in KSA */}
+                {country === "SA" && (
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="national_address">
+                      {t('NationalAddress')}*
+                    </Label>
+                    <Input
+                      id="national_address"
+                      name="national_address"
+                      value={formik.values.national_address}
+                      onChange={(e) =>
+                        formik.setFieldValue("national_address", e.target.value.toUpperCase())
+                      }
+                      onBlur={formik.handleBlur}
+                      placeholder={t('NationalAddressPlaceholder')}
+                      maxLength={8}
+                      className="uppercase"
+                    />
+                    {formik.touched.national_address && formik.errors.national_address ? (
+                      <div className="text-red-500 text-xs mt-1">{formik.errors.national_address}</div>
+                    ) : null}
+                  </div>
+                )}
+
+                <div className="sm:col-span-2 flex items-center mt-2">
+                  <RadioGroup
+                    defaultValue={formik.values.type}
+                    onValueChange={(value) => formik.setFieldValue('type', value)}
+                    name="type"
+                    className="flex space-x-6"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="home" id="r1" />
+                      <Label className="mb-0 cursor-pointer" htmlFor="r1">{t('Home')}</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="work" id="r2" />
+                      <Label className="mb-0 cursor-pointer" htmlFor="r2">{t('Work')}</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+
+              {/* Right Column: Map Location Picker */}
+              <div className="lg:col-span-5 flex flex-col justify-start text-left">
+                <Label className="mb-2 font-medium">{t('PickLocationOnMap')}</Label>
+                <div className="w-full flex-1">
+                  <MapPicker
+                    value={{ lat: formik.values.latitude, lng: formik.values.longitude }}
+                    country={country}
+                    locale={locale}
+                    onPick={handleMapPick}
+                  />
+                </div>
+              </div>
             </div>
-            <div>
 
-            </div>
-
-          </div>
-
-          <div className="flex justify-between items-center">
-           
-            {/* {mode === "edit" &&
-              <button
-                className="btn btn-primary btn-lg"
-                onClick={()=> defaultHandler(data?.id)}
-              >
-                Default
-              </button>
-            } */}
-            <div className="flex items-center">
-              <Switch id="default"
-                name="default"
-                // value={"on"}
-                defaultChecked={data?.default_shipping}
-                value={formik.values.default === 1 ? true : false}
-                onCheckedChange={(value) => formik.setFieldValue('default', value === true ? 1 : 0)}
-              />
-
-              <Label htmlFor="default" className="ms-2 mb-0">{t('MakeThisAsDefault')}</Label>
-            </div>
-
-
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg lg:min-w-40 "
-            >
-              {mode === "edit" ? `${t('EditAddress')}` : `${t("AddAddress")}`}
-            </button>
-            
-
-            {/*             
-            <div className="flex items-center">
-              <Switch id="defa"
-                checked={isDefault}
-                disabled={isDefault}
-                onCheckedChange={() => defaultHandler(data?.id)} 
+            <div className="flex justify-between items-center border-t pt-4 mt-6">
+              <div className="flex items-center">
+                <Switch
+                  id="default"
+                  name="default"
+                  defaultChecked={data?.default_shipping}
+                  checked={formik.values.default === 1}
+                  onCheckedChange={(value) => formik.setFieldValue('default', value === true ? 1 : 0)}
                 />
-              <Label htmlFor="defa" className="ms-2 mb-0">Make this as default</Label>
-            </div> */}
+                <Label htmlFor="default" className="ms-2 mb-0 cursor-pointer">{t('MakeThisAsDefault')}</Label>
+              </div>
 
-          </div>
-        </form>
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg lg:min-w-40"
+              >
+                {mode === "edit" ? `${t('EditAddress')}` : `${t("AddAddress")}`}
+              </button>
+            </div>
+          </form>
         </DialogHeader>
-     
       </DialogContent>
     </Dialog>
   );

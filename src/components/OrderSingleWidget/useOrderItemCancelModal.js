@@ -68,14 +68,14 @@ export const useOrderItemCancelModal = (id, orderId, invNo) => {
             if(result?.success){
                 mutate(`${TRACK_ORDER}?invoice_no=${invNo}&lang=${locale}`)
                 setIsOpen(false);
-                toast({ 
-                    title: response?.message,
+                toast({
+                    title: result?.message,
                     variant: "success",
                 })
             } else {
                 setIsOpen(false);
-                toast({ 
-                    title: 'This item not cancelled please try again',
+                toast({
+                    title: result?.message || 'This item not cancelled please try again',
                     variant: "destructive",
                 })
             }
@@ -83,24 +83,24 @@ export const useOrderItemCancelModal = (id, orderId, invNo) => {
             console.error(error);
             setIsOpen(false);
         }
-    } 
+    }
 
     const returnResponse = async (values) => {
         const data = {...values, ...payLoad}
-            
+
         try {
             const result = await axiosPostWithToken(`${ORDER_PRODUCT_RETURN}`, data, lang);
             if(result?.success){
                 mutate(`${TRACK_ORDER}?invoice_no=${invNo}&lang=${locale}`)
                 setIsOpen(false);
-                toast({ 
-                    title: response?.message,
+                toast({
+                    title: result?.message,
                     variant: "success",
                 })
             } else {
                 setIsOpen(false);
-                toast({ 
-                    title: 'This item not Returned please try again',
+                toast({
+                    title: result?.message || 'This item not Returned please try again',
                     variant: "destructive",
                 })
             }

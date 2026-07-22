@@ -1,11 +1,12 @@
 import useSWR, { mutate, useSWRConfig } from 'swr';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { loginIsOpen, cartCountState, cartState, selectedVariantState, errorMessageProductCard, trax_id } from "@/recoil/atoms";
+import { loginIsOpen, cartCountState, cartState, selectedVariantState, errorMessageProductCard, trax_id, couponAppliedState } from "@/recoil/atoms";
 import { addCartItem, addToWishlist, removeCartItem, updateCartItemQty } from '@/lib/getHome';
 import { useSession } from 'next-auth/react';
-import { ADD_CART, ADD_WISHLIST, GET_CART } from '@/constants/apiRoutes';
+import { ADD_CART, ADD_WISHLIST, GET_CART, COUPON_REMOVE, APPLIED_COUPON } from '@/constants/apiRoutes';
+import { axiosPostWithToken } from '@/lib/getHome';
 import axios from 'axios';
 import { apiFetcher } from '@/utils/fetcher';
 import { fetcherWithToken } from "@/utils/fetcher";
@@ -24,6 +25,8 @@ export const useCartWidget = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessages, setErrorMessages] = useRecoilState(errorMessageProductCard);
   const [selectedVariant, setSelectedVariant] = useRecoilState(selectedVariantState);
+  const [couponApplied, setCouponApplied] = useRecoilState(couponAppliedState);
+  const trx = useRecoilValue(trax_id);
 
   const [variantOpen, setIsVariantOpen] = useState(false)
 
@@ -67,6 +70,23 @@ export const useCartWidget = () => {
     return trxId;
   }
 
+  const removeCouponIfApplied = async (trxId) => {
+    if (!couponApplied?.coupon_id) return;
+    const effectiveTrx = trx || trxId;
+    try {
+      await axiosPostWithToken(
+        `${COUPON_REMOVE}`,
+        { coupon_id: couponApplied.coupon_id, trx_id: effectiveTrx },
+        lang
+      );
+    } catch (e) {
+      // silently ignore
+    } finally {
+      setCouponApplied(null);
+      mutate(`${APPLIED_COUPON}?trx_id=${effectiveTrx}`);
+    }
+  };
+
   const getVariantByProductID = (productID) => {
     const product = selectedVariant.find(item => item.productID === productID);
     return product ? product.variant : null;
@@ -95,7 +115,7 @@ export const useCartWidget = () => {
     return cartProduct.quantity < selectedProduct.stock;
   };
 
-  const addCartItem = async (id, quantity, token, variant, variants_ids = null, trx_id) => {
+  const addCartItem = async (id, quantity, token, variant, variants_ids = null, trx_id, custom_size = null) => {
     const formData = {
       'product_id': id,
       'quantity': quantity,
@@ -104,18 +124,22 @@ export const useCartWidget = () => {
       'variants_name': variant,
       'variants_ids': variants_ids
     }
+    // Optional free-text custom size — only sent when the customer typed something.
+    if (custom_size) {
+      formData.custom_size = custom_size;
+    }
     const url = `${ADD_CART}`;
     const postOptions = getPostOptions("POST", token); // Token is needed
     const data = await apiFetcher(url, formData, postOptions, country);
-    // await mutate(`${GET_CART}lang=${locale}&token=true`); 
+    // await mutate(`${GET_CART}lang=${locale}&token=true`);
     return data;
   }
 
-  const addItem = async (item, variant = null, variant_id = null, count = 1) => {
+  const addItem = async (item, variant = null, variant_id = null, count = 1, custom_size = null) => {
     setIsLoading(true)
     try {
       let trxId = fetchTrxId()
-      const res = await addCartItem(item, count, authToken, variant, variant_id, trxId);
+      const res = await addCartItem(item, count, authToken, variant, variant_id, trxId, custom_size);
       if (res.success) {
         trackAddToCart({
           content_name: item?.name,
@@ -126,14 +150,11 @@ export const useCartWidget = () => {
         });
         if (session?.status === "unauthenticated" && !trxId && res.data?.trx_id) {
           localStorage.setItem("guestToken", res.data.trx_id);
-          console.log(item, "asasfee");
-
-
-
-
           mutate(`${GET_CART}lang=${locale}&trx_id=${res.data?.trx_id}`);
+          await removeCouponIfApplied(res.data.trx_id);
         } else {
           mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+          await removeCouponIfApplied(trxId);
         }
 
 
@@ -176,8 +197,9 @@ export const useCartWidget = () => {
       let trxId = fetchTrxId()
       const res = await removeCartItem(id, authToken, trxId, country);
       if (res.success) {
-        setCartCount(cartCount - 1)
+        setCartCount(cartCount - 1);
         mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+        await removeCouponIfApplied(trxId);
       }
       toast({
         title: `${t('ItemRemovedFromCart')}`,
@@ -196,11 +218,11 @@ export const useCartWidget = () => {
 
       const res = await updateCartItemQty(id, formData, authToken, country);
       if (res.success) {
-        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`)
+        mutate(`${GET_CART}lang=${locale}&trx_id=${trxId}`);
+        await removeCouponIfApplied(trxId);
         toast({
           title: `${t('CartItemUpdated')}`,
           variant: "success",
-
         })
         return res
       } else {
@@ -215,7 +237,7 @@ export const useCartWidget = () => {
     }
   };
 
-  const addToBag = (productId, count) => {
+  const addToBag = (productId, count, custom_size = null) => {
     // Check if the selected variant state has this productId
     const selectedProduct = findProductInSelectedVariant(productId);
     if (!selectedProduct) {
@@ -232,7 +254,7 @@ export const useCartWidget = () => {
 
     if (cartProduct) {
       if (isStockAvailable(cartProduct, selectedProduct)) {
-        addItem(productId, variant, variantId, count);
+        addItem(productId, variant, variantId, count, custom_size);
         // Clear the error message if adding succeeds
         setErrorMessages((prevErrors) => ({
           ...prevErrors,
@@ -246,7 +268,7 @@ export const useCartWidget = () => {
       }
     } else {
       // Add product to cart if it doesn't exist
-      addItem(productId, variant, variantId, count);
+      addItem(productId, variant, variantId, count, custom_size);
       // Clear any previous error message
       setErrorMessages({
         [productId]: ""

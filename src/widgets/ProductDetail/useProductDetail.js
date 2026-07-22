@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export const useProductDetail = ({ datas }) => {
     const [count, setCount] = useState(1);
+    const [customSize, setCustomSize] = useState("");
     const [productDetail, setProductDetail] = useState({
         id: null,
         name: "",
@@ -16,7 +17,9 @@ export const useProductDetail = ({ datas }) => {
     return {
         productDetail,
         setProductDetail,
-        count, 
-        setCount
+        count,
+        setCount,
+        customSize,
+        setCustomSize
     };
 };

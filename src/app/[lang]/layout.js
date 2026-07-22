@@ -33,6 +33,7 @@ const fontArab = Noto_Kufi_Arabic({
 
 export default async function RootLayout({
   children,
+  modal,
   params: { session, lang, ...params },
 }) {
   const messages = await getMessages();
@@ -47,7 +48,11 @@ export default async function RootLayout({
     <html lang={locale} dir={direction}>
       <Script
         src="https://checkout.tabby.ai/tabby-promo.js"
-        strategy="beforeInteractive" // Ensures it loads before any React runs
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://checkout.tabby.ai/tabby-card.js"
+        strategy="beforeInteractive"
       />
       <head>
         <meta property="fb:pixel_id" content={"851173184222165"} />
@@ -58,6 +63,7 @@ export default async function RootLayout({
           <GlobalProviders session={session} >
             <Header data={data} menu={menuData?.data} />
             {children}
+            {modal}
             <Footer data={data} menu={footerData?.data} />
             <Toaster />
           </GlobalProviders>

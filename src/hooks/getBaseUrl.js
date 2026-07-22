@@ -23,7 +23,7 @@ const getBaseUrl = (countryCode) => {
             base_url = process.env.NEXT_PUBLIC_API_BASE_URL_SA; 
     }
 
-    return base_url;
+    return base_url || process.env.NEXT_PUBLIC_BASE_URL;
 };
 
 export default getBaseUrl;

@@ -1,7 +1,8 @@
 "use client";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { useDebouncedCallback } from "use-debounce";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { axiosPostWithToken } from "@/lib/getHome";
 import { SEARCH } from "@/constants/apiRoutes";
 import { useLocale } from "next-intl";

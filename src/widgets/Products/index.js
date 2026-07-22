@@ -32,7 +32,6 @@ import useHeaderSecond from "@/hooks/useHeaderSecond";
 
 export default function Products({ slug }) {
   const t = useTranslations("Index");
-  const { categories, isLoading, isError } = useCategories({ slug });
   const { width } = useGetDeviceType();
   const {
     products,
@@ -54,9 +53,13 @@ export default function Products({ slug }) {
     isSearchPage,
     isAllProducts
   } = useProducts({ slug });
-  const subCategory = categories?.results?.categories.find(
-    (item) => item?.slug === slug
-  );
+
+  // Use parent category slug to fetch filters/subcategories if we are in a subcategory
+  const parentSlug = products && products[0]?.results?.parent;
+  const filterSlug = parentSlug || slug;
+  const { categories, isLoading, isError } = useCategories({ slug: filterSlug });
+
+  const subCategory = categories?.results?.categories?.[0];
   const searchTerm = filters?.q;
 
   const isLastData =

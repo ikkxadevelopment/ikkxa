@@ -10,7 +10,7 @@ import { useLocale } from "next-intl";
 const Slider = ({ children, customSettings, className }) => {
   const lang = useLocale();
   const [locale, country] = lang.split('-');
-  return <Swiper {...customSettings} dir={locale==="ar"?"rtl":"ltr"} pagination={true} className={`${className}`}>{children}</Swiper>;
+  return <Swiper {...customSettings} dir={locale==="ar"?"rtl":"ltr"} pagination={true} observer={true} observeParents={true} className={`${className}`}>{children}</Swiper>;
 };
 
 export default Slider;

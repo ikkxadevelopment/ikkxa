@@ -75,7 +75,7 @@ export default function ProductCard({ data, isWishlist }) {
           className="relative bg-slate-50 overflow-hidden rounded-sm"
         >
           {/* <div className='inline-block absolute top-2 font-semibold start-2 bg-red-600 text-white rounded-sm text-[10px] z-10 px-2 py-1'>BEST SELLING</div> */}
-          <button onClick={() => { handleWishlist(pid) }} className="w-[32.22px] h-[32.22px] border-gray-50 flex-col justify-center items-center  inline-flex absolute top-2 font-semibold end-2 bg-white text-[#C87739] rounded-full z-10 px-2 py-1">
+          <button onClick={() => { handleWishlist(pid) }} className="w-[32.22px] h-[32.22px] border-gray-50 flex-col justify-center items-center  inline-flex absolute top-2 font-semibold end-2 bg-white text-[#C87739] rounded-full z-10 px-2 py-1 transition-all duration-200 hover:bg-[#C87739] hover:text-white hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C87739] focus-visible:ring-offset-1">
             {hasWishlist || isWishlist ? <GoHeartFill /> : <GoHeart />}
           </button>
           <Link
@@ -100,7 +100,7 @@ export default function ProductCard({ data, isWishlist }) {
             <Image
               src={`${data?.image_url || data?.image_190x230}`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 50vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               fill
               alt={`${data?.product_name}`}
             />

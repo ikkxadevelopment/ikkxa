@@ -88,6 +88,7 @@ export const STORE_DATA ="store-data?lang="
 export const SITE_MAP ="site-map"
 export const CMS ="home/others-page"
 export const FOOTER_DATA ="footer-data"
+export const SYSTEM_DATA_APP ="system-data-app"
 
 export const SOCIAL_LOGIN="social-login"
 export const BUY_NOW="user/buy-now"

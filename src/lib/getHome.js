@@ -15,6 +15,7 @@ import {
   SITE_MAP,
   META_DATA,
   MENU_DATA,
+  SYSTEM_DATA_APP,
 } from "@/constants/apiRoutes";
 import getBaseUrl from "@/hooks/getBaseUrl";
 import { deleteFetcher, apiFetcher } from "@/utils/fetcher";
@@ -131,6 +132,14 @@ export async function getCms(slug,lang, country) {
 export async function getFooter(lang, country) {
   // const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
   const url = `${FOOTER_DATA}?lang=${lang}`;
+  const urlParamsObject = null;
+  const data = await strapiFetch(url, urlParamsObject, options, country);
+  return data;
+}
+
+export async function getSocialData(lang, country) {
+  // Base URL (AE/SA) is resolved inside strapiFetch via getBaseUrl(country).
+  const url = `${SYSTEM_DATA_APP}?lang=${lang}`;
   const urlParamsObject = null;
   const data = await strapiFetch(url, urlParamsObject, options, country);
   return data;

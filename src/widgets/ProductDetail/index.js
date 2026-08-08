@@ -20,9 +20,6 @@ import { useProductDetail } from "./useProductDetail";
 import { useRecoilState } from "recoil";
 import { errorMessageProductCard } from "@/recoil/atoms";
 import DetailCounter from "@/components/DetailCounter";
-import Slider from "@/components/Slider";
-import { SwiperSlide } from "swiper/react";
-import ProductCard from "@/components/ProductCard";
 import useHeaderSecondary from "@/hooks/useHeaderSecondary";
 import DetailBack from "@/components/DetailBack";
 import { Link } from "@/i18n/routing";
@@ -37,10 +34,17 @@ import {
 import { FaWhatsapp, FaFacebook } from "react-icons/fa";
 import { IoCopyOutline } from "react-icons/io5";
 import { useToast } from "@/hooks/use-toast";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import useHeaderSecond from "@/hooks/useHeaderSecond";
 import TabbyPromoWithButton from "@/components/TabbyPromoWithButton/TabbyPromoWithButton";
 import ViewContentTracker from "@/components/ViewContentTracker";
+import dynamic from "next/dynamic";
+
+// Lazy-mounted on scroll (see the IntersectionObserver below) so its chunk is
+// not part of the product page's initial bundle (DEV-13).
+const RelatedProducts = dynamic(() => import("./RelatedProducts"), {
+  ssr: false,
+});
 
 export default function ProductDetail({ data, isOutOfStock }) {
   const t = useTranslations("Index");
@@ -51,6 +55,25 @@ export default function ProductDetail({ data, isOutOfStock }) {
   const datas = data?.results;
   const currency = getCurrency();
   const lang = useLocale();
+
+  // Load the related-products carousel only once it nears the viewport.
+  const relatedRef = useRef(null);
+  const [relatedInView, setRelatedInView] = useState(false);
+  useEffect(() => {
+    if (relatedInView || !relatedRef.current) return;
+    const el = relatedRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setRelatedInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [relatedInView]);
 
 
   // const structuredData = {
@@ -83,31 +106,6 @@ export default function ProductDetail({ data, isOutOfStock }) {
   const { productDetail, setProductDetail, count, setCount, customSize, setCustomSize } = useProductDetail(
     { datas }
   );
-  const customSettings = {
-    spaceBetween: 15,
-    slidesPerView: 1.7,
-    pagination: false,
-    // modules: [Navigation],
-    breakpoints: {
-      640: {
-        spaceBetween: 2,
-      },
-      768: {
-        slidesPerView: 3,
-      },
-      992: {
-        slidesPerView: 5,
-      },
-      1600: {
-        slidesPerView: 6,
-      },
-    },
-    navigation: {
-      prevEl: `.swiper-button-prev`,
-      nextEl: `.swiper-button-next`,
-    },
-  };
-
   const offerPerc =
     100 - Math.round((productDetail?.disPrice / productDetail?.price) * 100);
 
@@ -458,33 +456,11 @@ export default function ProductDetail({ data, isOutOfStock }) {
           </div>
         </section>
 
-        <section className={`py-6 lg:py-10  `}>
-          {/* ${flashSale && "bg-[#fbf4f4]"} */}
-          <div className="container">
-            <div className="grid grid-cols-2 mb-4">
-              <div>
-                <h2 className="text-lg lg:text-xl   font-semibold">
-                  {t("RelatedProducts")}
-                </h2>
-              </div>
-            </div>
-
-            <Slider className={""} customSettings={customSettings}>
-              {Array.isArray(datas?.product?.related_products) ? (
-                datas?.product?.related_products?.map((item, i) => {
-                  return (
-                    <SwiperSlide key={i}>
-                      {" "}
-                      <ProductCard data={item} />{" "}
-                    </SwiperSlide>
-                  );
-                })
-              ) : (
-                <div>{t("NoItemsAvailable")}</div>
-              )}
-            </Slider>
-          </div>
-        </section>
+        <div ref={relatedRef} className="min-h-[1px]">
+          {relatedInView && (
+            <RelatedProducts products={datas?.product?.related_products} />
+          )}
+        </div>
       </Suspense>
     </>
 

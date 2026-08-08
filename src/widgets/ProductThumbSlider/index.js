@@ -4,13 +4,27 @@ import Slider from "@/components/Slider";
 import { SwiperSlide } from "swiper/react";
 import { useState, useEffect, useRef } from "react";
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
-import ProductMagnifier from "./ProductMagnifier";
+import dynamic from "next/dynamic";
+
+// Zoom lightbox is interaction-only — defer its chunk until the shopper first
+// opens it, keeping it off the product page's initial bundle (DEV-13).
+const ProductMagnifier = dynamic(() => import("./ProductMagnifier"), {
+  ssr: false,
+});
 
 export default function ProductThumbSlider({ data }) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isOpen,setIsOpen]=useState(false)
+  // Mount the magnifier only after the first open, then keep it mounted so the
+  // Radix dialog close animation still runs.
+  const [magnifierMounted, setMagnifierMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const swiperRef = useRef(null); 
+  const swiperRef = useRef(null);
+
+  const openMagnifier = () => {
+    setMagnifierMounted(true);
+    setIsOpen(true);
+  };
 
   // Handle slide change and update the current slide index
   const handleSlideChange = (swiper) => {
@@ -57,7 +71,9 @@ export default function ProductThumbSlider({ data }) {
   return (
     <div className="relative">
       {/* Main slider */}
-      <ProductMagnifier data={data} isOpen={isOpen} setIsOpen={setIsOpen} index={currentSlide}  />
+      {magnifierMounted && (
+        <ProductMagnifier data={data} isOpen={isOpen} setIsOpen={setIsOpen} index={currentSlide} />
+      )}
       <div className="md:mb-4 relative">
         <Slider
           className={""}
@@ -68,7 +84,7 @@ export default function ProductThumbSlider({ data }) {
             return (
               <SwiperSlide key={i}>
                 <div className="aspect-[490/735] w-full relative"
-                 onClick={()=>setIsOpen(true)}>
+                 onClick={openMagnifier}>
                   <Image
                     src={item}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 30vw"

@@ -1,11 +1,5 @@
 import WidgetBlocks from "@/components/WidgetBlocks";
-import { getCategories, getHomeProducts, getMetaData } from "@/lib/getHome";
-import BannerSlider from "@/widgets/BannerSlider";
-import BudgetWidget from "@/widgets/BudgetWidget";
-import CategoriesSlider from "@/widgets/CategoriesSlider";
-import OfferBanner from "@/widgets/OfferBanner";
-import OfferCategoriesSlider from "@/widgets/OfferCategoriesSlider";
-import ProductsSlider from "@/widgets/ProductsSlider";
+import { getHomeProducts, getMetaData } from "@/lib/getHome";
 
 // export async function generateMetadata() {
 //   return {
@@ -20,31 +14,24 @@ import ProductsSlider from "@/widgets/ProductsSlider";
 // }
 
 export async function generateMetadata({ params: { lang } }) {
-  const [locale, country] = lang.split("-");
   const seoData = await getMetaData(lang);
-  console.log(seoData,"countrycountrycountry");
-  let seoTitle 
-  if(country==="SA") {
-    seoTitle="Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA"
-  }
-
-  if(country==="AE") {
-    seoTitle="Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA"
-  }
 
   return {
     title: seoData?.message?.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA",
     description:
       seoData?.message?.desc ||
       "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
-      metadataBase: new URL('https://ikkxa.com'),
-    
+      metadataBase: new URL('https://www.ikkxa.com'),
+
     alternates: {
       canonical:
-        seoData?.message?.canonical_url || `https://ikkxa.com/${lang}`,
+        seoData?.message?.canonical_url || `https://www.ikkxa.com/${lang}`,
       languages: {
-        [`en-${country}`]: `/en-${country}`,
-        [`ar-${country}`]: `/ar-${country}`,
+        "en-SA": `/en-SA`,
+        "ar-SA": `/ar-SA`,
+        "en-AE": `/en-AE`,
+        "ar-AE": `/ar-AE`,
+        "x-default": `/en-SA`,
       },
     },
     openGraph: {

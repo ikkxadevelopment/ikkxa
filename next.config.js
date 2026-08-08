@@ -5,6 +5,13 @@
  
 // const withNextIntl = createNextIntlPlugin();
 const withNextIntl = require('next-intl/plugin')('./src/i18n/request.js');
+
+// Only active when ANALYZE=true (local perf audits); a no-op for normal and
+// Cloudflare builds. Run: `ANALYZE=true npx next build`.
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+    openAnalyzer: false,
+});
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // NEXT_PUBLIC_* vars are inlined at build time by webpack.
@@ -51,12 +58,19 @@ const nextConfig = {
             
         ],
         formats: ['image/webp'],
+        // Trim the very large breakpoints — no storefront image needs 2K/4K
+        // srcset candidates. Fewer variants = fewer optimizer transforms and
+        // smaller srcset payloads (DEV-12).
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+        imageSizes: [32, 64, 128, 256, 384],
+        // Cache optimized images at the edge for 24h instead of the 60s default.
+        minimumCacheTTL: 60 * 60 * 24,
     },
 };
 
 // export default nextConfig;
 // export default withNextIntl(nextConfig);
-module.exports = withNextIntl(nextConfig);
+module.exports = withBundleAnalyzer(withNextIntl(nextConfig));
 
 // const withNextIntl = require('next-intl/plugin')('./src/i18n/request.js');
 

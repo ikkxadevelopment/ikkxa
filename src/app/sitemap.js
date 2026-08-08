@@ -68,7 +68,7 @@ export default async function sitemap({ id }) {
       console.warn('Invalid data structure received from API');
       return [
         {
-          url: `https://ikkxa.com/${locale}-${country}`,
+          url: `https://www.ikkxa.com/${locale}-${country}`,
           lastModified: new Date().toISOString(),
           changeFrequency: 'daily',
           priority: 1.0,
@@ -83,7 +83,7 @@ export default async function sitemap({ id }) {
           const cleanPath = cleanUrlPath(page.loc);
           
           return {
-            url: `https://ikkxa.com/${locale}-${country}/${cleanPath}`,
+            url: `https://www.ikkxa.com/${locale}-${country}/${cleanPath}`,
             lastModified: (page.lastmod && new Date(page.lastmod).toISOString()) || new Date().toISOString(),
             changeFrequency: (page.changefreq && typeof page.changefreq === 'string') ? page.changefreq : 'daily',
             priority: (typeof page.priority === 'number' && page.priority >= 0 && page.priority <= 1) ? page.priority : 0.7,
@@ -97,7 +97,7 @@ export default async function sitemap({ id }) {
 
     // Add homepage
     entries.unshift({
-      url: `https://ikkxa.com/${locale}-${country}`,
+      url: `https://www.ikkxa.com/${locale}-${country}`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
       priority: 1.0,
@@ -110,7 +110,7 @@ export default async function sitemap({ id }) {
     
     // Return homepage as fallback
     return [{
-      url: `https://ikkxa.com/${locale}-${country}`,
+      url: `https://www.ikkxa.com/${locale}-${country}`,
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
       priority: 1.0,

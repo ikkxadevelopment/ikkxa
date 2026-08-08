@@ -28,6 +28,7 @@ export async function generateMetadata({ params: { product, lang } }) {
       languages: {
         [`en-${country}`]: `/en-${country}/products/${meta?.slug}`,
         [`ar-${country}`]: `/ar-${country}/products/${meta?.slug}`,
+        "x-default": `/en-${country}/products/${meta?.slug}`,
       },
     },
     metadataBase: new URL('https://www.ikkxa.com'),
@@ -60,23 +61,28 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
   const data = await getSingleProduct(product, locale, country);
   const isOutOfStock = data?.results?.product?.stock.every(item => item.current_stock === 0);
 
+  const productData = data?.results?.product;
+  // API field `discount_percentage` holds the discounted selling price
+  // (mapped to `disPrice` in useProductDetail); `price` is the regular price.
+  const sellingPrice = productData?.discount_percentage ?? productData?.price;
+
   const structuredData = {
     "@context": "https://schema.org/",
     "@type": "Product",
-    name: data?.results?.product?.language_product?.name,
-    image: data?.results?.product?.gallery?.large,
-    description: data?.results?.product?.short_description,
-    sku: data?.results?.product?.product_stock?.sku,
+    name: productData?.language_product?.name,
+    image: productData?.gallery?.large,
+    description: productData?.short_description,
+    sku: productData?.product_stock?.sku,
     brand: {
       "@type": "Brand",
       name: "IKKXA",
     },
     offers: {
       "@type": "Offer",
-      url: `https://www.ikkxa.com/${locale}-${country}/products/${data?.results?.product?.slug}`,
-      priceCurrency: "SAR",
-      price: data?.results?.product?.stock[0]?.product?.discount_percentage,
-      priceValidUntil: data?.results?.product?.special_discount_end,
+      url: `https://www.ikkxa.com/${locale}-${country}/products/${productData?.slug}`,
+      priceCurrency: country === "AE" ? "AED" : "SAR",
+      price: sellingPrice,
+      priceValidUntil: productData?.special_discount_end,
       itemCondition: "https://schema.org/NewCondition",
       availability: `https://schema.org/${isOutOfStock ? "OutOfStock" : "InStock"}`,
     },

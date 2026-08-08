@@ -5,6 +5,13 @@
  
 // const withNextIntl = createNextIntlPlugin();
 const withNextIntl = require('next-intl/plugin')('./src/i18n/request.js');
+
+// Only active when ANALYZE=true (local perf audits); a no-op for normal and
+// Cloudflare builds. Run: `ANALYZE=true npx next build`.
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+    openAnalyzer: false,
+});
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // NEXT_PUBLIC_* vars are inlined at build time by webpack.
@@ -63,7 +70,7 @@ const nextConfig = {
 
 // export default nextConfig;
 // export default withNextIntl(nextConfig);
-module.exports = withNextIntl(nextConfig);
+module.exports = withBundleAnalyzer(withNextIntl(nextConfig));
 
 // const withNextIntl = require('next-intl/plugin')('./src/i18n/request.js');
 

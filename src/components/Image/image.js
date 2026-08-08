@@ -4,7 +4,7 @@ import ImageNext from "next/image";
 import { checkIsBaseUrlIncludes } from "@/hooks/checkIsBaseUrlIncludes";
 
 
-const Image= (props, ref) => {
+const Image = (props, ref) => {
   const { src, ...rest } = props;
 
   const hasSource = !!src;
@@ -17,7 +17,7 @@ const Image= (props, ref) => {
     <ImageNext
       src={checkIsBaseUrlIncludes(src)}
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
-      quality={90}
+      quality={75}
       {...rest}
       ref={ref}
     />

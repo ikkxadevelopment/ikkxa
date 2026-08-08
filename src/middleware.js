@@ -9,6 +9,19 @@ const middleware = async (req, ev) => {
   // NextAuth's default JWE decode which crashes on Cloudflare Workers
   // (`crypto.createCipheriv is not implemented yet`). Removed for safety.
 
+  // Non-production hosts (dev/test/pos/preview/localhost) must never be indexed
+  // (DEV-06). robots.txt blocks crawling; this header stops indexing even if a
+  // page is already linked or was crawled before robots was tightened.
+  const PROD_HOSTS = ['www.ikkxa.com', 'ikkxa.com'];
+  const host = (req.headers.get('host') || '').split(':')[0].toLowerCase();
+  const isNonProdHost = !PROD_HOSTS.includes(host);
+  const applyNoindex = (res) => {
+    if (isNonProdHost && res) {
+      res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    }
+    return res;
+  };
+
   // Extract current locale & country from the URL (e.g., /en-SA)
   const pathname = req.nextUrl.pathname;
   const localeCountryMatch = pathname.match(/^\/(en|ar)-([A-Z]{2})/);
@@ -37,7 +50,7 @@ const middleware = async (req, ev) => {
       });
     }
 
-    return response;
+    return applyNoindex(response);
   }
 
   // Only redirect if URL doesn't have locale-country
@@ -53,7 +66,7 @@ const middleware = async (req, ev) => {
     });
   }
 
-  return response;
+  return applyNoindex(response);
 };
 
 export default middleware;

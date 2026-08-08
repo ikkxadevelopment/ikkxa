@@ -33,6 +33,8 @@ export default function BannerSlider({ data }) {
                       fill
                       className="object-cover"
                       alt={`${item?.title}`}
+                      sizes="100vw"
+                      priority={i === 0}
                     />
                   </Link>
                 </SwiperSlide>
@@ -50,6 +52,8 @@ export default function BannerSlider({ data }) {
                       fill
                       className="object-cover"
                       alt={`${item?.title}`}
+                      sizes="100vw"
+                      priority={i === 0}
                     />
                   </Link>
                 </SwiperSlide>

@@ -1,5 +1,6 @@
 // app/sitemap/[id]/route.js
 import { escape } from "lodash";
+import { TAG_ARCHIVES } from "@/config/tagArchives";
 
 export async function generateSitemaps() {
   return [
@@ -101,6 +102,17 @@ export default async function sitemap({ id }) {
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
       priority: 1.0,
+    });
+
+    // Curated tag archives (DEV-00). Config-driven so they are discoverable
+    // without waiting on the backend site-map feed to include them.
+    Object.keys(TAG_ARCHIVES).forEach((slug) => {
+      entries.push({
+        url: `https://www.ikkxa.com/${locale}-${country}/collections/${slug}`,
+        lastModified: new Date().toISOString(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      });
     });
 
     return entries;

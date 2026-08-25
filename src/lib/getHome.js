@@ -16,6 +16,7 @@ import {
   META_DATA,
   MENU_DATA,
   SYSTEM_DATA_APP,
+  FILTER_PRODUCTS,
 } from "@/constants/apiRoutes";
 import getBaseUrl from "@/hooks/getBaseUrl";
 import { deleteFetcher, apiFetcher } from "@/utils/fetcher";
@@ -184,6 +185,24 @@ export async function getSingleProduct(slug, lang, country) {
   const urlParamsObject = null;
   const data = await strapiFetch(url, urlParamsObject, options, country);
   return data;
+}
+
+// Server-side first-page fetch for a tag archive (DEV-00). Mirrors the query
+// the client Products widget builds, but runs on the server so the archive's
+// title/total and ItemList JSON-LD are in the initial HTML for crawlers.
+export async function getTagProducts({ tag, lang, country, page = 1, paginate = 24, sort = "newest" }) {
+  const query = new URLSearchParams({
+    tag,
+    sort,
+    paginate: String(paginate),
+    page: String(page),
+    price: '{"min":0,"max":899}',
+    type: "",
+    route: "all.products",
+    lang,
+  }).toString();
+  const url = `${FILTER_PRODUCTS}?${query}`;
+  return strapiFetch(url, null, options, country);
 }
 
 

@@ -16,6 +16,7 @@ const useProducts = ({ slug }) => {
   const [locale, country] = lang.split('-');
   const isSearchPage = pathname?.includes("search")
   const isAllProducts = pathname?.includes("products")
+  const isTagPage = pathname?.includes("collections")
   const router = useRouter();
   const [sliderValue, setSliderValue] = useState([0, 899]);
   const [filters, setFilters] = useState({
@@ -246,7 +247,7 @@ const useProducts = ({ slug }) => {
       return null;
     const query = qs.stringify(
       {
-        ...(isSearchPage  ? { key: String(filters.q) } : { slug }),
+        ...(isSearchPage ? { key: String(filters.q) } : isTagPage ? { tag: slug } : { slug }),
         sort: filters.sort,
         paginate: 24,
         page: pageIndex + 1,
@@ -254,7 +255,7 @@ const useProducts = ({ slug }) => {
         attribute_value_id: filters.attribute_value_id,
         child_category: filters.child_category,
         type: filters.type,
-        route: isSearchPage||isAllProducts ? "all.products" :"product.by.category",
+        route: isSearchPage||isAllProducts||isTagPage ? "all.products" :"product.by.category",
       },
       { encodeValuesOnly: true, arrayFomat: "brackets" }
     );
@@ -295,7 +296,8 @@ const useProducts = ({ slug }) => {
     isLoadingProducts: !error && !data,
     isError: error,
     isSearchPage,
-    isAllProducts
+    isAllProducts,
+    isTagPage
   };
 };
 

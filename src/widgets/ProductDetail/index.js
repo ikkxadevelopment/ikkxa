@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import ProductThumbSlider from "../ProductThumbSlider";
+import ProductTags from "./ProductTags";
 import Counter from "@/components/Counter";
 import PaymetnIcons from "@/components/PaymentIcons";
 import BuyNow from "@/components/BuyNow";
@@ -46,7 +47,7 @@ const RelatedProducts = dynamic(() => import("./RelatedProducts"), {
   ssr: false,
 });
 
-export default function ProductDetail({ data, isOutOfStock }) {
+export default function ProductDetail({ data, isOutOfStock, onNavigate }) {
   const t = useTranslations("Index");
   // console.log(structuredData,data,"structuredData");
 
@@ -361,6 +362,8 @@ export default function ProductDetail({ data, isOutOfStock }) {
                     />
                   </p>
                 </div>
+
+                <ProductTags tags={datas?.product?.language_product?.tags} onNavigate={onNavigate} />
 
                 {/* <div className="py-3 lg:py-4 border-b border-gray-200">
                 <h3 className=" text-base font-semibold mb-2">

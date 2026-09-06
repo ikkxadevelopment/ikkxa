@@ -140,3 +140,14 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* Tabby's "learn more" popup is rendered into a container the script appends to
+   <body>, i.e. outside the product modal's portal. Radix (through vaul) sets
+   `pointer-events: none` on <body> while the drawer is open, which leaves the
+   popup visible but completely unclickable — clicks fall through to the drawer
+   behind it. `styles__dialog…` is Tabby's dialog class; `.tabby-promo` is the
+   container older builds of the script use. */
+.tabby-promo,
+[class*="styles__dialog"] {
+  pointer-events: auto;
+}

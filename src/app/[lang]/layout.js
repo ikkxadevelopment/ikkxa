@@ -46,16 +46,20 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <Script
-        src="https://checkout.tabby.ai/tabby-promo.js"
-        strategy="beforeInteractive"
-      />
-      <Script
-        src="https://checkout.tabby.ai/tabby-card.js"
-        strategy="beforeInteractive"
-      />
       <head>
         <meta property="fb:pixel_id" content={"851173184222165"} />
+        {/* Must live inside <head>: as direct children of <html> React treats
+            them as invalid markup ("<script> cannot be a child of <html>"),
+            which fails hydration for the whole document — nothing on a
+            hard-loaded page hydrates, so the Tabby widgets never initialise. */}
+        <Script
+          src="https://checkout.tabby.ai/tabby-promo.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://checkout.tabby.ai/tabby-card.js"
+          strategy="beforeInteractive"
+        />
       </head>
       <body className={locale === "ar" ? fontArab.className : inter.className}>
         <GoogleTagManager gtmId="GTM-TR3CTMHB" />

@@ -5,6 +5,7 @@ import { useCartFetcher } from "@/components/Header/useCartFetcher";
 import CheckoutSummary from "@/components/CheckoutSummary";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import Image from "@/components/Image/image";
 import AppBack from "@/components/AppBack";
 import { useRecoilState } from "recoil";
@@ -20,7 +21,7 @@ import axios from "axios";
 import OrderPending from "./OrderPending";
 import OrderSuccess from "./OrderSuccess";
 import { axiosPostWithToken } from "@/lib/getHome";
-import { PiMoney } from "react-icons/pi";
+import { PiMoney, PiTruck } from "react-icons/pi";
 import { FaStripe } from "react-icons/fa6";
 
 // import Moyasar from "./Moyasar";
@@ -56,6 +57,15 @@ const TABBY_STATUS_PALETTE = {
 };
 // const Moyasar = dynamic(() => import('./Moyasar'));
 
+// The API returns `message` as a string, a list, or a field => errors bag.
+const getApiMessage = (message) => {
+  if (!message) return "";
+  if (typeof message === "string") return message;
+  if (Array.isArray(message)) return message.flat().join(" ");
+  if (typeof message === "object") return Object.values(message).flat().join(" ");
+  return "";
+};
+
 const CheckoutWidget = () => {
   const t = useTranslations("Index");
   const { toast } = useToast();
@@ -64,7 +74,7 @@ const CheckoutWidget = () => {
   const { mutate } = useSWRConfig();
   const { isLoading, calculations } = useCartFetcher();
   const [checkoutData, setCheckoutData] = useRecoilState(checkoutDataState);
-  const { handleCheckoutCod, loading, success } = useCheckout();
+  const { handleCheckoutCod, toggleSameDayDelivery, loading, success } = useCheckout();
   const [address, setAddress] = useState(checkoutData?.shipping_address);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const router = useRouter();
@@ -102,6 +112,28 @@ const CheckoutWidget = () => {
       }
     })();
   }, [tabbyStatus, order_id, baseUrl, locale]);
+
+  const [sameDay, setSameDay] = useState(false);
+  const [sameDayPending, setSameDayPending] = useState(false);
+  const sameDayCharge = Number(checkoutData?.same_day_delivery_charge ?? 0);
+
+  // Same day delivery (UAE only) is an add-on with its own fee, not a payment method.
+  const handleSameDayToggle = async (checked) => {
+    setSameDay(checked);
+    setSameDayPending(true);
+    const result = await toggleSameDayDelivery(checked);
+    setSameDayPending(false);
+
+    if (!result?.success) {
+      // Keep the switch and the server state in step.
+      setSameDay(!checked);
+      toast({
+        title: t("Error"),
+        description: getApiMessage(result?.message) || t("PleaseTryAgain"),
+        variant: "destructive",
+      });
+    }
+  };
 
   const getCheckoutPayload = () => {
     const defaultQuantity = checkoutData?.items?.map(item => ({
@@ -805,10 +837,48 @@ const CheckoutWidget = () => {
                 </Label>
 
               </RadioGroup>
+
+              {country === "AE" && (
+                <div className="flex items-center space-x-3 w-full p-3 lg:p-6 mt-2 rounded border border-gray-200 bg-white">
+                  <div className="text-2xl relative">
+                    <PiTruck />
+                  </div>
+                  <div className="flex items-center w-full justify-between">
+                    <div>
+                      <Label
+                        htmlFor="same_day"
+                        className="text-black text-sm lg:text-base font-semibold mb-1 block"
+                      >
+                        {t('SameDayDelivery')}
+                      </Label>
+                      <p className="text-[#9e9e9e] text-xs">
+                        {t('SameDayDeliveryDesc')}
+                        {sameDayCharge > 0 && (
+                          <span>
+                            {" "}
+                            (+{currency}{sameDayCharge})
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    <Switch
+                      id="same_day"
+                      checked={sameDay}
+                      disabled={sameDayPending}
+                      onCheckedChange={handleSameDayToggle}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex-col-auto w-full lg:w-[28%] lg:px-4">
               <div className="mb-3">
-                <CheckoutSummary data={checkoutData} isCod={paymentMethod === "cod"} />
+                <CheckoutSummary
+                  data={checkoutData}
+                  isCod={paymentMethod === "cod"}
+                  isSameDay={sameDay}
+                />
               </div>
               <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
                 {paymentMethod === "tabby" && (

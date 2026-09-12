@@ -66,6 +66,7 @@ export const STATE_BY_COUNTRY = "state/by-country"
 
 export const CONFIRM_ORDER ="user/confirm-order"
 export const COD_ORDER ="user/complete-order"
+export const TOGGLE_SAME_DAY_DELIVERY ="user/toggle-same-day-delivery"
 export const TABBY_CHECKOUT = "tabby/pay"
 export const TAMARA_CHECKOUT = "tamara/pay"
 export const NGENIUS_CHECKOUT = "ngenius/pay"

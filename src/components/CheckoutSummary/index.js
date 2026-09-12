@@ -1,12 +1,18 @@
 import getCurrency from "@/hooks/getCurrency";
 import { useLocale, useTranslations } from "next-intl";
 
-export default function CheckoutSummary({ data, isCod }) {
+export default function CheckoutSummary({ data, isCod, isSameDay }) {
   const t = useTranslations("Index");
   const currency = getCurrency();
   const lang = useLocale();
   const [locale, country] = lang.split("-");
-  
+
+  const codCharge = isCod ? Number(data?.plus_cod_charge ?? 0) : 0;
+  const sameDayCharge = isSameDay
+    ? Number(data?.same_day_delivery_charge ?? 0)
+    : 0;
+  const total = Number(data?.total_payable ?? 0) + codCharge + sameDayCharge;
+
   return (
     <div className="p-6 bg-stone-50 md:rounded border border-gray-200 ">
       <h4 className=" text-black text-lg font-semibold mb-3">{t('OrderSummary')}</h4>
@@ -79,13 +85,22 @@ export default function CheckoutSummary({ data, isCod }) {
             </p>
           </div>
         )}
+        {isSameDay && (
+          <div className="flex justify-between ">
+            <p className="text-black text-sm">{t('SameDayDeliveryCharge')}</p>
+            <p className="text-black text-sm ">
+              {" "}
+              {currency}{sameDayCharge}
+            </p>
+          </div>
+        )}
         {/* coupon_discount */}
       </div>
       <div className="flex justify-between pt-4 ">
         <p className="text-black text-base font-semibold">{t('Total')}</p>
         <p className="text-black text-base font-semibold">
           {" "}
-          {currency}{isCod?(data?.total_payable+data?.plus_cod_charge):data?.total_payable}     
+          {currency}{total}
         </p>
       </div>
 

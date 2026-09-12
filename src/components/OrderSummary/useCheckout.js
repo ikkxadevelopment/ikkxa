@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { useRecoilState } from "recoil";
 import { checkoutDataState } from "@/recoil/atoms";
-import { COD_ORDER, CONFIRM_ORDER } from "@/constants/apiRoutes";
+import {
+  COD_ORDER,
+  CONFIRM_ORDER,
+  TOGGLE_SAME_DAY_DELIVERY,
+} from "@/constants/apiRoutes";
 import { axiosPostWithToken } from "@/lib/getHome";
 import qs from "qs";
 import { useLocale } from "next-intl";
@@ -72,7 +76,37 @@ const useCheckout = (data) => {
     }
   };
 
-  return { handleCheckout, handleCheckoutCod, loading, error, success };
+  // UAE only: flags the confirmed order for same day delivery, which adds its own fee.
+  const toggleSameDayDelivery = async (enable) => {
+    if (!order_id) return null;
+
+    setError(null);
+    try {
+      const result = await axiosPostWithToken(
+        TOGGLE_SAME_DAY_DELIVERY,
+        { order_id: order_id, enable: enable ? 1 : 0 },
+        lang
+      );
+      return result;
+    } catch (error) {
+      setError(error);
+      console.error("Same day delivery toggle error:", error);
+      // Hand the API's own message back so the caller can surface it.
+      return {
+        success: false,
+        message: error?.response?.data?.message,
+      };
+    }
+  };
+
+  return {
+    handleCheckout,
+    handleCheckoutCod,
+    toggleSameDayDelivery,
+    loading,
+    error,
+    success,
+  };
 };
 
 export default useCheckout;

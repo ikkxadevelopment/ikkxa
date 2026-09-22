@@ -86,5 +86,7 @@ npx wrangler pages dev .open-next --compatibility-date=2025-04-01 --compatibilit
 ## Env vars
 - `NEXT_PUBLIC_*` are inlined at **build time** by webpack, so they live in `next.config.js`'s `env`
   block (Cloudflare `[vars]` are runtime-only and not available to `next build`).
+- Backend hosts: `next.config.js` picks `test.ikkxa.com` when `CF_PAGES=1` (set by Cloudflare only in
+  Pages builds → ikkxa-dev / dev.ikkxa.com) and the live `uae`/`ksa`/`www` hosts otherwise (prod Workers build).
 - Server-side secrets (`NEXTAUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, Moyasar keys, `NEXT_PUBLIC_API_KEY`)
   are stored as encrypted values in each Cloudflare project's dashboard, not in the repo.

@@ -12,6 +12,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
     openAnalyzer: false,
 });
+// Backend hosts. Cloudflare sets CF_PAGES=1 only in Pages builds — that is the
+// ikkxa-dev project (dev.ikkxa.com, `development` branch), which must talk to
+// the test backend. The production Workers build (ikkxa-production, `main`)
+// does not set it and uses the live per-country hosts.
+const isDevPages = process.env.CF_PAGES === '1';
+const TEST_API = 'https://test.ikkxa.com/web-api/';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // NEXT_PUBLIC_* vars are inlined at build time by webpack.
@@ -19,13 +25,13 @@ const nextConfig = {
     // Cloudflare Pages wrangler.toml [vars] are runtime-only and are
     // NOT available to `next build` for static inlining.
     env: {
-        NEXT_PUBLIC_BASE_URL: 'https://www.ikkxa.com/web-api/',
-        NEXT_PUBLIC_BASE_URL_IMG: 'https://www.ikkxa.com/public/',
+        NEXT_PUBLIC_BASE_URL: isDevPages ? TEST_API : 'https://www.ikkxa.com/web-api/',
+        NEXT_PUBLIC_BASE_URL_IMG: isDevPages ? 'https://test.ikkxa.com/public/' : 'https://www.ikkxa.com/public/',
         // Country-dynamic API hosts — selected per request from the
         // NEXT_LOCALE cookie (SA → ksa, AE → uae). See src/utils/fetcher.js
         // and src/app/api/auth/[...nextauth]/route.js (getBaseUrlFromLocale).
-        NEXT_PUBLIC_API_BASE_URL_AE: 'https://uae.ikkxa.com/web-api/',
-        NEXT_PUBLIC_API_BASE_URL_SA: 'https://ksa.ikkxa.com/web-api/',
+        NEXT_PUBLIC_API_BASE_URL_AE: isDevPages ? TEST_API : 'https://uae.ikkxa.com/web-api/',
+        NEXT_PUBLIC_API_BASE_URL_SA: isDevPages ? TEST_API : 'https://ksa.ikkxa.com/web-api/',
         // NEXT_PUBLIC_MOYASAR_PUBLIC_API_KEY and NEXT_PUBLIC_MOYASAR_SECRET_API_KEY
         // use pk_live_/sk_live_ prefixes that trigger GitHub push-protection.
         // They are set as encrypted Secrets in the Cloudflare Pages dashboard

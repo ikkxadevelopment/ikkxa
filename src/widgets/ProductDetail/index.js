@@ -434,8 +434,7 @@ export default function ProductDetail({ data, isOutOfStock, onNavigate }) {
                   <div>
                     <TabbyPromoWithButton
                       price={productDetail?.disPrice}
-                      publicKey={process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY || 'pk_xyz'}
-                      merchantCode={lang}
+                      locale={lang}
                       source="product"
                     />
                   </div>

@@ -304,7 +304,7 @@
       "Blogs":"Blogs",
       "All":"All",
       "PayLaterTabby":"Pay later with Tabby",
-      "RejectTabbyGeneral":"Sorry, Tabby is unable to approve this purchase. Please use an alternative payment method for your order",
+      "RejectTabbyGeneral":"Sorry, Tabby is unable to approve this purchase. Please use an alternative payment method for your order.",
       "RejectTabbyCancel":"You aborted the payment. Please retry or choose another payment method.",
       "RejectTabbyAmountTooHigh":"This purchase is above your current spending limit with Tabby, try a smaller cart or use another payment method",
       "RejectTabbyAmountTooLow":"The purchase amount is below the minimum amount required to use Tabby, try adding more items or use another payment method",

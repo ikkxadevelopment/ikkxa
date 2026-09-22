@@ -1,17 +1,16 @@
 'use client';
 
 import { useEffect, useId } from 'react';
+import { getTabbyConfig } from '@/constants/tabby';
 
-const CURRENCY_MAP = { AE: 'AED', SA: 'SAR', KW: 'KWD' };
 const SCRIPT_POLL_MS = 200;
 const SCRIPT_MAX_WAIT_MS = 5000;
 
-const TabbyPromoWithButton = ({ price, publicKey, merchantCode, source = 'product' }) => {
-  const [lang, region] = (merchantCode || '').split('-');
-  const currency = CURRENCY_MAP[region] || 'AED';
-  const formattedPrice = region === 'KW'
-    ? parseFloat(price).toFixed(3)
-    : parseFloat(price).toFixed(2);
+// `locale` is the storefront locale ("ar-SA"); the Tabby public key and merchant
+// code for that country come from constants/tabby.
+const TabbyPromoWithButton = ({ price, locale, source = 'product' }) => {
+  const { publicKey, merchantCode, currency, lang, formatPrice } = getTabbyConfig(locale);
+  const formattedPrice = formatPrice(price);
   // The product modal mounts a second ProductDetail on top of a page that may
   // already render one, so a shared `#TabbyPromo` id would resolve to the
   // widget behind the drawer and leave the one inside it empty.
@@ -38,11 +37,11 @@ const TabbyPromoWithButton = ({ price, publicKey, merchantCode, source = 'produc
         selector: `#${containerId}`,
         currency,
         price: formattedPrice,
-        lang: lang || 'en',
+        lang,
         source,
         shouldInheritBg: false,
         publicKey,
-        merchantCode: region,
+        merchantCode,
       });
     };
 
@@ -52,7 +51,7 @@ const TabbyPromoWithButton = ({ price, publicKey, merchantCode, source = 'produc
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [price, publicKey, merchantCode, source, containerId]);
+  }, [formattedPrice, currency, lang, publicKey, merchantCode, source, containerId]);
 
   return (
     // Inside a vaul drawer (the product modal), DrawerContent's onPointerDown

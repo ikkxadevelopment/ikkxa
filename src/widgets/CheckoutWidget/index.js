@@ -10,7 +10,7 @@ import Image from "@/components/Image/image";
 import AppBack from "@/components/AppBack";
 import { useRecoilState } from "recoil";
 import { checkoutDataState } from "@/recoil/atoms";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import useCheckout from "@/components/OrderSummary/useCheckout";
 import { SelectAddressModal } from "@/components/SelectAddressModal";
 import { fetcherWithToken } from "@/utils/fetcher";
@@ -36,7 +36,7 @@ import TabbyCardSnippet from "@/components/TabbyCardSnippet/TabbyCardSnippet";
 import InitiateCheckoutTracker from "@/components/pixel/InitiateCheckoutTracker";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "next/navigation";
-import { buildTabbyMerchantUrls } from "./tabbyMessages";
+import { tabbyRejectionKey } from "@/constants/tabby";
 import { Banner } from "@/components/ui/banner";
 
 const TABBY_STATUS_PALETTE = {
@@ -82,36 +82,30 @@ const CheckoutWidget = () => {
   const [locale, country] = lang.split('-');
   const baseUrl = getBaseUrl(country);
   const defaultAddress = checkoutData?.shipping_address;
-  const tabbyUrl = checkoutData?.tabby?.payment_url;
+  // Background pre-scoring: the backend opens a Tabby session when the order is
+  // confirmed; payment_url === false means Tabby rejected this customer/cart.
+  const tabbyRejected = checkoutData?.tabby?.payment_url === false;
+  const [tabbyLoading, setTabbyLoading] = useState(false);
+  const [tabbyError, setTabbyError] = useState(null);
+  const tabbyMessageText = tabbyRejected
+    ? t(tabbyRejectionKey(checkoutData?.tabby?.rejection_reason))
+    : tabbyError;
   const searchParams = useSearchParams();
   const tabbyStatus = searchParams.get("tabby_status");
-  const tabbyMessage = searchParams.get("message");
+  // Translate from the status rather than echoing the ?message= text, so the
+  // banner follows the current language even if the customer switches it.
+  const tabbyMessage =
+    tabbyStatus === "cancel"
+      ? t("RejectTabbyCancel")
+      : tabbyStatus === "failure"
+        ? t("RejectTabbyGeneral")
+        : null;
 
   useEffect(() => {
     setAddress(defaultAddress);
   }, [defaultAddress]);
 
   const order_id = checkoutData?.id;
-
-  const tabbyStatusReportedRef = useRef(false);
-  useEffect(() => {
-    if (tabbyStatusReportedRef.current) return;
-    if (tabbyStatus !== "cancel" && tabbyStatus !== "failure") return;
-    if (!order_id) return;
-    tabbyStatusReportedRef.current = true;
-    (async () => {
-      try {
-        const session = await getSession();
-        const token = session?.accessToken;
-        await axios.get(
-          `${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
-          token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
-        );
-      } catch (err) {
-        console.error("Tabby status report failed:", err);
-      }
-    })();
-  }, [tabbyStatus, order_id, baseUrl, locale]);
 
   const [sameDay, setSameDay] = useState(false);
   const [sameDayPending, setSameDayPending] = useState(false);
@@ -134,122 +128,6 @@ const CheckoutWidget = () => {
       });
     }
   };
-
-  const getCheckoutPayload = () => {
-    const defaultQuantity = checkoutData?.items?.map(item => ({
-      id: item.id,
-      quantity: item.quantity,
-      title: item.title,
-      unit_price: item.price,
-      reference_id: item.id
-    }))
-    if (country === "SA") {
-      return {
-        payment_type: 0,
-        sub_total: checkoutData?.sub_total,
-        discount_offer: checkoutData?.discount,
-        shipping_tax: checkoutData?.shipping_cost,
-        tax: checkoutData?.total_tax,
-        coupon_discount: checkoutData?.coupon_discount,
-        total: checkoutData?.total_payable,
-        trx_id: checkoutData?.trx_id,
-        quantity: defaultQuantity.map(item => ({ id: item.id, quantity: item.quantity })),
-        coupon_code: "",
-        coupon: [],
-        checkout_method: 2,
-        shipping_address: address,
-        billing_address: address,
-        buy_now: 0
-      };
-    } else if (country === "AE") {
-      const checkoutPayload = {
-        payment: {
-          amount: checkoutData?.total_payable,        // Required
-          currency: "AED",                            // Required
-          description: "Order Payment",
-          buyer: {
-            name: address?.name || "Customer",
-            email: address?.email,
-            phone: address?.phone_no?.replace("+971", "0") // Tabby requires numeric format
-          },
-
-          //Added required fields
-          shipping_address: {
-            city: address?.city || "Dubai",
-            address: address?.address || "Dubai",
-            zip: address?.zip || "00000"
-          },
-
-          order: {
-            reference_id: checkoutData?.trx_id,
-            updated_at: new Date().toISOString(),      //Required
-            items:
-              checkoutData?.items?.map((item) => ({
-                title: item.title,
-                quantity: item.quantity,
-                unit_price: item.price,
-                reference_id: item.id,
-                category: item.category || "General"    //Required by Tabby
-              })) || [
-                {
-                  title: "Product Title",
-                  quantity: 1,
-                  unit_price: checkoutData?.sub_total,
-                  reference_id: 3167,
-                  category: "General"
-                }
-              ]
-          },
-
-          //Required minimal buyer history
-          buyer_history: {
-            registered_since: new Date().toISOString(),
-            loyalty_level: 0
-          },
-
-          //Required minimal order history
-          order_history: [
-            {
-              purchased_at: new Date().toISOString(),
-              amount: checkoutData?.total_payable,
-              status: "new",
-              payment_method: "card",
-              buyer: {
-                name: address?.name || "Customer",
-                email: address?.email,
-                phone: address?.phone_no?.replace("+971", "0")
-              },
-              shipping_address: {
-                city: address?.city || "Dubai",
-                address: address?.address || "Dubai",
-                zip: address?.zip || "00000"
-              },
-              items:
-                checkoutData?.items?.map((item) => ({
-                  title: item.title,
-                  quantity: item.quantity,
-                  unit_price: item.price,
-                  reference_id: item.id,
-                  category: item.category || "General"
-                }))
-            }
-          ],
-
-          merchant_urls: buildTabbyMerchantUrls(window.location.origin, lang, {
-            cancelMessage: t("RejectTabbyCancel"),
-            failureMessage: t("RejectTabbyGeneral"),
-          })
-        },
-
-        //These must be outside "payment"
-        lang: locale === "ar" ? "ar" : "en",
-        merchant_code: "IGTARE"
-      };
-    } else {
-      throw new Error("Unsupported region");
-    }
-  }
-
 
   const handleTamaraCheckout = async () => {
     const checkoutPayload = {
@@ -295,183 +173,30 @@ const CheckoutWidget = () => {
     }
   };
 
+  // Tabby sessions are single-use: once cancelled, rejected or expired they cannot
+  // be reopened. So never reuse the URL created at order confirmation — ask the
+  // backend for a brand-new session every time the customer pays with Tabby.
   const handleTabbyCheckout = async () => {
-
-    const payload = getCheckoutPayload()
+    if (!order_id || tabbyLoading) return;
+    setTabbyLoading(true);
+    setTabbyError(null);
     try {
       const session = await getSession();
       const token = session?.accessToken;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
-          "Content-Type": "application/json", // Set content type
-        },
-      };
-
-      // const checkoutPayload = {
-      //   payment: {
-      //     amount: checkoutData?.total_payable,  // Required
-      //     currency: "AED",                      // REQUIRED for UAE
-      //     description: "Order Payment",
-      //     buyer: {
-      //       name: address?.name || "Customer",
-      //       email: address?.email,
-      //       phone: address?.phone_no
-      //     },
-      //     order: {
-      //       reference_id: checkoutData?.trx_id,  // Your order ID
-      //       items: checkoutData?.items?.map((item) => ({
-      //         title: item.title,
-      //         quantity: item.quantity,
-      //         unit_price: item.price,
-      //         reference_id: item.id
-      //       })) || [
-      //         {
-      //           title: "Product Title",
-      //           quantity: 1,
-      //           unit_price: checkoutData?.sub_total,
-      //           reference_id: 3167
-      //         }
-      //       ]
-      //     },
-      //     merchant_urls: {
-      //       success: `${window.location.origin}/cart`,
-      //       cancel: `${window.location.origin}/cart`,
-      //       failure: `${window.location.origin}/cart`
-      //     }
-      //   }
-      // };
-
-      const checkoutPayload = {
-        payment: {
-          amount: checkoutData?.total_payable,        // Required
-          currency: "AED",                            // Required
-          description: "Order Payment",
-          buyer: {
-            name: address?.name || "Customer",
-            email: address?.email,
-            phone: address?.phone_no?.replace("+971", "0") // Tabby requires numeric format
-          },
-
-          shipping_address: {
-            city: address?.city || "Dubai",
-            address: address?.address || "Dubai",
-            zip: address?.zip || "00000"
-          },
-
-          order: {
-            reference_id: checkoutData?.trx_id,
-            updated_at: new Date().toISOString(),
-            items:
-              checkoutData?.items?.map((item) => ({
-                title: item.title,
-                quantity: item.quantity,
-                unit_price: item.price,
-                reference_id: item.id,
-                category: item.category || "General"
-              })) || [
-                {
-                  title: "Product Title",
-                  quantity: 1,
-                  unit_price: checkoutData?.sub_total,
-                  reference_id: 3167,
-                  category: "General"
-                }
-              ]
-          },
-
-          buyer_history: {
-            registered_since: new Date().toISOString(),
-            loyalty_level: 0
-          },
-
-          order_history: [
-            {
-              purchased_at: new Date().toISOString(),
-              amount: checkoutData?.total_payable,
-              status: "new",
-              payment_method: "card",
-              buyer: {
-                name: address?.name || "Customer",
-                email: address?.email,
-                phone: address?.phone_no?.replace("+971", "0")
-              },
-              shipping_address: {
-                city: address?.city || "Dubai",
-                address: address?.address || "Dubai",
-                zip: address?.zip || "00000"
-              },
-              items:
-                checkoutData?.items?.map((item) => ({
-                  title: item.title,
-                  quantity: item.quantity,
-                  unit_price: item.price,
-                  reference_id: item.id,
-                  category: item.category || "General"
-                }))
-            }
-          ],
-
-          merchant_urls: buildTabbyMerchantUrls(window.location.origin, lang, {
-            cancelMessage: t("RejectTabbyCancel"),
-            failureMessage: t("RejectTabbyGeneral"),
-          })
-        },
-
-        lang: locale === "ar" ? "ar" : "en",
-        merchant_code: "IGTARE"
-      };
-
-
-      if (country === "AE") {
-        const response = await fetch("/api/tabby-checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(checkoutPayload)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-          console.error(result.error?.message);
-          // alert(result.error?.message || "Tabby failed");
-          return;
-        }
-
-        const tabbyData = result.data;
-        //  Check Tabby status
-        if (tabbyData.status !== "created") {
-          // alert("Tabby checkout not created");
-          return;
-        }
-
-        const installment = tabbyData.configuration?.available_products?.installments?.[0];
-
-        if (!installment?.web_url) {
-          alert("Tabby installments not available");
-          return;
-        }
-
-        //  Redirect
-        window.location.href = installment.web_url;
-        // window.open(installment.web_url, "_blank");
-      } else {
-        const response = await axios.post(`${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}`,
-          data,
-          config
-        );
-        if (response?.data?.success) {
-          router.push(response?.data?.message);
-        }
+      const response = await axios.get(
+        `${baseUrl}${TABBY_CHECKOUT}/${order_id}?lang=${locale}&country=${country}`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      );
+      if (response?.data?.success && response?.data?.message) {
+        window.location.href = response.data.message;
+        return;
       }
+      setTabbyError(t(tabbyRejectionKey(response?.data?.data?.rejection_reason)));
     } catch (error) {
-      // setError(error);
-      console.error("Checkout error:", error);
-    } finally {
-      // setLoading(false);
+      console.error("Tabby checkout error:", error);
+      setTabbyError(t(tabbyRejectionKey(error?.response?.data?.data?.rejection_reason)));
     }
-    // await mutate(wishlistKey);
-    // return data;
+    setTabbyLoading(false);
   };
 
   const handleNgeniusCheckout = async () => {
@@ -749,13 +474,12 @@ const CheckoutWidget = () => {
                   </div>
                 </Label>
               }
-              {country === "SA" &&
                 <Label
                   htmlFor="tabby"
                   className="flex flex-col w-full p-3 lg:p-6 mb-0 rounded border border-gray-200 bg-white"
                 >
                   <div className="flex items-center space-x-3 w-full">
-                    <RadioGroupItem value="tabby" id="tabby" />
+                    <RadioGroupItem value="tabby" id="tabby" disabled={tabbyRejected} />
                     <div className="flex items-center w-full justify-between">
                       <div>
                         <h5 className="text-black text-sm lg:text-base font-semibold mb-1">
@@ -764,7 +488,7 @@ const CheckoutWidget = () => {
                         <p className="text-[#9e9e9e] text-xs">
                           {t('SplitYourPayment')}
                         </p>
-                        {tabbyUrl === false ? <p className="text-[#b02828] text-xs">{checkoutData?.tabby?.message}</p> : null}
+                        {tabbyMessageText ? <p role="alert" className="text-[#b02828] text-xs">{tabbyMessageText}</p> : null}
                       </div>
                       <div className="aspect-[46/17] w-12 relative">
                         <Image
@@ -776,15 +500,13 @@ const CheckoutWidget = () => {
                       </div>
                     </div>
                   </div>
-                  {paymentMethod === 'tabby' && (
+                  {paymentMethod === 'tabby' && !tabbyRejected && (
                     <TabbyCardSnippet
                       price={checkoutData?.total_payable}
-                      publicKey={process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY || 'pk_xyz'}
-                      merchantCode={lang}
+                      locale={lang}
                     />
                   )}
                 </Label>
-}
                 <Label
                   htmlFor="tamara"
                   className="flex items-center space-x-3 w-full p-3 lg:p-6  rounded border border-gray-200 bg-white"
@@ -881,61 +603,23 @@ const CheckoutWidget = () => {
                 />
               </div>
               <div className="fixed lg:static bottom-0 left-0 w-full z-10 bg-white py-3 lg:py-0 px-4 lg:px-0 lg:shadow-none shadow-sm">
-                {paymentMethod === "tabby" && (
-                  <>
-                    {country === "AE" ?
-                      <>
-                        {tabbyUrl &&
-                          <a
-                            href={`${tabbyUrl}`}
-                            className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
-                          >
-                            {t('PlaceOrderWith')}{" "}
-                            <div className="aspect-[46/17] w-12 relative ms-2">
-                              <Image
-                                src={"/images/tabby_logo.png"}
-                                fill
-                                className="object-contain"
-                                alt="tabby logo"
-                              />
-                            </div>
-                          </a>}</> :
-<>
-<a
-                            target="_blank"
-                            href={`${tabbyUrl}`}
-                            className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
-                          >
-                            {t('PlaceOrderWith')}{" "}
-                            <div className="aspect-[46/17] w-12 relative ms-2">
-                              <Image
-                                src={"/images/tabby_logo.png"}
-                                fill
-                                className="object-contain"
-                                alt="tabby logo"
-                              />
-                            </div>
-                          </a>
-{/* <button
-                        href={`${checkoutData?.tabby_checkout_url}`}
-                        onClick={() => handleTabbyCheckout()}
-                        className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
-                      >
-                        {t('PlaceOrderWith')}{" "}
-                        <div className="aspect-[46/17] w-12 relative ms-2">
-                          <Image
-                            src={"/images/tabby_logo.png"}
-                            fill
-                            className="object-contain"
-                            alt="tabby logo"
-                          />
-                        </div>
-                      </button> */}
-</>
-                     }
-
-                  </>
-
+                {paymentMethod === "tabby" && !tabbyRejected && (
+                  <button
+                    type="button"
+                    onClick={handleTabbyCheckout}
+                    disabled={tabbyLoading}
+                    className="flex justify-center w-full btn btn-grad btn-lg lg:mb-3 "
+                  >
+                    {t('PlaceOrderWith')}{" "}
+                    <div className="aspect-[46/17] w-12 relative ms-2">
+                      <Image
+                        src={"/images/tabby_logo.png"}
+                        fill
+                        className="object-contain"
+                        alt="tabby logo"
+                      />
+                    </div>
+                  </button>
                 )}
                 {paymentMethod === "tamara" && (
                   <button

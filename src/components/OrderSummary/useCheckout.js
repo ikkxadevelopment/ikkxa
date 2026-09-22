@@ -36,6 +36,10 @@ const useCheckout = (data) => {
     const checkoutPayload = new FormData();
     checkoutPayload.append("address_id", id);
     checkoutPayload.append("coupon_code", `${coupon}`);
+    // The backend opens the Tabby session with this language, and Tabby's
+    // cancel/failure redirects bring the customer back in it.
+    checkoutPayload.append("lang", lang.split("-")[0]);
+    checkoutPayload.append("country", lang.split("-")[1]);
 
     setLoading(true);
     setError(null);

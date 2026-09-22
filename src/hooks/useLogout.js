@@ -7,6 +7,11 @@ export function useLogout() {
   const handleLogOut = async () => {
     try {
       cache.clear(); // Clear the SWR cache
+      // The confirmed order (and its Tabby pre-score) belongs to this account and
+      // country's backend; don't carry it into the next session.
+      try {
+        localStorage.removeItem('checkoutDataState');
+      } catch (e) {}
       await signOut(); // Perform the sign-out using NextAuth
       mutate(() => true, undefined, { revalidate: false }); // Disable revalidation
       window.location.href = '/'; // Redirect to the home page

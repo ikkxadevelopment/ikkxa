@@ -1,0 +1,19 @@
+# Pages-mode config for the ikkxa-dev Cloudflare Pages project (dev.ikkxa.com).
+#
+# wrangler.toml at the repo root is the Workers-mode config for production
+# (ikkxa-production). Pages skips a wrangler.toml without
+# `pages_build_output_dir`, and the Pages Functions bundling step then fails
+# to resolve Node built-ins ("Could not resolve \"fs\"" etc.). The ikkxa-dev
+# build command therefore starts with `cp wrangler.pages.toml wrangler.toml`
+# so both branches can share the same files.
+name = "ikkxa"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".open-next"
+
+# Runtime variables available to the Cloudflare Worker (next-auth server side).
+# NEXTAUTH_SECRET and GOOGLE_CLIENT_SECRET are set as encrypted Secrets
+# in the Cloudflare Pages dashboard (Settings → Variables and Secrets).
+[vars]
+NEXTAUTH_URL = "https://dev.ikkxa.com"
+GOOGLE_CLIENT_ID = "810683566241-p5k1l4j4p4lvhpt7l591u2blg8umhelh.apps.googleusercontent.com"

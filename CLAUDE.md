@@ -49,12 +49,18 @@ Workers mode (prod) needs none of this — the `[assets]` binding handles it. Th
 
 ### ikkxa-dev Pages build command (dashboard → Settings → Build)
 ```
-npx @opennextjs/cloudflare@1.3.0 build \
+cp wrangler.pages.toml wrangler.toml \
+  && npx @opennextjs/cloudflare@1.3.0 build \
   && cp -r .open-next/assets/. .open-next/ \
   && npm run cf:patch-worker \
   && mv .open-next/worker.js .open-next/_worker.js
 ```
 Build output dir: `.open-next`. Compat date `2025-04-01`, flag `nodejs_compat`.
+The root `wrangler.toml` is the **Workers-mode** prod config. Pages skips it (no
+`pages_build_output_dir`) and the Functions bundling step then fails with `Could not resolve "fs"`
+etc. — dev silently kept serving a July build for two months because of this. The leading
+`cp wrangler.pages.toml wrangler.toml` swaps in the Pages-mode config (with
+`NEXTAUTH_URL=https://dev.ikkxa.com`) for the dev build only.
 
 ## Constraints & common failure modes
 

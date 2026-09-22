@@ -158,7 +158,16 @@ const providers = [
           body: JSON.stringify(payload),
         });
 
-        if (!res.ok) throw new Error("Invalid OTP");
+        if (!res.ok) {
+          // Log the backend's real answer — a 429/403 from the host's
+          // firewall looks identical to a wrong OTP otherwise.
+          const body = await res.text().catch(() => "");
+          console.error(
+            `OTP verify failed: ${res.status} ${baseUrl}${OTP_VERIFY}`,
+            body.slice(0, 500)
+          );
+          throw new Error("Invalid OTP");
+        }
 
         const data = await res.json();
         const { token, first_name, last_name, image, phone, email } =

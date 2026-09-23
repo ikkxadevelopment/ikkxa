@@ -137,18 +137,17 @@ export const useLoginWidget = ({ }) => {
                 setInvalid(true);
                 setSubmitting(false)
             } else {
-                console.log('successs during sign-in:', result);
                 if(isQuestToken){
                     localStorage.removeItem("guestToken");
                 }
-                // window.location.href = '/chat'
-                // router.push('/');
-                console.log(pathname, pathname.includes("cart"),"in cart page");
-                if(pathname.includes("cart")){
-                    console.log("in cart page");
-                } else {
-                    // router.push('/');
-                }
+                // Close the modal and reset it, otherwise the OTP form stays on
+                // screen after a successful login and looks like a failure.
+                setIsOpen(false);
+                setIsOtpSent(false);
+                setInvalid(false);
+                // Pick up the new session: the cart merges the guest cart, every
+                // other page just re-renders as the signed-in user.
+                router.refresh();
             }
             setSubmitting(false)
         } catch (error) {

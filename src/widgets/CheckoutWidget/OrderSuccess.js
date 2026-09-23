@@ -32,6 +32,14 @@ const OrderSuccess = ({ }) => {
   //   APPROVED
   const address = orderDetails?.shipping_address;
 
+  // Cash on delivery is legitimately unpaid until the courier collects. Every
+  // other method (tabby, tamara, moyasar, …) must be `paid` before this counts
+  // as a completed order — a customer who abandons the payment page can land
+  // here, and the webhook may also lag behind Tabby's redirect.
+  const isCod = orderDetails?.payment_type === "pay_later";
+  const paymentPending =
+    !!orderDetails && !isCod && orderDetails?.payment_status !== "paid";
+
   const handleComplete = async () => {
     const formData = new FormData();
     formData.append("status", status);
@@ -127,9 +135,12 @@ const OrderSuccess = ({ }) => {
   return (
     <>
 
-      <Suspense fallback={null}>
-        <PurchaseTracker order={orderDetails} />
-      </Suspense>
+      {/* Never report a purchase to the pixels for an order that was not paid. */}
+      {!paymentPending && (
+        <Suspense fallback={null}>
+          <PurchaseTracker order={orderDetails} />
+        </Suspense>
+      )}
       <section className="min-h-screen lg:min-h-[500px] py-12 flex items-center">
         <div className="container">
           <div className="aspect-[200/157] relative max-w-56 lg:max-w-64 mx-auto mb-6">
@@ -143,17 +154,19 @@ const OrderSuccess = ({ }) => {
           </div>
           <div>
             <h3 className="text-center text-black text-xl lg:text-3xl font-semibold mb-3">
-              {t('OrderPlaced')}
+              {paymentPending ? t('PaymentNotCompleted') : t('OrderPlaced')}
             </h3>
             <p className="text-center text-zinc-500 text-sm lg:text-lg leading-tight mb-7">
-              {t("EmailConfirm")} {address?.email}
+              {paymentPending
+                ? t("PaymentNotCompletedDesc")
+                : `${t("EmailConfirm")} ${address?.email ?? ""}`}
             </p>
             <p className="text-center mb-7">
               <Link
-                href="/"
+                href={paymentPending ? "/checkout" : "/"}
                 className="text-stone-900 text-sm underline leading-tight"
               >
-                {t('BackToHome')}
+                {paymentPending ? t('CompletePayment') : t('BackToHome')}
               </Link>
             </p>
             <div className="grid gap-10 md:grid-cols-2 p-4 md:p-6 rounded border border-gray-200 bg-white   mt-4 mx-auto max-w-[800px]">

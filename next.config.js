@@ -12,11 +12,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
     openAnalyzer: false,
 });
-// Backend hosts. Cloudflare sets CF_PAGES=1 only in Pages builds — that is the
-// ikkxa-dev project (dev.ikkxa.com, `development` branch), which must talk to
-// the test backend. The production Workers build (ikkxa-production, `main`)
-// does not set it and uses the live per-country hosts.
-const isDevPages = process.env.CF_PAGES === '1';
+// Backend hosts. The dev build (ikkxa-dev Worker, dev.ikkxa.com, `development`
+// branch) must talk to the test backend; production (ikkxa-production, `main`)
+// uses the live per-country hosts. Cloudflare Workers Builds sets
+// WORKERS_CI_BRANCH; CF_PAGES=1 covers the old Pages-based dev project.
+const isDevPages =
+    process.env.WORKERS_CI_BRANCH === 'development' || process.env.CF_PAGES === '1';
 const TEST_API = 'https://test.ikkxa.com/web-api/';
 /** @type {import('next').NextConfig} */
 const nextConfig = {

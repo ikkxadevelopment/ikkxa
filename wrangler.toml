@@ -8,9 +8,16 @@ compatibility_flags = ["nodejs_compat"]
 # the assets store BEFORE the Worker runs, so the Pages-mode patch-worker
 # hack is NOT needed here.
 #
-# Cloudflare Workers build settings (dashboard → ikkxa-production → Settings → Build):
-#   Build command:  npx opennextjs-cloudflare build
-#   Deploy command: npx wrangler deploy
+# Cloudflare Workers build settings (dashboard → <worker> → Settings → Build).
+# The build command MUST be the OpenNext one — `npm run build` only runs
+# `next build`, leaves no .open-next/ and the deploy fails with
+# "Open Next build not found".
+#   ikkxa-production (main):
+#     Build command:  npx opennextjs-cloudflare build
+#     Deploy command: npx opennextjs-cloudflare deploy
+#   ikkxa-dev (development) — uses [env.dev] below:
+#     Build command:  npx opennextjs-cloudflare build
+#     Deploy command: npx opennextjs-cloudflare deploy -- --env dev
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
@@ -21,3 +28,17 @@ binding = "ASSETS"
 [vars]
 GOOGLE_CLIENT_ID = "810683566241-p5k1l4j4p4lvhpt7l591u2blg8umhelh.apps.googleusercontent.com"
 NEXTAUTH_URL = "https://shop.ikksa.com"
+
+# Dev Worker (dev.ikkxa.com, `development` branch). `vars` are not inherited
+# by environments, so they are repeated here. Secrets (NEXTAUTH_SECRET,
+# GOOGLE_CLIENT_SECRET, ...) are set on the ikkxa-dev Worker in the dashboard.
+[env.dev]
+name = "ikkxa-dev"
+
+[env.dev.assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[env.dev.vars]
+GOOGLE_CLIENT_ID = "810683566241-p5k1l4j4p4lvhpt7l591u2blg8umhelh.apps.googleusercontent.com"
+NEXTAUTH_URL = "https://dev.ikkxa.com"

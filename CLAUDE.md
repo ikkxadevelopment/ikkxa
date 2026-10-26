@@ -11,8 +11,6 @@ the serving path is non-obvious and is the source of most "image 404 / not updat
 - The OpenNext build copies everything in `public/` into `.open-next/assets/` (its root),
   alongside `_next/static/`, `_next/media/`, `BUILD_ID`, etc. That directory is the asset store
   Cloudflare uploads.
-- The `cp -r public .open-next/public` tail in `package.json`'s `build` script is a **leftover
-  no-op** for Cloudflare — OpenNext already places `public/` into `.open-next/assets/`. Don't rely on it.
 
 ### Reference assets by root-relative path
 - Use `/images/foo.png`, **not** `` `${process.env.NEXT_PUBLIC_BASE_URL_IMG}images/foo.png` ``.
@@ -20,47 +18,38 @@ the serving path is non-obvious and is the source of most "image 404 / not updat
 - Images rendered through `next/image` go through the `/_next/image?url=...` optimizer, which the
   worker handles separately from the static-asset path below.
 
-## Two deployment modes (they serve static files differently)
+## Two Cloudflare Workers (dev + prod)
 
-| | dev.ikkxa.com | www.ikkxa.com (prod) |
+| | dev.ikkxa.com | shop.ikksa.com (prod) |
 |---|---|---|
 | Branch | `development` | `main` |
-| CF project | Pages `ikkxa-dev` | Workers `ikkxa-production` |
-| Mode | **Pages Advanced Mode** (`_worker.js`) | **Workers + Static Assets** (`[assets]` binding) |
-| wrangler.toml | `pages_build_output_dir = ".open-next"` | `main = ".open-next/worker.js"` + `[assets]` |
-| Static serving | Worker must proxy to `env.ASSETS` **manually** (see patch-worker) | Cloudflare serves assets natively **before** the worker runs |
+| CF Worker | `ikkxa-dev` | `ikkxa-production` |
+| wrangler.toml | `[env.dev]` section | top-level config |
+| Backend (build time) | `test.ikkxa.com` | live `ksa` / `uae` hosts |
+| `NEXTAUTH_URL` | `https://dev.ikkxa.com` | `https://shop.ikksa.com` |
 
-Both deployments auto-deploy on push to their branch (Cloudflare Git integration — this is
-separate from `.github/workflows/deploy.yml`, which is the unrelated VPS/Docker pipeline).
+Both use **Workers + Static Assets** (`[assets]` binding): Cloudflare serves `public/` and
+`_next/static` natively before the worker runs. Both auto-deploy on push via Cloudflare Workers
+Builds (separate from `.github/workflows/deploy.yml`, the unrelated VPS/Docker pipeline).
 
-### Pages mode (dev) requires `scripts/patch-worker.cjs`
-In Pages Advanced Mode **every** request hits `_worker.js` — Cloudflare does *not* auto-serve
-static files. `patch-worker.cjs` injects a check into the built worker that proxies static paths
-to `env.ASSETS` before falling through to the Next.js SSR handler. It serves:
-`/_next/static/`, `/_next/media/`, `/images/`, `/fonts/`, and any root-level path with a file
-extension (favicon.ico, *.svg, etc.). Anything it does **not** match falls through to SSR and 404s.
+### Dashboard build settings (each Worker → Settings → Build)
+| Worker | Branch | Build command | Deploy command |
+|---|---|---|---|
+| `ikkxa-production` | `main` | `npx opennextjs-cloudflare build` | `npx opennextjs-cloudflare deploy` |
+| `ikkxa-dev` | `development` | `npx opennextjs-cloudflare build` | `npx opennextjs-cloudflare deploy -- --env dev` |
 
-> **Gotcha that caused real 404s:** the patch originally only proxied `/_next/static/` and
-> `/_next/media/`, so the entire `public/` folder (`/images/*`, `/fonts/*`, root `.svg`) 404'd on
-> dev. If you add a new **top-level public prefix** (e.g. `public/videos/`), either it must be
-> covered by the extension catch or you must add the prefix to `patch-worker.cjs`.
+- The build command **must** be the OpenNext one. `npm run build` only runs `next build`, so
+  `.open-next/` never exists and deploy fails with `Open Next build not found`.
+- Keep `package.json`'s `build` script as plain `next build`: OpenNext calls `npm run build`
+  internally, and Vercel/Docker use it too.
+- The `ikkxa-dev` Worker's name must match `[env.dev] name` in `wrangler.toml`.
+- `vars` are not inherited by wrangler environments, so `[env.dev.vars]` repeats them.
+  Secrets are set per Worker in the dashboard.
 
-Workers mode (prod) needs none of this — the `[assets]` binding handles it. The patch is a no-op there.
-
-### ikkxa-dev Pages build command (dashboard → Settings → Build)
-```
-cp wrangler.pages.toml wrangler.toml \
-  && npx @opennextjs/cloudflare@1.3.0 build \
-  && cp -r .open-next/assets/. .open-next/ \
-  && npm run cf:patch-worker \
-  && mv .open-next/worker.js .open-next/_worker.js
-```
-Build output dir: `.open-next`. Compat date `2025-04-01`, flag `nodejs_compat`.
-The root `wrangler.toml` is the **Workers-mode** prod config. Pages skips it (no
-`pages_build_output_dir`) and the Functions bundling step then fails with `Could not resolve "fs"`
-etc. — dev silently kept serving a July build for two months because of this. The leading
-`cp wrangler.pages.toml wrangler.toml` swaps in the Pages-mode config (with
-`NEXTAUTH_URL=https://dev.ikkxa.com`) for the dev build only.
+### Legacy: Pages mode
+dev used to be a Pages project (`ikkxa-dev`, Advanced Mode `_worker.js`). `wrangler.pages.toml`
+and `scripts/patch-worker.cjs` (which proxied static paths to `env.ASSETS`) only exist for that
+setup and are not used by the Workers deployments.
 
 ## Constraints & common failure modes
 
@@ -75,18 +64,18 @@ etc. — dev silently kept serving a July build for two months because of this. 
 
 ## Build / verify locally
 ```
-npx opennextjs-cloudflare build   # produces .open-next/
-npm run cf:patch-worker           # applies the Pages static-asset patch to worker.js
-# Serve Pages-mode build exactly like the dashboard command:
-cp -r .open-next/assets/. .open-next/ && cp .open-next/worker.js .open-next/_worker.js
-npx wrangler pages dev .open-next --compatibility-date=2025-04-01 --compatibility-flags nodejs_compat
+WORKERS_CI_BRANCH=development npx opennextjs-cloudflare build   # dev build (test backend)
+npx wrangler deploy --dry-run --env dev                         # check dev bindings
+npx opennextjs-cloudflare build && npx wrangler deploy --dry-run   # prod
+npx opennextjs-cloudflare preview                               # run the worker locally
 ```
 `.open-next/` and `.wrangler/` are build artifacts — gitignored, never commit them.
 
 ## Env vars
 - `NEXT_PUBLIC_*` are inlined at **build time** by webpack, so they live in `next.config.js`'s `env`
   block (Cloudflare `[vars]` are runtime-only and not available to `next build`).
-- Backend hosts: `next.config.js` picks `test.ikkxa.com` when `CF_PAGES=1` (set by Cloudflare only in
-  Pages builds → ikkxa-dev / dev.ikkxa.com) and the live `uae`/`ksa`/`www` hosts otherwise (prod Workers build).
+- Backend hosts: `next.config.js` picks `test.ikkxa.com` when `WORKERS_CI_BRANCH=development` (set by
+  Workers Builds on the dev Worker; `CF_PAGES=1` kept for the legacy Pages project) and the live
+  `uae`/`ksa`/`www` hosts otherwise.
 - Server-side secrets (`NEXTAUTH_SECRET`, `GOOGLE_CLIENT_SECRET`, Moyasar keys, `NEXT_PUBLIC_API_KEY`)
   are stored as encrypted values in each Cloudflare project's dashboard, not in the repo.

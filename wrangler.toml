@@ -21,7 +21,7 @@ binding = "ASSETS"
 # in the dashboard (Settings → Variables and Secrets).
 [vars]
 GOOGLE_CLIENT_ID = "810683566241-p5k1l4j4p4lvhpt7l591u2blg8umhelh.apps.googleusercontent.com"
-NEXTAUTH_URL = "https://shop.ikksa.com"
+NEXTAUTH_URL = "https://shop.ikkxa.com"
 
 # Dev Worker (dev.ikkxa.com, `development` branch). `vars` are not inherited
 # by environments, so they are repeated here. Secrets (NEXTAUTH_SECRET,

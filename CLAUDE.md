@@ -20,13 +20,13 @@ the serving path is non-obvious and is the source of most "image 404 / not updat
 
 ## Two Cloudflare Workers (dev + prod)
 
-| | dev.ikkxa.com | shop.ikksa.com (prod) |
+| | dev.ikkxa.com | shop.ikkxa.com (prod) |
 |---|---|---|
 | Branch | `development` | `main` |
 | CF Worker | `ikkxa-dev` | `ikkxa-production` |
 | wrangler.toml | `[env.dev]` section | top-level config |
 | Backend (build time) | `test.ikkxa.com` | live `ksa` / `uae` hosts |
-| `NEXTAUTH_URL` | `https://dev.ikkxa.com` | `https://shop.ikksa.com` |
+| `NEXTAUTH_URL` | `https://dev.ikkxa.com` | `https://shop.ikkxa.com` |
 
 Both use **Workers + Static Assets** (`[assets]` binding): Cloudflare serves `public/` and
 `_next/static` natively before the worker runs. Both auto-deploy on push via Cloudflare Workers
@@ -43,6 +43,9 @@ Both Workers use the **default** commands: build `npm run build`, deploy `npx wr
 - `vars` are not inherited by wrangler environments, so `[env.dev.vars]` repeats them.
   Secrets are set per Worker in the dashboard.
 - Failure signature of a plain `next build`: `Open Next build not found` at deploy.
+- **ikkxa-production must not build non-production branches** (Settings → Build → Branch control).
+  A `development` push builds a version there with the *test* backend, and any later dashboard
+  change (e.g. editing a variable) deploys that latest version to prod.
 
 ### Legacy: Pages mode
 dev used to be a Pages project (`ikkxa-dev`, Advanced Mode `_worker.js`). `wrangler.pages.toml`

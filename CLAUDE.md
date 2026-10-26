@@ -33,18 +33,16 @@ Both use **Workers + Static Assets** (`[assets]` binding): Cloudflare serves `pu
 Builds (separate from `.github/workflows/deploy.yml`, the unrelated VPS/Docker pipeline).
 
 ### Dashboard build settings (each Worker → Settings → Build)
-| Worker | Branch | Build command | Deploy command |
-|---|---|---|---|
-| `ikkxa-production` | `main` | `npx opennextjs-cloudflare build` | `npx opennextjs-cloudflare deploy` |
-| `ikkxa-dev` | `development` | `npx opennextjs-cloudflare build` | `npx opennextjs-cloudflare deploy -- --env dev` |
-
-- The build command **must** be the OpenNext one. `npm run build` only runs `next build`, so
-  `.open-next/` never exists and deploy fails with `Open Next build not found`.
-- Keep `package.json`'s `build` script as plain `next build`: OpenNext calls `npm run build`
-  internally, and Vercel/Docker use it too.
+Both Workers use the **default** commands: build `npm run build`, deploy `npx wrangler deploy`.
+- `npm run build` is `scripts/build.cjs`: inside Workers Builds (`WORKERS_CI` set) it runs
+  `opennextjs-cloudflare build`; elsewhere (Vercel, Docker, local) plain `next build`.
+  `open-next.config.ts` sets `buildCommand: 'npx next build'` so OpenNext doesn't recurse into it.
+- **ikkxa-dev** additionally needs the build variable `CLOUDFLARE_ENV=dev` (Settings → Build →
+  Variables) so `wrangler deploy` targets `[env.dev]`. Without it, it deploys the top-level (prod) config.
 - The `ikkxa-dev` Worker's name must match `[env.dev] name` in `wrangler.toml`.
 - `vars` are not inherited by wrangler environments, so `[env.dev.vars]` repeats them.
   Secrets are set per Worker in the dashboard.
+- Failure signature of a plain `next build`: `Open Next build not found` at deploy.
 
 ### Legacy: Pages mode
 dev used to be a Pages project (`ikkxa-dev`, Advanced Mode `_worker.js`). `wrangler.pages.toml`

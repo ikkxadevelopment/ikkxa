@@ -8,16 +8,10 @@ compatibility_flags = ["nodejs_compat"]
 # the assets store BEFORE the Worker runs, so the Pages-mode patch-worker
 # hack is NOT needed here.
 #
-# Cloudflare Workers build settings (dashboard → <worker> → Settings → Build).
-# The build command MUST be the OpenNext one — `npm run build` only runs
-# `next build`, leaves no .open-next/ and the deploy fails with
-# "Open Next build not found".
-#   ikkxa-production (main):
-#     Build command:  npx opennextjs-cloudflare build
-#     Deploy command: npx opennextjs-cloudflare deploy
-#   ikkxa-dev (development) — uses [env.dev] below:
-#     Build command:  npx opennextjs-cloudflare build
-#     Deploy command: npx opennextjs-cloudflare deploy -- --env dev
+# Cloudflare Workers build settings (dashboard → <worker> → Settings → Build):
+#   Build command:  npm run build      (scripts/build.cjs runs the OpenNext build in Workers Builds)
+#   Deploy command: npx wrangler deploy
+#   ikkxa-dev only: build variable CLOUDFLARE_ENV=dev  → deploys [env.dev] below
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"

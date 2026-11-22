@@ -1,6 +1,7 @@
 // app/sitemap/[id]/route.js
 import { escape } from "lodash";
-import { TAG_ARCHIVES } from "@/config/tagArchives";
+import { TAG_ARCHIVES, MIN_TAG_PRODUCTS } from "@/config/tagArchives";
+import { getTagProducts } from "@/lib/getHome";
 
 export async function generateSitemaps() {
   return [
@@ -10,6 +11,8 @@ export async function generateSitemaps() {
     { id: 'ar-AE' },
   ];
 }
+
+const NON_INDEXABLE_PATHS = ['store-list'];
 
 function getApiUrl(region) {
   const baseUrls = {
@@ -79,6 +82,11 @@ export default async function sitemap({ id }) {
 
     const entries = data.results.urls
       .filter(page => page && typeof page === 'object') // Filter out null/undefined entries
+      // The homepage is added below; an empty path would list it twice
+      // (/en-SA and /en-SA/).
+      .filter(page => cleanUrlPath(page.loc) !== '')
+      // Data-only CMS pages (JSON for the app) are noindex, so keep them out.
+      .filter(page => !NON_INDEXABLE_PATHS.includes(cleanUrlPath(page.loc)))
       .map((page) => {
         try {
           const cleanPath = cleanUrlPath(page.loc);
@@ -106,7 +114,20 @@ export default async function sitemap({ id }) {
 
     // Curated tag archives (DEV-00). Config-driven so they are discoverable
     // without waiting on the backend site-map feed to include them.
-    Object.keys(TAG_ARCHIVES).forEach((slug) => {
+    // Only list archives that currently render: an empty tag 404s (see
+    // collections/[tag]/page.js), and a 404 in the sitemap wastes crawl budget.
+    const liveSlugs = await Promise.all(
+      Object.keys(TAG_ARCHIVES).map(async (slug) => {
+        try {
+          const data = await getTagProducts({ tag: slug, lang: locale, country, paginate: 1 });
+          const total = data?.results?.products?.total ?? 0;
+          return total >= MIN_TAG_PRODUCTS ? slug : null;
+        } catch {
+          return null;
+        }
+      })
+    );
+    liveSlugs.filter(Boolean).forEach((slug) => {
       entries.push({
         url: `https://www.ikkxa.com/${locale}-${country}/collections/${slug}`,
         lastModified: new Date().toISOString(),

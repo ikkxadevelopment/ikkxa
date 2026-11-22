@@ -32,7 +32,7 @@ export default function BannerSlider({ data }) {
                       src={`${item?.slider_bg_image}`}
                       fill
                       className="object-cover"
-                      alt={`${item?.title}`}
+                      alt={item?.title || ""}
                       sizes="100vw"
                       priority={i === 0}
                     />
@@ -51,7 +51,7 @@ export default function BannerSlider({ data }) {
                       src={`${item?.slider_bg_image}`}
                       fill
                       className="object-cover"
-                      alt={`${item?.title}`}
+                      alt={item?.title || ""}
                       sizes="100vw"
                       priority={i === 0}
                     />

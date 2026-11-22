@@ -2,12 +2,17 @@ import { getGlobal, getStoreDetail } from "@/lib/getHome";
 import ContactAddress from "@/widgets/ContactAddress";
 import ContactBanner from "@/widgets/ContactBanner";
 import ContactForm from "@/widgets/ContactForm";
+import { pageAlternates, SITE_URL } from "@/lib/seo";
 
-export async function generateMetadata() {
+export async function generateMetadata({ params: { lang } }) {
+    const isAr = lang.startsWith("ar");
     return {
-      title: "Contact Us",
-      description:
-        "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
+      title: isAr ? "اتصل بنا | IKKXA" : "Contact Us | IKKXA",
+      description: isAr
+        ? "تواصلي مع فريق IKKXA بخصوص الطلبات والتوصيل والاستبدال، أو زوري أحد متاجرنا."
+        : "Get in touch with the IKKXA team about orders, delivery and exchanges, or visit one of our stores.",
+      metadataBase: new URL(SITE_URL),
+      alternates: pageAlternates(lang, "/contact-us"),
       robots: {
         index: true,
         follow: true,

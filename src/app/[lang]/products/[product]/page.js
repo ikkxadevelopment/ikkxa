@@ -1,8 +1,7 @@
 import { getSingleProduct } from "@/lib/getHome";
 import ProductDetail from "@/widgets/ProductDetail";
-import Head from "next/head";
 import { notFound } from "next/navigation";
-import Script from "next/script";
+import { htmlExcerpt } from "@/lib/seo";
 
 export async function generateMetadata({ params: { product, lang } }) {
   const [locale, country] = lang.split("-");
@@ -44,7 +43,7 @@ export async function generateMetadata({ params: { product, lang } }) {
       // url: header_url,
     },
     twitter: {
-      card: meta_base?.meta_title,
+      card: "summary_large_image",
       title: meta_base?.meta_title,
       description: meta_base?.meta_description,
       images: {
@@ -71,7 +70,12 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
     "@type": "Product",
     name: productData?.language_product?.name,
     image: productData?.gallery?.large,
-    description: productData?.short_description,
+    // short_description is usually empty; fall back so Product has a description.
+    description:
+      htmlExcerpt(productData?.short_description, 500) ||
+      productData?.language_product?.meta_description ||
+      htmlExcerpt(productData?.language_product?.description, 500) ||
+      productData?.language_product?.name,
     sku: productData?.product_stock?.sku,
     brand: {
       "@type": "Brand",
@@ -91,17 +95,13 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
   if (!data) return notFound();
   return (
     <>
-      {/* <Head>
-        <Script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      </Head> */}
       <main className="min-h-screen  pt-[58px] md:pt-20">
-        <Script
+        {/* Plain <script> so the JSON-LD is in the server HTML; next/script
+            injects it only after hydration. */}
+        <script
           id="structuredData"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
         />
         <ProductDetail data={data} isOutOfStock={isOutOfStock} />
       </main>

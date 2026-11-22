@@ -1,31 +1,55 @@
 import WidgetBlocks from "@/components/WidgetBlocks";
 import { getHomeProducts, getMetaData } from "@/lib/getHome";
+import { SITE_URL } from "@/lib/seo";
 
-// export async function generateMetadata() {
-//   return {
-//     title: "Home",
-//     description:
-//       "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
-//     robots: {
-//       index: true,
-//       follow: true,
-//     },
-//   };
-// }
+const HOME_COPY = {
+  SA: {
+    en: {
+      h1: "Abayas, Jalabiyas & Occasion Wear in Saudi Arabia",
+      description:
+        "Shop abayas, jalabiyas, party wear and kids' fashion at IKKXA, with fast delivery across Saudi Arabia, easy exchanges and Tabby instalments.",
+    },
+    ar: {
+      h1: "عبايات وجلابيات وفساتين مناسبات في السعودية",
+      description:
+        "تسوقي العبايات والجلابيات وفساتين السهرة وأزياء الأطفال من IKKXA مع توصيل سريع في جميع أنحاء السعودية واستبدال سهل والتقسيط مع تابي.",
+    },
+  },
+  AE: {
+    en: {
+      h1: "Abayas, Jalabiyas & Occasion Wear in the UAE",
+      description:
+        "Shop abayas, jalabiyas, party wear and kids' fashion at IKKXA, with fast delivery across Dubai, Abu Dhabi and the UAE, easy exchanges and Tabby instalments.",
+    },
+    ar: {
+      h1: "عبايات وجلابيات وفساتين مناسبات في الإمارات",
+      description:
+        "تسوقي العبايات والجلابيات وفساتين السهرة وأزياء الأطفال من IKKXA مع توصيل سريع في دبي وأبوظبي وجميع أنحاء الإمارات واستبدال سهل والتقسيط مع تابي.",
+    },
+  },
+};
+
+const homeCopy = (lang) => {
+  const [locale, country] = lang.split("-");
+  return (HOME_COPY[country] || HOME_COPY.SA)[locale] || HOME_COPY.SA.en;
+};
 
 export async function generateMetadata({ params: { lang } }) {
   const seoData = await getMetaData(lang);
+  const msg = seoData?.message || {};
+  const copy = homeCopy(lang);
+  const title = msg.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA";
+  // The SEO tool's description currently repeats the title; only use it when
+  // it actually says something more.
+  const description = msg.desc && msg.desc.trim() !== title.trim() ? msg.desc : copy.description;
+  const image = msg.image || undefined;
 
   return {
-    title: seoData?.message?.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA",
-    description:
-      seoData?.message?.desc ||
-      "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
-      metadataBase: new URL('https://www.ikkxa.com'),
-
+    title,
+    description,
+    metadataBase: new URL(SITE_URL),
     alternates: {
-      canonical:
-        seoData?.message?.canonical_url || `https://www.ikkxa.com/${lang}`,
+      canonical: msg.canonical_url || `${SITE_URL}/${lang}`,
       languages: {
         "en-SA": `/en-SA`,
         "ar-SA": `/ar-SA`,
@@ -35,20 +59,18 @@ export async function generateMetadata({ params: { lang } }) {
       },
     },
     openGraph: {
-      images: seoData?.message?.image || [],
-      title: seoData?.message?.tittle || "Premium Abayas, Jalabiyas & Partywear Online | Shop Now - IKKXA",
-      description:
-        seoData?.message?.desc ||
-        "Search for Jalabiyas, abayas, lehengas, baby products and more on ikkxa",
+      type: "website",
+      url: `${SITE_URL}/${lang}`,
+      siteName: "IKKXA",
+      images: image ? [image] : [],
+      title,
+      description,
     },
     twitter: {
-      card: seoData?.message?.tittle,
-      title: seoData?.message?.tittle,
-      description: seoData?.message?.desc,
-      images: {
-        url: seoData?.message?.image || "",
-        alt: seoData?.message?.tittle,
-      },
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [{ url: image, alt: title }] : [],
     },
     robots: {
       index: true,
@@ -64,6 +86,8 @@ export default async function Home({ params: { lang } }) {
 
   return (
     <main className="min-h-screen pt-[58px] lg:pt-[70px]">
+      {/* The banner slider is the visual headline; this is its text equivalent. */}
+      <h1 className="sr-only">{homeCopy(lang).h1}</h1>
       {/* <OfferCategoriesSlider/> */}
       {/* <OfferCategoriesSlider/>
       <BannerSlider/>

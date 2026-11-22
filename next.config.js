@@ -21,6 +21,27 @@ const isDevPages =
 const TEST_API = 'https://test.ikkxa.com/web-api/';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Don't advertise the framework in every response (audit: X-Powered-By).
+    poweredByHeader: false,
+    // Baseline browser security headers on every page/route response.
+    // frame-ancestors is the only CSP directive enforced: it blocks
+    // clickjacking without risking the many third-party scripts (GTM, Meta,
+    // TikTok, Tabby, Moyasar) a full script-src policy would have to list.
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+                    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    // geolocation kept for our own origin only, in case an address picker needs it.
+                    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
+                ],
+            },
+        ];
+    },
     // NEXT_PUBLIC_* vars are inlined at build time by webpack.
     // They must be present here (or in a tracked .env file) because
     // Cloudflare Pages wrangler.toml [vars] are runtime-only and are

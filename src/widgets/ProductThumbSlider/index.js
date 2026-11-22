@@ -91,6 +91,8 @@ export default function ProductThumbSlider({ data }) {
                     fill
                     className="object-cover bg-slate-200"
                     alt={`product image ${i}`}
+                    // First slide is the page's LCP image: load it eagerly, high priority.
+                    priority={i === 0}
                   />
                 </div>
               </SwiperSlide>
@@ -112,7 +114,7 @@ export default function ProductThumbSlider({ data }) {
                 <div className="aspect-[490/735] w-full relative border-white/60 border-2">
                   <Image
                     src={item}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 15vw"
+                    sizes="(max-width: 768px) 20vw, (max-width: 1200px) 10vw, 6vw"
                     fill
                     className="object-cover"
                     alt={`product image ${i}`}

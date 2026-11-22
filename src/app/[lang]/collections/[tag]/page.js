@@ -1,7 +1,6 @@
 import { getTagProducts } from "@/lib/getHome";
 import { getTagArchive, MIN_TAG_PRODUCTS } from "@/config/tagArchives";
 import Products from "@/widgets/Products";
-import Script from "next/script";
 import { notFound } from "next/navigation";
 
 // A tag archive is indexable only if it is on the curated allowlist AND has
@@ -78,15 +77,15 @@ export default async function TagArchivePage({ params: { lang, tag } }) {
 
   return (
     <main className="min-h-screen pt-[60px] lg:pt-20">
-      <Script
+      <script
         id="tag-breadcrumb-ld"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }}
       />
-      <Script
+      <script
         id="tag-collection-ld"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd).replace(/</g, "\\u003c") }}
       />
 
       <div className="container pt-4 mb-3">

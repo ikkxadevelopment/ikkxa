@@ -30,7 +30,7 @@ import { isComponentPresentState } from "@/recoil/atoms";
 import { useRecoilState } from "recoil";
 import useHeaderSecond from "@/hooks/useHeaderSecond";
 
-export default function Products({ slug }) {
+export default function Products({ slug, initialData, initialPage = 1, basePath }) {
   const t = useTranslations("Index");
   const { width } = useGetDeviceType();
   const {
@@ -52,7 +52,7 @@ export default function Products({ slug }) {
     handleSortMobile,
     isSearchPage,
     isAllProducts
-  } = useProducts({ slug });
+  } = useProducts({ slug, initialData, initialPage });
 
   // Use parent category slug to fetch filters/subcategories if we are in a subcategory
   const parentSlug = products && products[0]?.results?.parent;
@@ -69,6 +69,14 @@ export default function Products({ slug }) {
     products && products[products?.length - 1]?.results?.products?.total;
 
     useHeaderSecond()
+
+  const PER_PAGE = 24;
+  const totalProducts = products?.[0]?.results?.products?.total || 0;
+  const totalPages = Math.ceil(totalProducts / PER_PAGE);
+  // First, last and a window around the current page.
+  const pageLinks = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+    (n) => n === 1 || n === totalPages || Math.abs(n - initialPage) <= 3
+  );
     
 
   return (
@@ -183,7 +191,7 @@ export default function Products({ slug }) {
               {allProducts?.map((product, index) => {
                 return (
                   <div className="" key={`${product?.id}${index}`}>
-                    <ProductCard data={product} />
+                    <ProductCard data={product} priority={index < 4} />
                   </div>
                 );
               })}
@@ -191,6 +199,22 @@ export default function Products({ slug }) {
             {(isLoadingProducts || isLoadingMore) && <ProductSkeleton />}
             {nodata === 0 ? <NoData/>: ""}
             <LoadMoreComponent isLastData={isLastData} loadMore={loadMore} isLoadingMore={isLoadingMore}/>
+            {/* Plain page links: crawlers don't scroll, so infinite scroll alone
+                leaves everything past the first page unreachable. */}
+            {basePath && totalPages > 1 ? (
+              <nav aria-label="Pagination" className="mt-6 flex flex-wrap justify-center gap-2 text-sm">
+                {pageLinks.map((n) => (
+                  <a
+                    key={n}
+                    href={n === 1 ? basePath : `${basePath}?page=${n}`}
+                    aria-current={n === initialPage ? "page" : undefined}
+                    className={`min-w-9 px-3 py-1.5 border text-center ${n === initialPage ? "bg-black text-white border-black" : "border-gray-300"}`}
+                  >
+                    {n}
+                  </a>
+                ))}
+              </nav>
+            ) : null}
             {/* {isLastData === true && (
               <div className="text-center mt-3">
                 <button

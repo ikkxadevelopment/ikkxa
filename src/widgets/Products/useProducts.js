@@ -10,7 +10,7 @@ import { useLocale } from "next-intl";
 
 // const fetcher = (url) => axios.get(url).then((res) => res.data);
 
-const useProducts = ({ slug }) => {
+const useProducts = ({ slug, initialData, initialPage = 1 }) => {
   const pathname=usePathname()
   const lang = useLocale();
   const [locale, country] = lang.split('-');
@@ -250,7 +250,8 @@ const useProducts = ({ slug }) => {
         ...(isSearchPage ? { key: String(filters.q) } : isTagPage ? { tag: slug } : { slug }),
         sort: filters.sort,
         paginate: 24,
-        page: pageIndex + 1,
+        // ?page=N pages start the list at N (server-rendered for crawlers).
+        page: pageIndex + initialPage,
         price: `{"min":${debouncedMinPrice},"max":${debouncedMaxPrice}}`,
         attribute_value_id: filters.attribute_value_id,
         child_category: filters.child_category,
@@ -262,7 +263,21 @@ const useProducts = ({ slug }) => {
     return `${FILTER_PRODUCTS}?${query}&lang=${locale}`;
   };
 
-  const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey);
+  // Server-rendered first page: use it while the filters are the defaults it
+  // was fetched with, so products are in the initial HTML (SEO) and appear
+  // without waiting for the client fetch.
+  const isDefaultFilters =
+    filters.sort === "newest" &&
+    Number(debouncedMinPrice) === 0 &&
+    Number(debouncedMaxPrice) === 899 &&
+    !filters.attribute_value_id?.length &&
+    !filters.child_category?.length &&
+    !filters.type &&
+    !filters.q;
+  const { data, error, size, setSize, isValidating } = useSWRInfinite(
+    getKey,
+    initialData && isDefaultFilters ? { fallbackData: [initialData] } : undefined
+  );
   const isLoadingMore =
   isValidating &&
   data &&

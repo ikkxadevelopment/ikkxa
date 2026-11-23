@@ -2,6 +2,7 @@
 
 import { useEffect, useId } from 'react';
 import { getTabbyConfig } from '@/constants/tabby';
+import loadScript from '@/lib/loadScript';
 
 const SCRIPT_POLL_MS = 200;
 const SCRIPT_MAX_WAIT_MS = 5000;
@@ -23,8 +24,8 @@ const TabbyPromoWithButton = ({ price, locale, source = 'product' }) => {
     let timer;
     let waited = 0;
 
-    // tabby-promo.js is loaded with `beforeInteractive`, but the widget is dead
-    // if this effect happens to run before the script finished evaluating.
+    // tabby-promo.js is loaded on demand (lib/loadScript); keep polling briefly
+    // in case the global appears a moment after the script's load event.
     const mount = () => {
       if (cancelled) return;
       if (!window.TabbyPromo) {
@@ -45,7 +46,7 @@ const TabbyPromoWithButton = ({ price, locale, source = 'product' }) => {
       });
     };
 
-    mount();
+    loadScript('https://checkout.tabby.ai/tabby-promo.js').then(mount).catch(() => {});
 
     return () => {
       cancelled = true;

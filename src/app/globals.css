@@ -151,3 +151,27 @@ html {
 [class*="styles__dialog"] {
   pointer-events: auto;
 }
+
+/* Product descriptions are pasted from Excel/Word and carry fixed-width
+   tables (td.xl65, width="1789"), which made product pages ~1,800px wide on
+   phones. Keep that content inside the column. */
+.product-description {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.product-description table {
+  width: 100% !important;
+  max-width: 100%;
+  table-layout: fixed;
+}
+.product-description td,
+.product-description th,
+.product-description col {
+  width: auto !important;
+  white-space: normal !important;
+}
+.product-description img,
+.product-description iframe {
+  max-width: 100% !important;
+  height: auto;
+}

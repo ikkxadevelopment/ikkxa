@@ -126,7 +126,7 @@ export async function getCms(slug,lang, country) {
   // const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
   const url = `${CMS}/${slug}?lang=${lang}`;
   const urlParamsObject = null;
-  const data = await strapiFetch(url, urlParamsObject, options, country);
+  const data = await strapiFetch(url, urlParamsObject, { ...options, throwOnBlocked: true }, country);
   return data;
 }
 
@@ -183,8 +183,26 @@ export async function getSingleProduct(slug, lang, country) {
   // const baseUrl = country === "SA" ? process.env.NEXT_PUBLIC_API_BASE_URL_SA : process.env.NEXT_PUBLIC_API_BASE_URL_AE;
   const url = `${SINGLE_PRODUCT}/${slug}?lang=${lang}`;
   const urlParamsObject = null;
-  const data = await strapiFetch(url, urlParamsObject, options, country);
+  // Throttled backend → error (temporary), not undefined (→ 404).
+  const data = await strapiFetch(url, urlParamsObject, { ...options, throwOnBlocked: true }, country);
   return data;
+}
+
+// Server-side fetch of one page of a category listing, with the same default
+// query the client (widgets/Products/useProducts) uses, so the first page of
+// products is in the server HTML instead of arriving after JavaScript.
+export async function getCategoryProducts({ slug, lang, country, page = 1, paginate = 24 }) {
+  const query = new URLSearchParams({
+    slug,
+    sort: "newest",
+    paginate: String(paginate),
+    page: String(page),
+    price: '{"min":0,"max":899}',
+    type: "",
+    route: "product.by.category",
+    lang,
+  }).toString();
+  return strapiFetch(`${FILTER_PRODUCTS}?${query}`, null, options, country);
 }
 
 // Server-side first-page fetch for a tag archive (DEV-00). Mirrors the query

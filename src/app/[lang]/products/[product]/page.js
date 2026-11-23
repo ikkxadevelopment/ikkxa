@@ -1,7 +1,7 @@
 import { getSingleProduct } from "@/lib/getHome";
 import ProductDetail from "@/widgets/ProductDetail";
 import { notFound } from "next/navigation";
-import { htmlExcerpt } from "@/lib/seo";
+import { htmlExcerpt, productSeo, SITE_URL } from "@/lib/seo";
 
 export async function generateMetadata({ params: { product, lang } }) {
   const [locale, country] = lang.split("-");
@@ -13,14 +13,15 @@ export async function generateMetadata({ params: { product, lang } }) {
     ? [
       {
         url: data?.results?.product?.product_meta_image,
-        alt: meta_base?.meta_title,
+        alt: meta_base?.name,
       },
     ]
     : [];
-  const canonicalUrl = `https://www.ikkxa.com/${locale}-${country}/products/${meta?.slug}`;
+  const canonicalUrl = `${SITE_URL}/${locale}-${country}/products/${meta?.slug}`;
+  const { title, description } = productSeo(meta, locale, country);
   return {
-    title: meta_base?.meta_title || data?.results?.product?.language_product?.name,
-    description: meta_base?.meta_description || data?.results?.product?.short_description,
+    title,
+    description,
     // keywords: data?.results?.product?.product_meta_keywords,
     alternates: {
       canonical: canonicalUrl,
@@ -37,19 +38,17 @@ export async function generateMetadata({ params: { product, lang } }) {
       follow: true,
     },
     openGraph: {
+      type: "website",
+      url: canonicalUrl,
       images: openGraphImage,
-      title: meta_base?.meta_title,
-      description: meta_base?.meta_description,
-      // url: header_url,
+      title,
+      description,
     },
     twitter: {
       card: "summary_large_image",
-      title: meta_base?.meta_title,
-      description: meta_base?.meta_description,
-      images: {
-        url: data?.results?.product?.product_meta_image,
-        alt: meta_base?.meta_title,
-      },
+      title,
+      description,
+      images: meta?.product_meta_image ? [{ url: meta.product_meta_image, alt: meta_base?.name }] : [],
     },
   };
 }
@@ -58,24 +57,29 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
   const [locale, country] = lang.split("-");
 
   const data = await getSingleProduct(product, locale, country);
-  const isOutOfStock = data?.results?.product?.stock.every(item => item.current_stock === 0);
-
   const productData = data?.results?.product;
+  if (!productData) return notFound();
+  const isOutOfStock = Array.isArray(productData.stock)
+    ? productData.stock.every((item) => item.current_stock === 0)
+    : false;
+
   // API field `discount_percentage` holds the discounted selling price
   // (mapped to `disPrice` in useProductDetail); `price` is the regular price.
   const sellingPrice = productData?.discount_percentage ?? productData?.price;
+  const seo = productSeo(productData, locale, country);
+  const base = `${SITE_URL}/${locale}-${country}`;
+  const url = `${base}/products/${productData?.slug}`;
 
   const structuredData = {
     "@context": "https://schema.org/",
     "@type": "Product",
-    name: productData?.language_product?.name,
+    name: seo.name,
     image: productData?.gallery?.large,
     // short_description is usually empty; fall back so Product has a description.
     description:
       htmlExcerpt(productData?.short_description, 500) ||
-      productData?.language_product?.meta_description ||
       htmlExcerpt(productData?.language_product?.description, 500) ||
-      productData?.language_product?.name,
+      seo.description,
     sku: productData?.product_stock?.sku,
     brand: {
       "@type": "Brand",
@@ -83,7 +87,7 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
     },
     offers: {
       "@type": "Offer",
-      url: `https://www.ikkxa.com/${locale}-${country}/products/${productData?.slug}`,
+      url,
       priceCurrency: country === "AE" ? "AED" : "SAR",
       price: sellingPrice,
       priceValidUntil: productData?.special_discount_end,
@@ -92,7 +96,28 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
     },
   };
 
-  if (!data) return notFound();
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: locale === "ar" ? "الرئيسية" : "Home", item: base },
+      ...(productData?.category_slug
+        ? [{
+            "@type": "ListItem",
+            position: 2,
+            name: productData.category_title || productData.category_slug,
+            item: `${base}/categories/${productData.category_slug}`,
+          }]
+        : []),
+      {
+        "@type": "ListItem",
+        position: productData?.category_slug ? 3 : 2,
+        name: seo.name,
+        item: url,
+      },
+    ],
+  };
+
   return (
     <>
       <main className="min-h-screen  pt-[58px] md:pt-20">
@@ -102,6 +127,11 @@ export default async function ProductDetailPage({ params: { product, lang } }) {
           id="structuredData"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+        />
+        <script
+          id="breadcrumbData"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData).replace(/</g, "\\u003c") }}
         />
         <ProductDetail data={data} isOutOfStock={isOutOfStock} />
       </main>

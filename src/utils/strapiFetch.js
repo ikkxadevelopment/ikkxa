@@ -73,27 +73,51 @@ const fetchEdgeCached = async (url, requestHeaders) => {
     return new Response(body, { headers: cacheFor(EDGE_CACHE_TTL) });
 };
 
+// The web-api throttles per IP (Laravel `throttle:api`, 60 req/min). Server
+// renders reach it from a few shared Cloudflare/Vercel IPs, so busy minutes hit
+// 429. When STOREFRONT_API_KEY is set (server-only secret, never NEXT_PUBLIC),
+// it is sent so the backend can exempt the storefront's own servers from that
+// limit. Harmless until the backend checks it.
+// Read on every call, not at module load: on Cloudflare (OpenNext) Worker
+// secrets are only copied into process.env once a request is being handled.
+const getStorefrontKey = () =>
+    typeof window === "undefined" ? process.env.STOREFRONT_API_KEY : undefined;
+
+export class BackendUnavailableError extends Error {
+    constructor(status, url) {
+        super(`Backend unavailable (${status}) for ${url}`);
+        this.name = "BackendUnavailableError";
+        this.status = status;
+    }
+}
+
+// `throwOnBlocked`: for pages that would otherwise call notFound() on a missing
+// response (product, CMS). A rate-limited/blocked backend must surface as a
+// temporary server error, not a 404 — Google drops pages that answer 404.
 const strapiFetch = async (slug, urlParamsObject, options, country) => {
-      const baseUrl = getBaseUrl(country);
+    const baseUrl = getBaseUrl(country);
     const queryString = qs.stringify(urlParamsObject);
     const url = `${baseUrl}${slug}${queryString ? `?${queryString}` : ""}`;
-    // const res = await fetch(
-    //     `${process.env.NEXT_PUBLIC_BASE_URL}${slug}${queryString ? `?${queryString}` : ""}`,
-    //     { ...options }
-    // );
+    const { throwOnBlocked, ...fetchOptions } = options || {};
+    const storefrontKey = getStorefrontKey();
+    const headers = storefrontKey
+        ? { ...(fetchOptions.headers || {}), "X-Storefront-Key": storefrontKey }
+        : fetchOptions.headers;
 
     // Never edge-cache per-user responses.
     const isPublicGet =
-        (!options?.method || options.method.toUpperCase() === "GET") &&
-        !options?.headers?.Authorization;
+        (!fetchOptions.method || fetchOptions.method.toUpperCase() === "GET") &&
+        !fetchOptions.headers?.Authorization;
 
     const res = edgeCache && isPublicGet
-        ? await fetchEdgeCached(url, options?.headers)
-        : await fetch(url, { ...options });
-
-    // console.log(`${process.env.NEXT_PUBLIC_BASE_URL}${slug}${queryString ? `?${queryString}` : ""}`,"link");
+        ? await fetchEdgeCached(url, headers)
+        : await fetch(url, { ...fetchOptions, headers });
 
     if (!res.ok) {
+        if (throwOnBlocked && isBlocked(res.status)) {
+            console.error(`[strapiFetch] ${res.status} from backend: ${url}`);
+            throw new BackendUnavailableError(res.status, url);
+        }
         return undefined;
     }
 

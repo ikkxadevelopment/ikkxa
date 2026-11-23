@@ -188,6 +188,23 @@ export async function getSingleProduct(slug, lang, country) {
   return data;
 }
 
+// Server-side fetch of one page of a category listing, with the same default
+// query the client (widgets/Products/useProducts) uses, so the first page of
+// products is in the server HTML instead of arriving after JavaScript.
+export async function getCategoryProducts({ slug, lang, country, page = 1, paginate = 24 }) {
+  const query = new URLSearchParams({
+    slug,
+    sort: "newest",
+    paginate: String(paginate),
+    page: String(page),
+    price: '{"min":0,"max":899}',
+    type: "",
+    route: "product.by.category",
+    lang,
+  }).toString();
+  return strapiFetch(`${FILTER_PRODUCTS}?${query}`, null, options, country);
+}
+
 // Server-side first-page fetch for a tag archive (DEV-00). Mirrors the query
 // the client Products widget builds, but runs on the server so the archive's
 // title/total and ItemList JSON-LD are in the initial HTML for crawlers.

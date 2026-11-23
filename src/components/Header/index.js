@@ -114,13 +114,13 @@ const uae ="+971507187565"
           <div className="container mx-auto flex justify-between items-center  px-4 md:px-6">
             <div className="flex items-center">
               {isInside?
-              <Link href={"/"} className="text-2xl me-2 lg:hidden">
+              <Link href={"/"} className="text-2xl me-2 lg:hidden" aria-label={locale === "ar" ? "رجوع" : "Back"}>
                 {locale==="ar"?<MdArrowForward />:<MdArrowBack />}
               
             </Link>
             :
               <Sheet>
-                <SheetTrigger className="lg:hidden">
+                <SheetTrigger className="lg:hidden" aria-label={locale === "ar" ? "القائمة" : "Menu"}>
                   <span className="text-2xl">
                     <RxHamburgerMenu />
                   </span>
@@ -242,7 +242,7 @@ const uae ="+971507187565"
                                 src={"/images/favicon-144x144.png"}
                                 fill
                                 className="object-contain"
-                                alt="logo"
+                                alt="IKKXA"
                               />
                             </div>
                           </div>
@@ -261,13 +261,13 @@ const uae ="+971507187565"
                 </SheetContent>
               </Sheet>
               }
-              <Link href="/" className="flex items-center" prefetch={false}>
+              <Link href="/" className="flex items-center" prefetch={false} aria-label="IKKXA">
                 <div className="aspect-[126/52] w-[84px] md:w-[126px] relative me-5">
                   <Image
                     src={"/images/logo.png"}
                     fill
                     className="object-fit-cover"
-                    alt="logo"
+                    alt="IKKXA"
                   />
                 </div>
               </Link>
@@ -278,6 +278,7 @@ const uae ="+971507187565"
 
               <Link
                 href={`/wishlist`}
+                aria-label={locale === "ar" ? "المفضلة" : "Wishlist"}
                 className="rounded-md px-1 py-2 text-lg text-center relative"
               >
                 {/* { wishlistLength > 0 &&
@@ -291,6 +292,7 @@ const uae ="+971507187565"
               </Link>
               <Link
                 href={`/cart`}
+                aria-label={locale === "ar" ? "السلة" : "Cart"}
                 className="rounded-md px-[10px] py-2 text-xl text-center relative"
               >
                 {cartLength > 0 && (
@@ -364,6 +366,7 @@ const uae ="+971507187565"
 
               <Link
                 href={`/cart`}
+                aria-label={locale === "ar" ? "السلة" : "Cart"}
                 className="rounded-md px-1 py-2 text-lg text-center relative"
               >
                 {cartLength > 0 && (

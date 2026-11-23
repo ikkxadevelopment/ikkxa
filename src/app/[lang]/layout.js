@@ -10,7 +10,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { getFooter, getGlobal, getMenuData } from "@/lib/getHome";
 import { GoogleTagManager } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/next';
-import Script from 'next/script';
 import MetaPixel from "@/components/MetaPixel";
 
 const inter = Inter({
@@ -48,18 +47,9 @@ export default async function RootLayout({
     <html lang={locale} dir={direction}>
       <head>
         <meta property="fb:pixel_id" content={"851173184222165"} />
-        {/* Must live inside <head>: as direct children of <html> React treats
-            them as invalid markup ("<script> cannot be a child of <html>"),
-            which fails hydration for the whole document — nothing on a
-            hard-loaded page hydrates, so the Tabby widgets never initialise. */}
-        <Script
-          src="https://checkout.tabby.ai/tabby-promo.js"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://checkout.tabby.ai/tabby-card.js"
-          strategy="beforeInteractive"
-        />
+        {/* Tabby scripts are loaded on demand by the Tabby widgets
+            (lib/loadScript), not here: as beforeInteractive scripts they
+            blocked every page, including ones with no Tabby widget. */}
         {/* TikTok Pixel — a plain inline <script> so it ships in the
             server-rendered <head> of every page. */}
         <script

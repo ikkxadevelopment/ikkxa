@@ -2,6 +2,7 @@
 
 import { useEffect, useId } from 'react';
 import { getTabbyConfig } from '@/constants/tabby';
+import loadScript from '@/lib/loadScript';
 
 // `locale` is the storefront locale ("ar-SA"); the Tabby public key and merchant
 // code for that country come from constants/tabby.
@@ -14,8 +15,11 @@ const TabbyCardSnippet = ({ price, locale }) => {
   const containerId = `TabbyCard-${useId().replace(/:/g, '')}`;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.TabbyCard) {
-      new window.TabbyCard({
+    let cancelled = false;
+    loadScript('https://checkout.tabby.ai/tabby-card.js')
+      .then(() => {
+        if (cancelled || !window.TabbyCard) return;
+        new window.TabbyCard({
         selector: `#${containerId}`,
         currency,
         price: formattedPrice,
@@ -23,8 +27,12 @@ const TabbyCardSnippet = ({ price, locale }) => {
         shouldInheritBg: false,
         publicKey,
         merchantCode,
-      });
-    }
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [formattedPrice, currency, lang, publicKey, merchantCode, containerId]);
 
   return (

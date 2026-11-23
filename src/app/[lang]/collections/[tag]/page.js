@@ -102,7 +102,7 @@ export default async function TagArchivePage({ params: { lang, tag } }) {
         )}
       </div>
 
-      <Products slug={tag} />
+      <Products slug={tag} initialData={data} />
     </main>
   );
 }

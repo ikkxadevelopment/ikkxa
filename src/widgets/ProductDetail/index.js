@@ -353,14 +353,15 @@ export default function ProductDetail({ data, isOutOfStock, onNavigate }) {
                     {t("AboutThisProduct")}
                   </h3>
 
-                  <p className="text-sm">
+                  {/* div, not p: a <div> inside <p> is invalid HTML. */}
+                  <div className="text-sm">
                     <div
-                      className="prose prose-sm max-w-none "
+                      className="product-description prose prose-sm max-w-none"
                       dangerouslySetInnerHTML={{
                         __html: datas?.product?.language_product?.description,
                       }}
                     />
-                  </p>
+                  </div>
                 </div>
 
                 <ProductTags tags={datas?.product?.language_product?.tags} onNavigate={onNavigate} />

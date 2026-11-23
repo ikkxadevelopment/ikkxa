@@ -46,7 +46,7 @@ export function ProfileDropdown() {
       }}
     >
       <DropdownMenuTrigger asChild className="">
-        <button className="rounded-md px-1 py-2 text-lg text-center relative">
+        <button className="rounded-md px-1 py-2 text-lg text-center relative" aria-label="Account">
           <span className="flex text-2xl justify-center mb-1">
             <LiaUserSolid />
           </span>

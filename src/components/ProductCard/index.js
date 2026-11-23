@@ -16,7 +16,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import getCurrency from "@/hooks/getCurrency";
 
-export default function ProductCard({ data, isWishlist }) {
+export default function ProductCard({ data, isWishlist, priority = false }) {
   const t = useTranslations('Index')
   const currency = getCurrency();
   const { selectVariant } = useProductCard();
@@ -99,10 +99,12 @@ export default function ProductCard({ data, isWishlist }) {
             }
             <Image
               src={`${data?.image_url || data?.image_190x230}`}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 50vw, 25vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               fill
-              alt={`${data?.product_name}`}
+              alt={data?.product_name || ""}
+              // First row of a listing is above the fold: don't lazy-load it.
+              priority={priority}
             />
           </Link>
         </div>

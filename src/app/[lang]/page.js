@@ -84,8 +84,34 @@ export default async function Home({ params: { lang } }) {
   const [locale, country] = lang.split("-");
   const products = await getHomeProducts(locale, country);
 
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "IKKXA",
+      url: SITE_URL,
+      logo: `${SITE_URL}/images/logo.png`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "IKKXA",
+      url: `${SITE_URL}/${lang}`,
+      inLanguage: locale,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${SITE_URL}/${lang}/search?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ];
+
   return (
     <main className="min-h-screen pt-[58px] lg:pt-[70px]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       {/* The banner slider is the visual headline; this is its text equivalent. */}
       <h1 className="sr-only">{homeCopy(lang).h1}</h1>
       {/* <OfferCategoriesSlider/> */}

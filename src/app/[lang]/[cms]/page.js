@@ -38,8 +38,35 @@ export default async function CmsPage({ params: { cms, lang } }) {
     if (!data) {
         notFound();
     }
+    // The stores page gets Store markup from the store-list data feed.
+    let storeLd = null;
+    if (cms === "store") {
+        try {
+            const raw = (await loadCms("store-list", locale, country))?.results?.page?.content;
+            const stores = JSON.parse(raw || "{}")?.stores || [];
+            if (stores.length) {
+                storeLd = stores.map((st) => ({
+                    "@context": "https://schema.org",
+                    "@type": "ClothingStore",
+                    name: `IKKXA ${st.name}`,
+                    address: st.address,
+                    ...(st.contact ? { telephone: st.contact } : {}),
+                    ...(st.map_link ? { hasMap: st.map_link } : {}),
+                    parentOrganization: { "@type": "Organization", name: "IKKXA", url: SITE_URL },
+                }));
+            }
+        } catch {
+            storeLd = null;
+        }
+    }
     return (
         <main className="">
+           {storeLd ? (
+               <script
+                   type="application/ld+json"
+                   dangerouslySetInnerHTML={{ __html: JSON.stringify(storeLd).replace(/</g, "\\u003c") }}
+               />
+           ) : null}
            <ContentPage data={data?.results?.page}/>
         </main>
     );

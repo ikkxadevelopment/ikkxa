@@ -78,7 +78,9 @@ const fetchEdgeCached = async (url, requestHeaders) => {
 // 429. When STOREFRONT_API_KEY is set (server-only secret, never NEXT_PUBLIC),
 // it is sent so the backend can exempt the storefront's own servers from that
 // limit. Harmless until the backend checks it.
-const storefrontKey =
+// Read on every call, not at module load: on Cloudflare (OpenNext) Worker
+// secrets are only copied into process.env once a request is being handled.
+const getStorefrontKey = () =>
     typeof window === "undefined" ? process.env.STOREFRONT_API_KEY : undefined;
 
 export class BackendUnavailableError extends Error {
@@ -97,6 +99,7 @@ const strapiFetch = async (slug, urlParamsObject, options, country) => {
     const queryString = qs.stringify(urlParamsObject);
     const url = `${baseUrl}${slug}${queryString ? `?${queryString}` : ""}`;
     const { throwOnBlocked, ...fetchOptions } = options || {};
+    const storefrontKey = getStorefrontKey();
     const headers = storefrontKey
         ? { ...(fetchOptions.headers || {}), "X-Storefront-Key": storefrontKey }
         : fetchOptions.headers;

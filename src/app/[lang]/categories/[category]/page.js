@@ -14,6 +14,7 @@ function categorySeo(msg, category, lang) {
   const delivery = ar
     ? country === "AE" ? "توصيل إلى دبي وأبوظبي وجميع الإمارات" : "توصيل إلى جميع مدن السعودية"
     : country === "AE" ? "Dubai & Abu Dhabi Delivery" : "Fast Delivery Across KSA";
+  const deliveryText = ar ? delivery : country === "AE" ? "delivery to Dubai, Abu Dhabi and across the UAE" : "fast delivery across KSA";
   const tooShort = !msg?.tittle || msg.tittle.replace(/\s*[|-]\s*IKKXA\s*$/i, "").trim().length < 12;
   const title = tooShort
     ? ar ? `${name} أونلاين في ${region} | ${delivery} | IKKXA` : `${name} Online in ${region} | ${delivery} | IKKXA`
@@ -23,7 +24,7 @@ function categorySeo(msg, category, lang) {
     desc ||
     (ar
       ? `تسوقي ${name} من IKKXA في ${region}: أحدث التصاميم بأسعار مميزة، ${delivery} واستبدال سهل.`
-      : `Shop ${name} at IKKXA in ${region}: the latest styles at great prices, with ${delivery.toLowerCase()} and easy exchanges.`);
+      : `Shop ${name} at IKKXA in ${region}: the latest styles at great prices, with ${deliveryText} and easy exchanges.`);
   return { title, description };
 }
 
